@@ -19,12 +19,12 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV,
   "ch.megard" %% "akka-http-cors" % "1.1.3",
-  "org.apache.spark" %% "spark-core" % "3.3.2" % Provided,
-  "org.apache.spark" %% "spark-sql" % "3.3.2" % Provided,
-  "org.apache.spark" %% "spark-hive" % "3.3.2" % Provided,
-  "org.apache.spark" %% "spark-mllib" % "3.3.2" % Provided,
-  "org.apache.hadoop" % "hadoop-common" % "3.3.2" % Provided,
-  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.2" % Provided
+  "org.apache.spark" %% "spark-core" % "3.3.2",
+  "org.apache.spark" %% "spark-sql" % "3.3.2",
+  "org.apache.spark" %% "spark-hive" % "3.3.2",
+  "org.apache.spark" %% "spark-mllib" % "3.3.2",
+  "org.apache.hadoop" % "hadoop-common" % "3.3.2",
+  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.2"
 )
 
 console / initialCommands :=

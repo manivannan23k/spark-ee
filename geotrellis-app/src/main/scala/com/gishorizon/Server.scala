@@ -13,6 +13,7 @@ import spray.json._
 import com.typesafe.config.ConfigFactory
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import com.gishorizon.ingestion.IngestData
+import com.gishorizon.reader.ReadPyIngestion
 import geotrellis.layer.{SpaceTimeKey, SpatialKey, TileLayerMetadata}
 import org.apache.log4j.Logger
 import geotrellis.proj4.{CRS, ConusAlbers, LatLng}
@@ -34,130 +35,144 @@ import scala.collection.concurrent.TrieMap
 
 case class IngestionRequest(sensor: String, srcPath: String, dataTime: String) //2021-05-02T00:00:00Z
 case class IngestionResponse(response: Map[String, String])
+case class TestResponse(response: Map[String, String])
 
 object RequestResponseProtocol extends DefaultJsonProtocol {
   implicit val ingestRequest = jsonFormat3(IngestionRequest)
   implicit val ingestResponse = jsonFormat1(IngestionResponse)
+  implicit val testResponse = jsonFormat1(TestResponse)
 }
 
 object Server extends HttpApp with App {
   implicit val sc: SparkContext = Spark.context
   private val appConf = ConfigFactory.load()
   implicit val system: ActorSystem = ActorSystem("Server", appConf)
-  val catalogPath = "data/output"
-  val layerName = "multiTiffCombinedTsRdd"
 
   import RequestResponseProtocol._
   val logger = Logger.getLogger(this.getClass.getName)
 
   def routes: Route = cors() {
     get {
-      path("tile" / Segment / Segment / Segment / Segment) {
-        (layerName, _z, _x, _y) => {
-          parameters(
-            Symbol("startDt").as[String],
-            Symbol("endDt").as[String],
-            Symbol("bands").as[String],
-            Symbol("mode").as[String]
-          ) {
-            (startDt, endDt, bands, mode) => {
-              complete {
-                Future {
-                  val x = _x.toInt
-                  val y = _y.toInt
-                  val z = _z.toInt
-                  val startDtStr = startDt //dateQuery.split(':')(0)
-                  val endDtStr = endDt
 
-                  val (reader, maxZoom) = TileServerUtils.getCatalogDetails(
-                    sc, f"G:/ProjectData/out/${layerName}", layerName //layer("path")
-                  )
-                  var tls = TileServerUtils.getMultibandTileForXYZTime(
-                    reader, layerName, maxZoom, x, y, z, startDtStr, endDtStr
-                  )
-
-                  if(mode=="viz"){
-                    val _vizBands = bands.split(',').map(e => e.toInt)
-                    tls = tls.subsetBands(_vizBands)
-                      .map {
-                        (_, v) =>
-                          256 * v / 65536
-                      }
-                    if(tls.bandCount<3){
-                      val renderDivision = (0 until 255 by 1).toArray
-                      val png = tls.band(0).withNoData(Option(0.0)).renderPng(
-                        ColorMap(renderDivision, ColorRamps.greyscale(renderDivision.length))
-                      )
-//                      val png = tls.band(0).withNoData(Option(0.0)).renderPng()
-                      HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`image/png`), png.bytes))
-                    }else{
-                      val png = tls.withNoData(Option(0.0)).renderPng()
-                      HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`image/png`), png.bytes))
-                    }
-                  }else{
-                    var min = -100
-                    var max = 100
-
-//                    var mTileData = Array[Array[Double]]()
-                    var index = 0
-                    val _mTileData = Array.fill(256*256)(
-                      Array.fill(tls.bandCount)(0.0)
-                    )
-
-                    val niBands = bands.split(',').map(e => e.toInt)
-                    tls.subsetBands(niBands  ).toArrayTile().foreachDouble((v)=>{
-                      val xi = (index % 256)
-                      val yi = Math.floor(index.toDouble / 256).toInt
-                      _mTileData(((xi * 256) + yi)) = v
-                      index = index + 1
-                    })
-//                    for(i <- mTileData.indices){
-//                      val xi = (i%256).toInt
-//                      val yi = Math.floor(i.toDouble/256).toInt
-//                      _mTileData(((xi*256) + yi)) = mTileData(i)
-//                    }
-                    val t: Tile = ArrayTile(
-                      sc.parallelize(_mTileData).map {
-                        case (v) => {
-                          if (v(0) == 0 && v(1) == 0) {
-                            (-99.0).toInt
-                          } else {
-                            ((v(1) - v(0)) / (v(1) + v(0)) * 100).toInt
-                          }
-                        }
-                      }.collect(),
-                      256,
-                      256
-                    ).withNoData(Option(-99))
-
-
-//                    val t = tls.subsetBands(3, 4  ).combine(0, 1){
-//                      case (a, b)=>{
-//                        if(a==0 && b==0){
-//                          -99
-//                        }else{
-//                          val v = ((
-//                            (b.toDouble - a.toDouble) / (b.toDouble + a.toDouble)
-//                            ) * 100).toInt
-//                          v
-//                        }
-//                      }
-//                    }.withNoData(Option(-99))
-
-                    val renderDivision = (min until max by 1).toArray
-                    val png = t.renderPng(
-                      ColorMap(renderDivision, ColorRamps.greyscale(renderDivision.length))
-                    )
-
-                    HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`image/png`), png.bytes))
-                  }
-
-                }
-              }
+      path("test" / Segment) {
+        (sensor) => {
+          complete {
+            Future {
+              ReadPyIngestion.run(sc)
+              TestResponse(Map {
+                "message" -> "Success"
+              })
             }
           }
         }
       }
+
+//      path("tile" / Segment / Segment / Segment / Segment) {
+//        (layerName, _z, _x, _y) => {
+//          parameters(
+//            Symbol("startDt").as[String],
+//            Symbol("endDt").as[String],
+//            Symbol("bands").as[String],
+//            Symbol("mode").as[String]
+//          ) {
+//            (startDt, endDt, bands, mode) => {
+//              complete {
+//                Future {
+//                  val x = _x.toInt
+//                  val y = _y.toInt
+//                  val z = _z.toInt
+//                  val startDtStr = startDt //dateQuery.split(':')(0)
+//                  val endDtStr = endDt
+//
+//                  val (reader, maxZoom) = TileServerUtils.getCatalogDetails(
+//                    sc, f"${appConf.getString("FILE_CATALOG_PATH")}${layerName}", layerName //layer("path")
+//                  )
+//                  var tls = TileServerUtils.getMultibandTileForXYZTime(
+//                    reader, layerName, maxZoom, x, y, z, startDtStr, endDtStr
+//                  )
+//
+//                  if(mode=="viz"){
+//                    val _vizBands = bands.split(',').map(e => e.toInt)
+//                    tls = tls.subsetBands(_vizBands)
+//                      .map {
+//                        (_, v) =>
+//                          256 * v / 65536
+//                      }
+//                    if(tls.bandCount<3){
+//                      val renderDivision = (0 until 255 by 1).toArray
+//                      val png = tls.band(0).withNoData(Option(0.0)).renderPng(
+//                        ColorMap(renderDivision, ColorRamps.greyscale(renderDivision.length))
+//                      )
+////                      val png = tls.band(0).withNoData(Option(0.0)).renderPng()
+//                      HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`image/png`), png.bytes))
+//                    }else{
+//                      val png = tls.withNoData(Option(0.0)).renderPng()
+//                      HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`image/png`), png.bytes))
+//                    }
+//                  }else{
+//                    var min = -100
+//                    var max = 100
+//
+////                    var mTileData = Array[Array[Double]]()
+//                    var index = 0
+//                    val _mTileData = Array.fill(256*256)(
+//                      Array.fill(tls.bandCount)(0.0)
+//                    )
+//
+//                    val niBands = bands.split(',').map(e => e.toInt)
+//                    tls.subsetBands(niBands  ).toArrayTile().foreachDouble((v)=>{
+//                      val xi = (index % 256)
+//                      val yi = Math.floor(index.toDouble / 256).toInt
+//                      _mTileData(((xi * 256) + yi)) = v
+//                      index = index + 1
+//                    })
+////                    for(i <- mTileData.indices){
+////                      val xi = (i%256).toInt
+////                      val yi = Math.floor(i.toDouble/256).toInt
+////                      _mTileData(((xi*256) + yi)) = mTileData(i)
+////                    }
+//                    val t: Tile = ArrayTile(
+//                      sc.parallelize(_mTileData).map {
+//                        case (v) => {
+//                          if (v(0) == 0 && v(1) == 0) {
+//                            (-99.0).toInt
+//                          } else {
+//                            ((v(1) - v(0)) / (v(1) + v(0)) * 100).toInt
+//                          }
+//                        }
+//                      }.collect(),
+//                      256,
+//                      256
+//                    ).withNoData(Option(-99))
+//
+//
+////                    val t = tls.subsetBands(3, 4  ).combine(0, 1){
+////                      case (a, b)=>{
+////                        if(a==0 && b==0){
+////                          -99
+////                        }else{
+////                          val v = ((
+////                            (b.toDouble - a.toDouble) / (b.toDouble + a.toDouble)
+////                            ) * 100).toInt
+////                          v
+////                        }
+////                      }
+////                    }.withNoData(Option(-99))
+//
+//                    val renderDivision = (min until max by 1).toArray
+//                    val png = t.renderPng(
+//                      ColorMap(renderDivision, ColorRamps.greyscale(renderDivision.length))
+//                    )
+//
+//                    HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`image/png`), png.bytes))
+//                  }
+//
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
     } ~ post {
         path("ingest") {
           entity(as[IngestionRequest]) { ingestionRequest =>
