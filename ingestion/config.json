@@ -1,0 +1,8 @@
+{
+    "start_time": "1990-01-01 00:00:00",
+    "sensors": [],
+    "tile_dir": "/projects/data/shift_culti/tiles",
+    "grid_dir": "/projects/project/ingestion/grids",
+    "temp_dir": "/projects/project/temp_data",
+    "tindex_dir": "/projects/project/ingestion/time_index"
+}

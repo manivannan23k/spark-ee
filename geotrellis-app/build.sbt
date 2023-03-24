@@ -24,7 +24,8 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-hive" % "3.3.2",
   "org.apache.spark" %% "spark-mllib" % "3.3.2",
   "org.apache.hadoop" % "hadoop-common" % "3.3.2",
-  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.2"
+  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.2",
+  "com.typesafe.play" %% "play-json" % "2.9.4"
 )
 
 console / initialCommands :=

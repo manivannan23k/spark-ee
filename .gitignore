@@ -47,3 +47,8 @@ geotrellis-app/*.log
 
 /data-download/data
 /envs
+/temp_data
+/ingestion/__pycache__
+/ingestion/index_dat
+/ingestion/grids
+/ingestion/time_index
