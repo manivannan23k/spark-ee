@@ -140,7 +140,8 @@ def partition_data(input_tiff, input_ts, sensor_name):
                 # print(out_path)
                 # break
 
-                tmp_ds = gdal.Translate(out_path, dataset, width=tile_size, height=tile_size, format='GTiff', projWin = [xmin, ymax, xmax, ymin], outputSRS="EPSG:4326", projWinSRS="EPSG:4326", noData=0, resampleAlg='lanczos')
+                tmp_ds = gdal.Translate(out_path, dataset, width=tile_size, height=tile_size, format='COG', projWin = [xmin, ymax, xmax, ymin], outputSRS="EPSG:4326", projWinSRS="EPSG:4326", noData=0, resampleAlg='cubic')
+                tmp_ds = None
                 print(f"[Level {i}] {f_index}/{fea_count}" + f' Features, Total tiles: {lcount}', end='\r')
             f_index += 1
         # print(f"Level {i}: {lcount}")

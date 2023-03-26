@@ -1,8 +1,11 @@
 {
     "start_time": "1990-01-01 00:00:00",
     "sensors": [],
-    "tile_dir": "/projects/data/shift_culti/tiles",
-    "grid_dir": "/projects/project/ingestion/grids",
-    "temp_dir": "/projects/project/temp_data",
-    "tindex_dir": "/projects/project/ingestion/time_index"
+    "tile_dir": "G:\\ProjectData\\tiles",
+    "grid_dir": "G:\\ProjectData\\grids",
+    "temp_dir": "G:\\ProjectData\\temp_data",
+    "tindex_dir": "G:\\ProjectData\\time_index",
+    "sindex_dir": "G:\\ProjectData\\spatial_index",
+    "sindex_dir_2": "G:\\ProjectData\\spatial_index_2",
+    "sindex_dir_3": "G:\\ProjectData\\spatial_index_3"
 }

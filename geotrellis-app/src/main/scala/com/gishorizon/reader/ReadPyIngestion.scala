@@ -1,8 +1,12 @@
 package com.gishorizon.reader
 
-import geotrellis.layer.TemporalProjectedExtent
-import geotrellis.raster.MultibandTile
+import geotrellis.layer.{FloatingLayoutScheme, LayoutDefinition, Metadata, SpaceTimeKey, SpatialKey, TemporalProjectedExtent, TileLayerMetadata}
+import geotrellis.raster.{MultibandTile, TileLayout}
+import geotrellis.raster.geotiff.GeoTiffRasterSource
+import geotrellis.raster.io.geotiff.reader.GeoTiffReader
+import geotrellis.raster.resample.NearestNeighbor
 import geotrellis.spark.store.hadoop.HadoopGeoTiffRDD
+import geotrellis.spark.{CollectTileLayerMetadata, RasterSourceRDD, withTilerMethods}
 import geotrellis.vector.ProjectedExtent
 import org.apache.hadoop.fs.Path
 import org.apache.spark.SparkContext
@@ -14,12 +18,18 @@ import java.net.{HttpURLConnection, URL}
 import scala.io.Source
 import play.api.libs.json._
 
+import java.io.File
+
 object ReadPyIngestion {
 
-//  private val dataPath = ""
+  private val appBasePath = "C:/Users/ManiChan/Desktop/Project/spark-ee/geotrellis-app/"
   def run(implicit sc: SparkContext): Unit = {
 
-    val url = new URL("https://test1.gishorizon.com/getDataForBbox/10?xmin=90.1474&ymax=25.7809&xmax=90.4697&ymin=25.2994&sensorName=Landsat8")
+    val tIndex = 978413100L * 1000
+    val indexStartTime = ZonedDateTime.parse("1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)))
+
+
+    val url = new URL("http://localhost:8080/getDataForBbox/10?xmin=90.1474&ymax=25.7809&xmax=90.4697&ymin=25.2994&sensorName=Landsat8&tIndex=978413100")
     val connection = url.openConnection.asInstanceOf[HttpURLConnection]
     connection.setRequestMethod("GET")
 
@@ -30,18 +40,30 @@ object ReadPyIngestion {
       inputStream.close()
 
       val json: JsValue = Json.parse(responseBody)
-      if(!json.asInstanceOf[JsObject].value("error").asInstanceOf[Boolean]){
-        val filePath = json.asInstanceOf[JsObject].value("data")
-            val sRdd = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
-              path = new Path(filePath),
-              uriToKey = {
-                case (uri, pExtent) => {
-                  val timestamp: Instant = Instant.ofEpochMilli(indexStartTime.toInstant.toEpochMilli + tIndex.toLong)
-                  TemporalProjectedExtent(pExtent, ZonedDateTime.ofInstant(timestamp, ZoneOffset.ofHoursMinutes(0, 0)))
-                }
-              },
-              options = HadoopGeoTiffRDD.Options.DEFAULT
-            )
+      if(json.asInstanceOf[JsObject].value("error").toString()=="false"){
+        val filePath = json.asInstanceOf[JsObject].value("data").toString()
+        val relative = new File(appBasePath).toURI.relativize(new File(filePath).toURI).getPath
+//        val sRdd = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
+//          path = new Path(relative),
+//          uriToKey = {
+//            case (uri, pExtent) => {
+//              val timestamp: Instant = Instant.ofEpochMilli(indexStartTime.toInstant.toEpochMilli + tIndex)
+//              TemporalProjectedExtent(pExtent, ZonedDateTime.ofInstant(timestamp, ZoneOffset.ofHoursMinutes(0, 0)))
+//            }
+//          },
+//          options = HadoopGeoTiffRDD.Options.DEFAULT
+//        )
+        val rasterSource = GeoTiffReader.readMultiband(filePath)
+        val rowRdd: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = RasterSourceRDD.spatial(
+          GeoTiffRasterSource(filePath),
+          LayoutDefinition(
+            rasterSource.extent,
+            TileLayout(rasterSource.tile.cols, rasterSource.tile.rows, rasterSource.tile.cols, rasterSource.tile.rows)
+          )
+        )
+
+        println(rowRdd)
+
       }else{
 
       }

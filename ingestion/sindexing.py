@@ -1,6 +1,11 @@
 import rtree
 from osgeo import ogr, osr
 import osgeo
+import json
+import os
+
+
+index_dat2 = None
 
 def reproject(geometry, in_srs, out_srs):
     src_srs = osr.SpatialReference()
@@ -36,7 +41,7 @@ def generate_index(shapefile_path):
             p = rtree.index.Property()
             # p.dat_extension = 'data'
             # p.idx_extension = 'index'
-            idx = rtree.index.Index(f"index_dat/spatial_index_{level_id}", properties=p)
+            idx = rtree.index.Index(os.path.join(config['sindex_dir'], f"spatial_index_{level_id}"), properties=p)
         idx.insert(f_i, g, obj=uid)
         f_i += 1
     idx.close()
@@ -45,5 +50,44 @@ def generate_index(shapefile_path):
 def load_indexes(level_ids):
     index_data = {}
     for level_id in level_ids:
-        index_data[level_id] = rtree.index.Index(f"index_dat/spatial_index_{level_id}")
+        f_path = os.path.join(config['sindex_dir'], f"spatial_index_{level_id}")
+        if not os.path.exists(f_path):
+            index_data[level_id] = rtree.index.Index(f_path)
     return index_data
+
+def load_indexes2(level_ids):
+    index_dat2 = {}
+    for level_id in level_ids:
+        f_path = os.path.join(config['sindex_dir_2'], f"spatial_index_{level_id}")
+        print(f_path)
+        if os.path.exists(f_path):
+            index_dat2[level_id] = rtree.index.Index(f_path)
+    return index_dat2
+
+def load_indexes3(level_ids):
+    index_data = {}
+    for level_id in level_ids:
+        f_path = os.path.join(config['sindex_dir_2'], f"spatial_index_{level_id}")
+        if not os.path.exists(f_path):
+            index_data[level_id] = rtree.index.Index(f_path)
+    return index_data
+
+def get_tile_intersection(level, bbox):
+    try:
+        return [n.object for n in index_dat[level].intersection(bbox, objects=True)]
+    except:
+        print("Using Index 2")
+        if(index_dat2 is None):
+            index_dat2 = load_indexes2(level_ids)
+        tiles = [n.object for n in index_dat2[level].intersection(bbox, objects=True)]
+        return tiles    
+        # return [n.object for n in index_dat2[level].intersection(bbox, objects=True)]
+
+
+
+config = json.load(open("config.json"))
+level_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12]
+index_dat = load_indexes(level_ids)
+# index_dat2 = load_indexes2(level_ids)
+# index_dat3 = load_indexes3(level_ids)
+print(f"Spatial Index loaded for {level_ids}")

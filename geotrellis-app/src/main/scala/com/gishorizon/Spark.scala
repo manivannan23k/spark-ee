@@ -14,6 +14,7 @@ object Spark {
     .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     .set("spark.kryoserializer.buffer.max", "128m")
     .set("spark.kryo.registrator", "geotrellis.spark.store.kryo.KryoRegistrator")
+    .set("spark.sql.warehouse.dir", "file:///c:/tmp/spark-warehouse")
 //    .set("spark.driver.memory", "5g")
 //    .set("spark.executionEnv.AWS_PROFILE", Properties.envOrElse("AWS_PROFILE", "default"))
 
