@@ -12,6 +12,7 @@ import Grid from "@material-ui/core/Grid";
 import AddressSearch from "./components/AddressSearch";
 import TimeSlider from './components/TimeSlider';
 import MapChart from './components/MapChart';
+import ModelBuilder from './components/ModelBuilder';
 
 const drawerWidth = 300;
 
@@ -42,7 +43,7 @@ export default function App(props) {
                     >
                         <Grid item>
                             <Typography variant="h6" noWrap component="div">
-                                ProjectX
+                                Project
                             </Typography>
                         </Grid>
                     </Grid>
@@ -69,6 +70,7 @@ export default function App(props) {
                 <Map />
                 <MapChart />
                 <TimeSlider />
+                <ModelBuilder />
             </Box>
         </Box>
     );

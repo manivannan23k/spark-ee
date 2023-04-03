@@ -14,9 +14,9 @@ import { addLayer, setTimeIndexes, updateRGBBands } from '../actions';
 const QueryPanel = (props) => {
 
     const dispatch = useDispatch()
-    const [sensor, setSensor] = React.useState("Landsat8_SC")
-    const [fromDate, setFromDate] = React.useState(new Date("2015-01-01"))
-    const [toDate, setToDate] = React.useState(new Date("2017-12-01"))
+    const [sensor, setSensor] = React.useState("Landsat")
+    const [fromDate, setFromDate] = React.useState(new Date("2023-01-20"))
+    const [toDate, setToDate] = React.useState(new Date("2023-01-28"))
 
     const [redBand, setRedBand] = React.useState(4)
     const [greenBand, setGreenBand] = React.useState(3)
@@ -25,7 +25,7 @@ const QueryPanel = (props) => {
 
     const [timeValues, setTimeValues] = React.useState(null)
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         // dispatch(updateRGBBands([redBand, greenBand, blueBand]))
     }, [redBand, greenBand, blueBand, vizMaxValue])
 
@@ -37,20 +37,20 @@ const QueryPanel = (props) => {
     }
 
     const queryDataset = () => {
-        fetch(`http://localhost:8080/getTimeIndexes?sensorName=Landsat8_SC&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}`)
-        .then(r=>r.json())
-        .then(r=>{
-            console.log(r)
-            setTimeValues(r.data.ts)
-            dispatch(setTimeIndexes(
-                r.data.tIndexes.map((ti, i)=>{
-                    return {ts: r.data.ts[i], tIndex: ti}
-                })
-            ))
-        })
-        .catch(e=>{
-            console.log(e)
-        })
+        fetch(`http://localhost:8082/getTimeIndexes?sensorName=Landsat&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}`)
+            .then(r => r.json())
+            .then(r => {
+                console.log(r)
+                setTimeValues(r.data.ts)
+                dispatch(setTimeIndexes(
+                    r.data.tIndexes.map((ti, i) => {
+                        return { ts: r.data.ts[i], tIndex: ti }
+                    })
+                ))
+            })
+            .catch(e => {
+                console.log(e)
+            })
     }
 
     return <>
@@ -63,11 +63,11 @@ const QueryPanel = (props) => {
                 labelId="sensor-select"
                 value={sensor}
                 label="Sensor"
-                onChange={(e)=>{setSensor(e.target.value)}}
+                onChange={(e) => { setSensor(e.target.value) }}
             >
-                <MenuItem value={'Landsat8_SC'}>Landsat8</MenuItem>
+                <MenuItem value={'Landsat'}>Landsat8</MenuItem>
             </Select>
-            <br/>
+            <br />
             <Typography variant="body2">From date</Typography>
             <DatePicker
                 style={{
@@ -76,7 +76,7 @@ const QueryPanel = (props) => {
                 selected={fromDate}
                 onChange={(date) => setFromDate(date)}
             />
-            <br/>
+            <br />
             <Typography variant="body2">To date</Typography>
             <DatePicker
                 style={{
@@ -85,13 +85,13 @@ const QueryPanel = (props) => {
                 selected={toDate}
                 onChange={(date) => setToDate(date)}
             />
-            <br/>
-            
+            <br />
+
             <br />
             <Button variant="contained" onClick={queryDataset}>Submit</Button>
         </FormControl>
-        <br/>
-        
+        <br />
+
         <Typography variant="h6" gutterBottom component="div">
             Visualization
         </Typography>
@@ -101,56 +101,56 @@ const QueryPanel = (props) => {
                 labelId="red-band-select"
                 value={redBand}
                 label="Red band"
-                onChange={(e)=>{setRedBand(e.target.value)}}
+                onChange={(e) => { setRedBand(e.target.value) }}
             >
                 {
-                    Array(7).fill(0).map((e, i)=> i).map(e=>{
-                        return <MenuItem key={e} value={e+1}>Band {e+1}</MenuItem>
+                    Array(7).fill(0).map((e, i) => i).map(e => {
+                        return <MenuItem key={e} value={e + 1}>Band {e + 1}</MenuItem>
                     })
                 }
             </Select>
         </FormControl>
-        <br/>
-        <br/>
+        <br />
+        <br />
         <FormControl fullWidth>
             <InputLabel id="green-band-select">Green band</InputLabel>
             <Select
                 labelId="green-band-select"
                 value={greenBand}
                 label="Green band"
-                onChange={(e)=>{setGreenBand(e.target.value)}}
+                onChange={(e) => { setGreenBand(e.target.value) }}
             >
                 {
-                    Array(7).fill(0).map((e, i)=> i).map(e=>{
-                        return <MenuItem key={e} value={e+1}>Band {e+1}</MenuItem>
+                    Array(7).fill(0).map((e, i) => i).map(e => {
+                        return <MenuItem key={e} value={e + 1}>Band {e + 1}</MenuItem>
                     })
                 }
             </Select>
         </FormControl>
-        <br/>
-        <br/>
+        <br />
+        <br />
         <FormControl fullWidth>
             <InputLabel id="blue-band-select">Blue band</InputLabel>
             <Select
                 labelId="blue-band-select"
                 value={blueBand}
                 label="Blue band"
-                onChange={(e)=>{setBlueBand(e.target.value)}}
+                onChange={(e) => { setBlueBand(e.target.value) }}
             >
                 {
-                    Array(7).fill(0).map((e, i)=> i).map(e=>{
-                        return <MenuItem key={e} value={e+1}>Band {e+1}</MenuItem>
+                    Array(7).fill(0).map((e, i) => i).map(e => {
+                        return <MenuItem key={e} value={e + 1}>Band {e + 1}</MenuItem>
                     })
                 }
             </Select>
         </FormControl>
-        <br/>
-        <br/>
+        <br />
+        <br />
         <FormControl fullWidth>
-            <TextField type={"number"} value={vizMaxValue} label="Max. value" variant="outlined" onChange={(e)=>setVizMaxValue(e.target.value)} />
+            <TextField type={"number"} value={vizMaxValue} label="Max. value" variant="outlined" onChange={(e) => setVizMaxValue(e.target.value)} />
         </FormControl>
-        <br/>
-        <br/>
+        <br />
+        <br />
         <Button variant="contained" onClick={updateViz}>Update</Button>
 
     </>
