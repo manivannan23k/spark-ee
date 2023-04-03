@@ -138,18 +138,39 @@ const useDraggable = ({ onDrag = id } = {}) => {
     // this code doesn't look pretty anymore, huh?
 };
 
-/// example.ts
-const quickAndDirtyStyle = {
-    width: "200px",
-    height: "100px",
-    background: "#FF9900",
-    color: "#FFFFFF",
-    display: "inline-flex",
-    justifyContent: "center",
-    alignItems: "center"
-};
 
-const DraggableComponent = () => {
+
+const DraggableComponent = (props) => {
+    /// example.ts
+    const quickAndDirtyStyle = props.type === 'input' ? (
+        {
+            width: "200px",
+            height: "100px",
+            background: "#1B9625",
+            color: "#FFFFFF",
+            display: "inline-flex",
+            justifyContent: "center",
+            alignItems: "center"
+        }
+    ) : props.type === 'operation' ? (
+        {
+            width: "200px",
+            height: "100px",
+            background: "#CD853C",
+            color: "#FFFFFF",
+            display: "inline-flex",
+            justifyContent: "center",
+            alignItems: "center"
+        }
+    ) : {
+        width: "200px",
+        height: "100px",
+        background: "#2B5EC3",
+        color: "#FFFFFF",
+        display: "inline-flex",
+        justifyContent: "center",
+        alignItems: "center"
+    }
     // handlers must be wrapped into `useCallback`. even though
     // resubscribing to `mousedown` on every tick is quite cheap
     // due to React's event system, `handleMouseDown` might be used
@@ -173,7 +194,8 @@ const DraggableComponent = () => {
 
     return (
         <div ref={ref} style={quickAndDirtyStyle}>
-            <p>{pressed ? "Input" : "Input"}</p>
+            {/* <p>{pressed ? "Input" : "Input"}</p> */}
+            <p>{props.name}</p>
         </div>
     );
 };

@@ -14,11 +14,12 @@ const ModelBuilder = (props) => {
 
     const [components, setComponents] = useState([])
 
-    const addComponent = (cType) => {
+    const addComponent = (cType, c) => {
         setComponents([
             ...components,
             {
-                type: 'input'
+                type: cType,
+                name: c.name
             }
         ])
     }
@@ -29,13 +30,52 @@ const ModelBuilder = (props) => {
             margin: 0,
             padding: 0
         }}>
-            <li style={{
-                cursor: 'pointer'
-            }} onClick={() => { addComponent('input') }}>Input</li>
+            {
+                [
+                    {
+                        type: 'input',
+                        components: [
+                            {
+                                name: "Raster Layer"
+                            }
+                        ]
+                    },
+                    {
+                        type: 'operation',
+                        components: [
+                            {
+                                name: "Pixel Average"
+                            }
+                        ]
+                    },
+                    {
+                        type: 'output',
+                        components: [
+                            {
+                                name: "Output Layer"
+                            }
+                        ]
+                    },
+
+                ].map(e => {
+                    return <li>
+                        {e.type}
+                        <ul>
+                            {
+                                e.components.map(c => {
+                                    return <li style={{
+                                        cursor: 'pointer'
+                                    }} onClick={() => { addComponent(e.type, c) }}>{c.name}</li>
+                                })
+                            }
+                        </ul>
+                    </li>
+                })
+            }
         </ul>
         {
             components.map((c, _i) => {
-                return <DraggableComponent key={_i} />
+                return <DraggableComponent key={_i} name={c.name} type={c.type} />
             })
         }
     </div>
