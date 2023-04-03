@@ -1,13 +1,13 @@
-import {alpha, styled} from "@mui/material/styles";
+import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import * as React from "react";
-import {useState} from "react";
+import { useState } from "react";
 import Popover from "@material-ui/core/Popover";
 import Typography from "@material-ui/core/Typography";
-import {useDispatch} from "react-redux";
-import {addLayer, addSearchLayer, changeMapView} from "../actions";
-import {generateId, loadparcelIdFromAddressId, fetchGetWithSignal} from "../utils/helpers";
+import { useDispatch } from "react-redux";
+import { addLayer, addSearchLayer, changeMapView } from "../actions";
+import { generateId, loadparcelIdFromAddressId, fetchGetWithSignal } from "../utils/helpers";
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -65,17 +65,17 @@ const AddressSearch = () => {
     const queryAddress = (searchText, targetEle) => {
         setAnchorEl(null);
         setSearchResults([])
-        if(!Boolean(searchText)){
+        if (!Boolean(searchText)) {
             return;
         }
-        let addressUrl = `http://localhost:8080/data/searchAddress?searchText=${searchText}`;
-        if(ctrl!==null){
+        let addressUrl = `http://localhost:8082/data/searchAddress?searchText=${searchText}`;
+        if (ctrl !== null) {
             ctrl.abort();
         }
         const controller = new AbortController();
         setCtrl(controller);
         let _pm = fetchGetWithSignal(addressUrl, controller.signal);
-        _pm.then(result=>{
+        _pm.then(result => {
             // console.log(result);
             let sr = [];
             for (let i = 0; i < result.data.length; i++) {
@@ -90,7 +90,7 @@ const AddressSearch = () => {
             setSearchResults(sr);
             setAnchorEl(targetEle);
         })
-            .catch(e=>{
+            .catch(e => {
 
             })
     }
@@ -104,12 +104,12 @@ const AddressSearch = () => {
                 placeholder="Search…"
                 inputProps={{ 'aria-label': 'search' }}
                 value={searchText}
-                onChange={(e)=>{
+                onChange={(e) => {
                     let text = e.target.value;
                     setSearchText(text);
                     // console.log(text, Boolean(text))
                     queryAddress(text, e.currentTarget);
-                    
+
                 }}
             />
         </Search>
@@ -130,8 +130,8 @@ const AddressSearch = () => {
             disableEnforceFocus={true}
         >
             {
-                searchResults.map(r=>{
-                    return <Typography onClick={async ()=>{
+                searchResults.map(r => {
+                    return <Typography onClick={async () => {
                         setAnchorEl(null);
                         setSearchResults([]);
                         dispatch(changeMapView([r.geom.coordinates[1], r.geom.coordinates[0]], 18));
