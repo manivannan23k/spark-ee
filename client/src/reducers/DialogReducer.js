@@ -1,9 +1,6 @@
 const initialState = {
     showAddLayerDialog: false,
-    showVectorToolDialog: false,
-    currentVectorTool: 'buffer',
-    showRasterToolDialog: false,
-    currentRasterTool: 'raster_calculator'
+    showModelBuilderDialog: true
 };
 
 const DialogReducer = (state = initialState, action) => {
@@ -11,19 +8,12 @@ const DialogReducer = (state = initialState, action) => {
         case "TOGGLE_ADD_LAYER":
             return {
                 ...state,
-                showAddLayerDialog: action.payload.flag
+                showAddLayerDialog: action.payload
             };
-        case 'TOGGLE_VECTOR_TOOL':
+        case 'TOGGLE_MODEL_BUILDER':
             return {
                 ...state,
-                showVectorToolDialog: action.payload.flag,
-                currentVectorTool: action.payload.tool
-            };
-        case 'TOGGLE_RASTER_TOOL':
-            return {
-                ...state,
-                showRasterToolDialog: action.payload.flag,
-                currentRasterTool: action.payload.tool
+                showModelBuilderDialog: action.payload
             };
         default:
             return {

@@ -4,10 +4,97 @@ import osgeo
 import json
 from datetime import datetime
 import math
+import zCurve as z
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 
 tiff_driver = gdal.GetDriverByName('GTiff')
 shp_driver = ogr.GetDriverByName("ESRI Shapefile")
+config = json.load(open("config.json"))
+
+def get_db_conn():
+    try:
+        connection = psycopg2.connect(
+            user=config['db_user'],
+            password=config['db_password'],
+            host=config['db_host'],
+            port="5432",
+            database=config['db_database']
+        )
+    except Exception as error:
+        print(error)
+    return connection
+
+def add_db_ingestion(data):
+    qry = f"""
+        insert into ingest_master (
+            dataset_id,
+            time_index,
+            geom,
+            date_time
+        )
+        values (
+            {data['dataset_id']},
+            {data['time_index']},
+            {data['geom']},
+            {data['date_time']}
+        ) RETURNING ingest_id;
+    """
+    conn = get_db_conn()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor.execute(qry)
+    conn.commit()
+    row = cursor.fetchone()['ingest_id']
+    cursor.close()
+    conn.close()
+    # row = cursor.fetchone()
+    return row
+
+def add_db_tile(tile_data):
+    qry = f"""
+        insert into tiles_local(
+            ingest_id,
+            dataset_id,
+            zoom_level,
+            time_index,
+            spatial_index_x,
+            spatial_index_y,
+            z_index,
+            file_path
+        )
+        values (
+            {tile_data['ingest_id']},
+            {tile_data['dataset_id']},
+            {tile_data['zoom_level']},
+            {tile_data['time_index']},
+            {tile_data['spatial_index_x']},
+            {tile_data['spatial_index_y']},
+            {tile_data['z_index']},
+            {tile_data['file_path']}
+        ) returning tile_id
+    """
+    conn = get_db_conn()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor.execute(qry)
+    conn.commit()
+    row = cursor.fetchone()['tile_id']
+    cursor.close()
+    conn.close()
+    # row = cursor.fetchone()
+    return row
+
+
+def get_db_dataset_def_by_name(dataset_name):
+        conn = get_db_conn()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(f"""
+            select * from {config['tbl_dataset_def']}
+                where ds_name = '{dataset_name}'
+                limit 1
+        """)
+        row = cursor.fetchone()
+        return row
 
 def get_extent_of_ds(dataset):
     geotransform = dataset.GetGeoTransform()
@@ -77,7 +164,6 @@ def reproject_extent(xmin, ymin, xmax, ymax, in_srs, out_srs):
     return (xmin, ymin, xmax, ymax)
 
 def partition_data(input_tiff, input_ts, sensor_name):
-    config = json.load(open("config.json"))
     start_ts = int(datetime.timestamp(datetime.strptime(config["start_time"], '%Y-%m-%d %H:%M:%S'))*1000)
     time_index = int((input_ts - start_ts)/1000)
     print(f"Saving tiles to {config['tile_dir']}, Sc:{input_tiff}, Ti:{time_index}")
@@ -90,8 +176,22 @@ def partition_data(input_tiff, input_ts, sensor_name):
     proj = osr.SpatialReference(wkt=dataset.GetProjection())
     src_src_code = int(proj.GetAttrValue('AUTHORITY',1))
     extent_geom = reproject(extent_geom, src_src_code, 4326)
+    extent_geom.FlattenTo2D()
 
+    if(src_src_code!=4326):
+        print(f"Reprojecting: {src_src_code} -> {4326}")
+        dataset = gdal.Warp('', dataset, format='VRT', dstSRS="EPSG:4326")
+        print(f"Reprojection completed")
 
+    ds_def = get_db_dataset_def_by_name(sensor_name)
+    ingest_data = {
+        "dataset_id": ds_def["dataset_id"],
+        "geom": f"st_geomfromgeojson('{extent_geom.ExportToJson()}')",
+        "time_index": time_index,
+        "date_time": f"to_timestamp('{config['start_time']}', 'YYYY-MM-DD hh24:mi:ss')::timestamp without time zone"
+    }
+    ingest_id = add_db_ingestion(ingest_data)
+    
     dir_path = config["tile_dir"]
     tindex_file = os.path.join(config["tindex_dir"], f"{sensor_name}.json")
     tile_size = 256
@@ -132,17 +232,31 @@ def partition_data(input_tiff, input_ts, sensor_name):
                 ymin = tile_extent[2]
                 xmax = tile_extent[1]
                 ymax = tile_extent[3]
+                rel_file_path = f"{sensor_name}/{level_id}/{x_id}/{y_id}/" + f"{time_index}.tif"
                 tile_file_dir = os.path.join(dir_path, f"{sensor_name}/{level_id}/{x_id}/{y_id}/")
                 if not os.path.exists(tile_file_dir):
                     os.makedirs(tile_file_dir)
 
-                out_path = os.path.join(tile_file_dir, f"{time_index}.tif")
+                out_path = os.path.join(dir_path, rel_file_path)
                 # print(out_path)
-                # break
+                tile_data = {
+                    "ingest_id": ingest_id,
+                    "dataset_id": ds_def["dataset_id"],
+                    "zoom_level": i,
+                    "time_index": time_index,
+                    "spatial_index_x": x_id,
+                    "spatial_index_y": y_id,
+                    "z_index": f"'{z.interlace(time_index, y_id, x_id)}'",
+                    "file_path": f"'{rel_file_path}'"
+                }
+                tile_id = add_db_tile(tile_data)
+                # print(tile_id)
 
                 tmp_ds = gdal.Translate(out_path, dataset, width=tile_size, height=tile_size, format='COG', projWin = [xmin, ymax, xmax, ymin], outputSRS="EPSG:4326", projWinSRS="EPSG:4326", noData=0, resampleAlg='cubic')
                 tmp_ds = None
                 print(f"[Level {i}] {f_index}/{fea_count}" + f' Features, Total tiles: {lcount}', end='\r')
+                # break
             f_index += 1
         # print(f"Level {i}: {lcount}")
         shp_ds = None
+        # break

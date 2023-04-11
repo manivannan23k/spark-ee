@@ -7,5 +7,12 @@
     "tindex_dir": "G:\\ProjectData\\time_index",
     "sindex_dir": "G:\\ProjectData\\spatial_index",
     "sindex_dir_2": "G:\\ProjectData\\spatial_index_2",
-    "sindex_dir_3": "G:\\ProjectData\\spatial_index_3"
+    "sindex_dir_3": "G:\\ProjectData\\spatial_index_3",
+    "db_host": "127.0.0.1",
+    "db_user": "postgres",
+    "db_password": "manichan",
+    "db_database": "project_master",
+    "tbl_dataset_def": "dataset_def",
+    "tbl_ingest": "ingest_master",
+    "tbl_tiles": "tiles_local"
 }

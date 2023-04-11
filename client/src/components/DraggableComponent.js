@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
-
+import ModelComponent from "./ModelComponent";
+//3C9655
 /// throttle.ts
 export const throttle = (f) => {
     let token = null,
@@ -110,9 +111,52 @@ const useDraggable = ({ onDrag = id } = {}) => {
                 elem.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
             }
         //);
+        function collision($div1, $div2) {
+            var x1 = $div1.getBoundingClientRect().left;
+            var y1 = $div1.getBoundingClientRect().top;
+            var h1 = $div1.getBoundingClientRect().height;
+            var w1 = $div1.getBoundingClientRect().width;
+            var b1 = y1 + h1;
+            var r1 = x1 + w1;
+            var x2 = $div2.getBoundingClientRect().left;
+            var y2 = $div2.getBoundingClientRect().top;
+            var h2 = $div2.getBoundingClientRect().height
+            var w2 = $div2.getBoundingClientRect().width
+            var b2 = y2 + h2;
+            var r2 = x2 + w2;
+            if (b1 < y2 || y1 > b2 || r1 < x2 || x1 > r2) return false;
+            return true;
+        }
         const handleMouseUp = (e) => {
             e.target.style.userSelect = "auto";
             setPressed(false);
+            //check if any component is intersecting
+            let c = document.querySelectorAll('.model-component')
+            c.forEach(element=>{
+                if(e.target === element){
+                    return;
+                }
+                let collisionFlag = collision(e.target, element)
+                if(collisionFlag){
+                    element.style.background = 'red';
+                    let transformValues = e.target.style.transform.replace("translate(", "").replace(")", "").replace("px", "").replace("px", "").split(",").map(v=>parseFloat(v.trim()))
+                    let originValues = [
+                        e.target.getBoundingClientRect().x - transformValues[0],
+                        e.target.getBoundingClientRect().y - transformValues[1]
+                    ];
+                    let elemPos = [element.getBoundingClientRect().x, element.getBoundingClientRect().y]
+                    console.log(originValues, elemPos, e.target.style.transform);
+                    console.log(originValues[0]-elemPos[0], originValues[1]-elemPos[1])
+                    // let newLoc = [originValues[0] - e.target.getBoundingClientRect().x, originValues[1] - e.target.getBoundingClientRect().y]
+                    // setTimeout(()=>{
+                    //     console.log(`translate(${-(originValues[0]-elemPos[0])}px, ${-(originValues[1]-elemPos[1])}px)`)
+                        e.target.style.transform = `translate(${-(originValues[0]-elemPos[0])}px, ${-(originValues[1]-elemPos[1]) + 100}px)`;
+                    // }, 500)
+                    // element.style.translate = ''
+                }else{
+                    element.style.background = 'green'
+                }
+            })
         };
         // subscribe to mousemove and mouseup on document, otherwise you
         // can escape bounds of element while dragging and get stuck
@@ -193,9 +237,10 @@ const DraggableComponent = (props) => {
     });
 
     return (
-        <div ref={ref} style={quickAndDirtyStyle}>
+        <div className="model-component" ref={ref} style={quickAndDirtyStyle}>
             {/* <p>{pressed ? "Input" : "Input"}</p> */}
-            <p>{props.name}</p>
+            {/* <p>{props.name}</p> */}
+            <ModelComponent {...props} />
         </div>
     );
 };

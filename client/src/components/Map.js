@@ -245,7 +245,7 @@ const Map = (props) => {
             type: 'TILE',
             id: 'data',
             active: true,
-            url: `http://localhost:8082/tile/Landsat/{z}/{x}/{y}.png?tIndex=${props.map.tIndex}&bands=${props.map.bands.join(",")}&vmin=0&vmax=${props.map.vizMaxValue}`,
+            url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=${props.map.tIndex}&bands=${props.map.bands.join(",")}&vmin=0&vmax=${props.map.vizMaxValue}`,
             name: 'Streets - Base',
             sortOrder: 0,
             showLegend: false,

@@ -5,8 +5,6 @@ import json
 import os
 
 
-index_dat2 = None
-
 def reproject(geometry, in_srs, out_srs):
     src_srs = osr.SpatialReference()
     src_srs.ImportFromEPSG(in_srs)
@@ -51,43 +49,21 @@ def load_indexes(level_ids):
     index_data = {}
     for level_id in level_ids:
         f_path = os.path.join(config['sindex_dir'], f"spatial_index_{level_id}")
-        if not os.path.exists(f_path):
-            index_data[level_id] = rtree.index.Index(f_path)
-    return index_data
-
-def load_indexes2(level_ids):
-    index_dat2 = {}
-    for level_id in level_ids:
-        f_path = os.path.join(config['sindex_dir_2'], f"spatial_index_{level_id}")
-        print(f_path)
-        if os.path.exists(f_path):
-            index_dat2[level_id] = rtree.index.Index(f_path)
-    return index_dat2
-
-def load_indexes3(level_ids):
-    index_data = {}
-    for level_id in level_ids:
-        f_path = os.path.join(config['sindex_dir_2'], f"spatial_index_{level_id}")
-        if not os.path.exists(f_path):
+        if os.path.exists(os.path.exists(f_path + ".idx")):
             index_data[level_id] = rtree.index.Index(f_path)
     return index_data
 
 def get_tile_intersection(level, bbox):
     try:
         return [n.object for n in index_dat[level].intersection(bbox, objects=True)]
-    except:
-        print("Using Index 2")
-        if(index_dat2 is None):
-            index_dat2 = load_indexes2(level_ids)
-        tiles = [n.object for n in index_dat2[level].intersection(bbox, objects=True)]
-        return tiles    
-        # return [n.object for n in index_dat2[level].intersection(bbox, objects=True)]
+    except Exception as e:
+        print(e)
+        print("Error in loading index")
+        return []
 
 
 
 config = json.load(open("config.json"))
 level_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 index_dat = load_indexes(level_ids)
-# index_dat2 = load_indexes2(level_ids)
-# index_dat3 = load_indexes3(level_ids)
 print(f"Spatial Index loaded for {level_ids}")

@@ -14,14 +14,14 @@ import { addLayer, setTimeIndexes, updateRGBBands } from '../actions';
 const QueryPanel = (props) => {
 
     const dispatch = useDispatch()
-    const [sensor, setSensor] = React.useState("Landsat")
+    const [sensor, setSensor] = React.useState("Landsat_OLI")
     const [fromDate, setFromDate] = React.useState(new Date("2023-01-20"))
     const [toDate, setToDate] = React.useState(new Date("2023-01-28"))
 
     const [redBand, setRedBand] = React.useState(4)
     const [greenBand, setGreenBand] = React.useState(3)
     const [blueBand, setBlueBand] = React.useState(2)
-    const [vizMaxValue, setVizMaxValue] = React.useState(0.75)
+    const [vizMaxValue, setVizMaxValue] = React.useState(15000)
 
     const [timeValues, setTimeValues] = React.useState(null)
 
@@ -37,7 +37,7 @@ const QueryPanel = (props) => {
     }
 
     const queryDataset = () => {
-        fetch(`http://localhost:8082/getTimeIndexes?sensorName=Landsat&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}`)
+        fetch(`http://localhost:8082/getTimeIndexes?sensorName=Landsat_OLI&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}`)
             .then(r => r.json())
             .then(r => {
                 console.log(r)
@@ -65,7 +65,7 @@ const QueryPanel = (props) => {
                 label="Sensor"
                 onChange={(e) => { setSensor(e.target.value) }}
             >
-                <MenuItem value={'Landsat'}>Landsat8</MenuItem>
+                <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
             </Select>
             <br />
             <Typography variant="body2">From date</Typography>
@@ -92,7 +92,7 @@ const QueryPanel = (props) => {
         </FormControl>
         <br />
 
-        <Typography variant="h6" gutterBottom component="div">
+        {/* <Typography variant="h6" gutterBottom component="div">
             Visualization
         </Typography>
         <FormControl fullWidth>
@@ -126,8 +126,8 @@ const QueryPanel = (props) => {
                     })
                 }
             </Select>
-        </FormControl>
-        <br />
+        </FormControl> */}
+        {/* <br />
         <br />
         <FormControl fullWidth>
             <InputLabel id="blue-band-select">Blue band</InputLabel>
@@ -151,7 +151,7 @@ const QueryPanel = (props) => {
         </FormControl>
         <br />
         <br />
-        <Button variant="contained" onClick={updateViz}>Update</Button>
+        <Button variant="contained" onClick={updateViz}>Update</Button> */}
 
     </>
 }

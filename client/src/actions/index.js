@@ -62,3 +62,15 @@ export const updateChartData = (data) => {
         payload: data
     }
 }
+export const toggleAddLayerDialog = (flag) => {
+    return {
+        type: 'TOGGLE_ADD_LAYER',
+        payload: flag
+    }
+};
+export const toggleModelBuilderDialog = (flag) => {
+    return {
+        type: 'TOGGLE_MODEL_BUILDER',
+        payload: flag
+    }
+};

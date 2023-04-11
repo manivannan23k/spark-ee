@@ -70,7 +70,6 @@ export default function App(props) {
                 <Map />
                 <MapChart />
                 <TimeSlider />
-                <ModelBuilder />
             </Box>
         </Box>
     );

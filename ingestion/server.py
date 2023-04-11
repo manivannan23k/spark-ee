@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import numpy as np
+import datetime
 import scipy.ndimage
 from PIL import Image
 import io
@@ -10,6 +11,7 @@ from starlette.responses import StreamingResponse
 from sindexing import generate_index, get_tile_intersection
 from ingestion import partition_data
 from retrieval import load_data, merge_tiles, clean_tmp_dir, time_indexes, time_indexes_ts, ts_to_tindex, tindex_to_ts, tilenum2deg, merge_tiles_tmp
+from db import Db
 # import load_render as lr
 
 clean_tmp_dir()
@@ -30,116 +32,111 @@ app.add_middleware(
 class GenerateSIndex(BaseModel):
     shapefile_path: str
 
-@app.post("/generateSpatialIndex")
-async def generate_spatial_index(index_request: GenerateSIndex):
-    try:
-        generate_index(
-            index_request.shapefile_path
-        )
-        return {
-            "error": False,
-            "message": "Spatial Index Generated"
-        }
-    except Exception as e:
-        print(e)
-        return {
-            "error": True,
-            "message": "Error"
-        }
+# @app.post("/generateSpatialIndex")
+# async def generate_spatial_index(index_request: GenerateSIndex):
+#     try:
+#         generate_index(
+#             index_request.shapefile_path
+#         )
+#         return {
+#             "error": False,
+#             "message": "Spatial Index Generated"
+#         }
+#     except Exception as e:
+#         print(e)
+#         return {
+#             "error": True,
+#             "message": "Error"
+#         }
 
-@app.get("/getSpatialIndex/{level}")
-def get_spatial_index(level: int, xmin: float, xmax: float, ymin: float, ymax: float):
-    results = get_tile_intersection(level, [xmin, ymin, xmax, ymax]) #[n.object for n in index_dat[level].intersection([xmin, ymin, xmax, ymax], objects=True)]
-    return {
-        "error": False,
-        "message": "Success",
-        "data": results
-    }
+# @app.get("/getSpatialIndex/{level}")
+# def get_spatial_index(level: int, xmin: float, xmax: float, ymin: float, ymax: float):
+#     results = get_tile_intersection(level, [xmin, ymin, xmax, ymax]) #[n.object for n in index_dat[level].intersection([xmin, ymin, xmax, ymax], objects=True)]
+#     return {
+#         "error": False,
+#         "message": "Success",
+#         "data": results
+#     }
 
-@app.get("/getDataForBbox/{level}")
-def get_data_for_bbox(sensorName: str, level: int, tIndex: int, xmin: float, xmax: float, ymin: float, ymax: float):
-    start_time = time.time()
-    tindex = tIndex
-    tiles = get_tile_intersection(level, [xmin, ymin, xmax, ymax]) # [n.object for n in index_dat[level].intersection([xmin, ymin, xmax, ymax], objects=True)]
-    tiles = [[int(i) for i in tile.split("#")] for tile in tiles]
-    merge_ds = []
-    for tile in tiles: 
-        ds = load_data(tile, tindex, sensorName)
-        merge_ds.append(ds)
+# @app.get("/getDataForBbox/{level}")
+# def get_data_for_bbox(sensorName: str, level: int, tIndex: int, xmin: float, xmax: float, ymin: float, ymax: float):
+#     start_time = time.time()
+#     tindex = tIndex
+#     tiles = get_tile_intersection(level, [xmin, ymin, xmax, ymax]) # [n.object for n in index_dat[level].intersection([xmin, ymin, xmax, ymax], objects=True)]
+#     tiles = [[int(i) for i in tile.split("#")] for tile in tiles]
+#     merge_ds = []
+#     for tile in tiles: 
+#         ds = load_data(tile, tindex, sensorName)
+#         merge_ds.append(ds)
     
-    out_path = merge_tiles(merge_ds, [xmin, ymax, xmax, ymin])
-    print("--- %s seconds ---" % (time.time() - start_time))
-    return {
-        "error": False,
-        "message": "Success",
-        "data": out_path
-    }
+#     out_path = merge_tiles(merge_ds, [xmin, ymax, xmax, ymin])
+#     print("--- %s seconds ---" % (time.time() - start_time))
+#     return {
+#         "error": False,
+#         "message": "Success",
+#         "data": out_path
+#     }
 
-
-@app.get("/ingestData")
-def ingest_data(filePath: str, sensorName: str, ts: int):
-    result = partition_data(filePath, ts, sensorName)
-    return {
-        "error": False,
-        "message": "Success",
-        "data": result
-    }
-
+# @app.get("/ingestData")
+# def ingest_data(filePath: str, sensorName: str, ts: int):
+#     result = partition_data(filePath, ts, sensorName)
+#     return {
+#         "error": False,
+#         "message": "Success",
+#         "data": result
+#     }
 
 @app.get("/getTimeIndexes")
 def get_time_indexes(sensorName: str, fromTs: int = None, toTs: int = None):
-    if(fromTs is None and toTs is not None):
-        result = [i for i in time_indexes_ts(sensorName) if (i<=toTs)]
-    elif(fromTs is not None and toTs is None):
-        result = [i for i in time_indexes_ts(sensorName) if (i>=fromTs)]
-    elif(fromTs is not None and toTs is not None):
-        result = [i for i in time_indexes_ts(sensorName) if (i>=fromTs and i<=toTs)]
-    else:
-        result = [i for i in time_indexes_ts(sensorName)]
-    result = list(set(result))
-    result.sort()
+    ds_def = Db.get_db_dataset_def_by_name(sensorName)
+    result = Db.get_time_indexes_for_ds(ds_def['dataset_id'], fromTs, toTs)
+    ts = []
+    t_indexes = []
+    for t in result:
+        ts.append(int(datetime.datetime.timestamp(t['date_time'])) * 1000)
+        t_indexes.append(t['time_index'])
     return {
         "error": False,
         "message": "Success",
         "data": {
-            "ts": result,
-            "tIndexes": ts_to_tindex(result)
+            "ts": ts,
+            "tIndexes": t_indexes
         }
     }
 
 
-@app.get("/getPixelAt")
-def get_pixel_at(sensorName: str, x: float, y: float, fromTs: int = None, toTs: int = None):
-    start_time = time.time()
-    if(fromTs is None and toTs is not None):
-        result = [i for i in time_indexes_ts(sensorName) if (i<=toTs)]
-    elif(fromTs is not None and toTs is None):
-        result = [i for i in time_indexes_ts(sensorName) if (i>=fromTs)]
-    elif(fromTs is not None and toTs is not None):
-        result = [i for i in time_indexes_ts(sensorName) if (i>=fromTs and i<=toTs)]
-    else:
-        result = [i for i in time_indexes_ts(sensorName)]
-    result = list(set(result))
-    print(result)
-    tindexes = ts_to_tindex(result)
-    tiles = get_tile_intersection(12, [x, y, x, y]) #[n.object for n in index_dat[12].intersection([x,y,x,y], objects=True)]
-    tiles = [[int(i) for i in tile.split("#")] for tile in tiles]
-    result = []
-    for tindex in tindexes:
-        ds = load_data(tiles[0], tindex, sensorName)
-        geotransform = ds.GetGeoTransform()
-        x_offset = int((x - geotransform[0]) / geotransform[1])
-        y_offset = int((y - geotransform[3]) / geotransform[5])
-        data = [ds.GetRasterBand(i).ReadAsArray(x_offset, y_offset, 1, 1)[0][0] for i in range(1, ds.RasterCount+1)]
-        data = np.array(data)
-        data[np.isnan(data)] = 0
-        result.append(data.tolist())
-    print("--- %s seconds ---" % (time.time() - start_time))
-    return {
-        "error": False,
-        "message": "Success",
-        "data": result
-    }
+# @app.get("/getPixelAt")
+# def get_pixel_at(sensorName: str, x: float, y: float, fromTs: int = None, toTs: int = None):
+#     start_time = time.time()
+#     if(fromTs is None and toTs is not None):
+#         result = [i for i in time_indexes_ts(sensorName) if (i<=toTs)]
+#     elif(fromTs is not None and toTs is None):
+#         result = [i for i in time_indexes_ts(sensorName) if (i>=fromTs)]
+#     elif(fromTs is not None and toTs is not None):
+#         result = [i for i in time_indexes_ts(sensorName) if (i>=fromTs and i<=toTs)]
+#     else:
+#         result = [i for i in time_indexes_ts(sensorName)]
+#     result = list(set(result))
+#     print(result)
+#     tindexes = ts_to_tindex(result)
+#     tiles = get_tile_intersection(12, [x, y, x, y]) #[n.object for n in index_dat[12].intersection([x,y,x,y], objects=True)]
+#     tiles = [[int(i) for i in tile.split("#")] for tile in tiles]
+#     result = []
+#     for tindex in tindexes:
+#         ds = load_data(tiles[0], tindex, sensorName)
+#         geotransform = ds.GetGeoTransform()
+#         x_offset = int((x - geotransform[0]) / geotransform[1])
+#         y_offset = int((y - geotransform[3]) / geotransform[5])
+#         data = [ds.GetRasterBand(i).ReadAsArray(x_offset, y_offset, 1, 1)[0][0] for i in range(1, ds.RasterCount+1)]
+#         data = np.array(data)
+#         data[np.isnan(data)] = 0
+#         result.append(data.tolist())
+#     print("--- %s seconds ---" % (time.time() - start_time))
+#     return {
+#         "error": False,
+#         "message": "Success",
+#         "data": result
+#     }
 
 def image_to_byte_array(image: Image):
   # BytesIO is a fake file stored in memory
@@ -195,7 +192,8 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
             zoom_factors = (256/out_ds.RasterYSize, 256/out_ds.RasterXSize)
             data = scipy.ndimage.zoom(data, zoom=zoom_factors, order=0)
             data = np.nan_to_num(data)
-            data = data.astype(np.float64) / vmax #np.nanmax(data)
+            print(np.nanmax(data))
+            data = data.astype(np.float64) / 20000 #np.nanmax(data)
             data = 255 * data
             data[data<0] = 0
             # print(np.nanmax(data), data[211,164])
