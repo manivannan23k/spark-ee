@@ -209,27 +209,28 @@ function ClickEvent(props) {
     // return;
     const dispatch = useDispatch();
     const map = useMapEvent('click', (e) => {
-        let fromTs = null, toTs = null;
-        props.setMarkerPos(e.latlng)
-        if (props.timeIndexes && props.timeIndexes.length > 0) {
-            fromTs = props.timeIndexes[0]['ts']
-            toTs = props.timeIndexes[props.timeIndexes.length - 1]['ts']
-        } else {
-            return;
-        }
-        fetch(`http://localhost:8082/getPixelAt?sensorName=Landsat&fromTs=${fromTs}&toTs=${toTs}&y=${e.latlng.lat}&x=${e.latlng.lng}`)
-            .then(r => r.json())
-            .then(r => {
-                dispatch(updateChartData({
-                    type: 'line',
-                    labels: props.timeIndexes.map(p => new Date(p['ts']).toLocaleDateString()),
-                    values: r.data.map(b => b[4] - b[3])
-                }))
-                console.log(r.data.map(b => b[4] - b[3]))
-            })
-            .catch(e => {
-                console.log(e)
-            })
+        console.log(e.latlng)
+        // let fromTs = null, toTs = null;
+        // props.setMarkerPos(e.latlng)
+        // if (props.timeIndexes && props.timeIndexes.length > 0) {
+        //     fromTs = props.timeIndexes[0]['ts']
+        //     toTs = props.timeIndexes[props.timeIndexes.length - 1]['ts']
+        // } else {
+        //     return;
+        // }
+        // fetch(`http://localhost:8082/getPixelAt?sensorName=Landsat&fromTs=${fromTs}&toTs=${toTs}&y=${e.latlng.lat}&x=${e.latlng.lng}`)
+        //     .then(r => r.json())
+        //     .then(r => {
+        //         dispatch(updateChartData({
+        //             type: 'line',
+        //             labels: props.timeIndexes.map(p => new Date(p['ts']).toLocaleDateString()),
+        //             values: r.data.map(b => b[4] - b[3])
+        //         }))
+        //         console.log(r.data.map(b => b[4] - b[3]))
+        //     })
+        //     .catch(e => {
+        //         console.log(e)
+        //     })
     })
     return null
 }
@@ -241,16 +242,16 @@ const Map = (props) => {
         if (!props.map.tIndex) {
             return;
         }
-        dispatch(addLayer({
-            type: 'TILE',
-            id: 'data',
-            active: true,
-            url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=${props.map.tIndex}&bands=${props.map.bands.join(",")}&vmin=0&vmax=${props.map.vizMaxValue}`,
-            name: 'Streets - Base',
-            sortOrder: 0,
-            showLegend: false,
-            showInLayerList: false
-        }))
+        // dispatch(addLayer({
+        //     type: 'TILE',
+        //     id: 'data',
+        //     active: true,
+        //     url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=${props.map.tIndex}&bands=${props.map.bands.join(",")}&vmin=0&vmax=${props.map.vizMaxValue}`,
+        //     name: 'Streets - Base',
+        //     sortOrder: 0,
+        //     showLegend: false,
+        //     showInLayerList: false
+        // }))
     }, [props.map.tIndex, props.map.bands])
 
     // console.log(props.map.searchLayer)

@@ -15,8 +15,9 @@ const QueryPanel = (props) => {
 
     const dispatch = useDispatch()
     const [sensor, setSensor] = React.useState("Landsat_OLI")
-    const [fromDate, setFromDate] = React.useState(new Date("2023-01-20"))
-    const [toDate, setToDate] = React.useState(new Date("2023-01-28"))
+    const [fromDate, setFromDate] = React.useState(new Date("2018-12-10"))
+    const [toDate, setToDate] = React.useState(new Date("2018-12-30"))
+    const [aoi, setAoi] = React.useState('qwertyuiopasdfgh')
 
     const [redBand, setRedBand] = React.useState(4)
     const [greenBand, setGreenBand] = React.useState(3)
@@ -37,16 +38,16 @@ const QueryPanel = (props) => {
     }
 
     const queryDataset = () => {
-        fetch(`http://localhost:8082/getTimeIndexes?sensorName=Landsat_OLI&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}`)
+        fetch(`http://localhost:8082/getTimeIndexes?sensorName=Landsat_OLI&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
             .then(r => r.json())
             .then(r => {
                 console.log(r)
-                setTimeValues(r.data.ts)
-                dispatch(setTimeIndexes(
-                    r.data.tIndexes.map((ti, i) => {
-                        return { ts: r.data.ts[i], tIndex: ti }
-                    })
-                ))
+                // setTimeValues(r.data.ts)
+                // dispatch(setTimeIndexes(
+                //     r.data.tIndexes.map((ti, i) => {
+                //         return { ts: r.data.ts[i], tIndex: ti }
+                //     })
+                // ))
             })
             .catch(e => {
                 console.log(e)
@@ -66,6 +67,19 @@ const QueryPanel = (props) => {
                 onChange={(e) => { setSensor(e.target.value) }}
             >
                 <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
+            </Select>
+            <br />
+            <InputLabel id="aoi-select">AOI</InputLabel>
+            <Select
+                labelId="aoi-select"
+                value={aoi}
+                label="AOI"
+                onChange={(e) => { setAoi(e.target.value) }}
+            >
+                <MenuItem value={'uTUYvVGHgcvchgxc'}>AOI 1</MenuItem>
+                <MenuItem value={'qwertyuiopasdfgh'}>AOI 2</MenuItem>
+                <MenuItem value={'wwertyuiopasdfgh'}>AOI 3</MenuItem>
+                
             </Select>
             <br />
             <Typography variant="body2">From date</Typography>

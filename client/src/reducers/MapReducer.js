@@ -2,12 +2,14 @@ import * as AppConfig from '../utils/AppConfig'
 
 const initialState = {
     // center: [-36.902306, 174.696037],
-    center: [25.6101681,90.3171594],
-    zoom: 10,
+    center: [25.71315688761512, 
+        90.12840270996094],
+    zoom: 13,
     layers: AppConfig.layers,
     mapView: {
-        center: [25.6101681,90.3171594],
-        zoom: 10
+        center: [25.71315688761512, 
+            90.12840270996094],
+        zoom: 13
     },
     changeMapView: false,
     searchLayer: null,

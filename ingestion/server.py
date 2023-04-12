@@ -7,6 +7,11 @@ import datetime
 import scipy.ndimage
 from PIL import Image
 import io
+import random
+import string
+import json
+import os
+from osgeo import ogr, osr, gdal
 from starlette.responses import StreamingResponse
 from sindexing import generate_index, get_tile_intersection
 from ingestion import partition_data
@@ -87,9 +92,10 @@ class GenerateSIndex(BaseModel):
 #     }
 
 @app.get("/getTimeIndexes")
-def get_time_indexes(sensorName: str, fromTs: int = None, toTs: int = None):
+def get_time_indexes(sensorName: str, fromTs: int = None, toTs: int = None, aoi_code: str = 'uTUYvVGHgcvchgxc'):
     ds_def = Db.get_db_dataset_def_by_name(sensorName)
-    result = Db.get_time_indexes_for_ds(ds_def['dataset_id'], fromTs, toTs)
+    result = Db.get_time_indexes_for_ds_aoi(aoi_code, ds_def['dataset_id'], fromTs, toTs)
+    
     ts = []
     t_indexes = []
     for t in result:
@@ -150,17 +156,58 @@ def image_to_byte_array(image: Image):
   return imgByteArr
 
 @app.get("/tile/{sensorName}/{z}/{x}/{y}.png")
-def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = None, vmin: float = 0, vmax: float = 0.75):
+def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = None, vmin: float = 0, vmax: float = 0.75, aoi_code: str = 'uTUYvVGHgcvchgxc'):
+    def clip_raster_ds_by_geom(ds, geom):
+        driver = ogr.GetDriverByName('ESRI Shapefile')
+        config = json.load(open("config.json"))
+        fname = ''.join(random.choices(string.ascii_uppercase, k=16))
+        fpath = os.path.join(config['temp_dir'], f'{fname}.shp')
+        memory_ds = driver.CreateDataSource(fpath)
+        memory_layer = memory_ds.CreateLayer('Layer', geom_type=ogr.wkbPolygon)
+        feature = ogr.Feature(memory_layer.GetLayerDefn())
+        feature.SetGeometry(geom)
+        memory_layer.CreateFeature(feature)
+        memory_layer = None
+        memory_ds = None
+        ds = gdal.Warp('', ds, format='VRT', cutlineDSName=fpath, cropToCutline=False)
+        return ds
+    
+    aoi_value = Db.get_aoi_geom_by_aoi_code(aoi_code)
     start_time = time.time()
+    gj = aoi_value['geom']
+    # print(gj)
+    aoi_geom = ogr.CreateGeometryFromJson(gj)
+    target_srs = osr.SpatialReference()
+    target_srs.ImportFromEPSG(4326)
+    aoi_geom.AssignSpatialReference(target_srs)
+
+    
+
     # rgb_data = lr.run(x, y, z, tIndex, sensorName, bands, vmax)
     # if(rgb_data is None):
     #     return None
     # img = Image.fromarray(rgb_data, 'RGBA')
     # print("--- %s seconds ---" % (time.time() - start_time))
     # return StreamingResponse(image_to_byte_array(img), media_type="image/png")
-
+    
     bbox = tilenum2deg(x, y, z)
-    level = z-1
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(bbox[0], bbox[3])
+    ring.AddPoint(bbox[0], bbox[1])
+    ring.AddPoint(bbox[2], bbox[1])
+    ring.AddPoint(bbox[2], bbox[3])
+    ring.AddPoint(bbox[0], bbox[3])
+
+    tile_geom = ogr.Geometry(ogr.wkbPolygon)
+    tile_geom.FlattenTo2D()
+    tile_geom.AddGeometry(ring)
+
+    # print(tile_geom)
+    print(tile_geom.Intersects(aoi_geom))
+    if(tile_geom.Intersects(aoi_geom) is False):
+        return None
+
+    level = z-2
     if(level > 12):
         level = 12
     if(level < 4):
@@ -178,7 +225,10 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
         
     if len(merge_ds) > 0:
         out_ds = merge_tiles_tmp(merge_ds, bbox)
+        out_ds = clip_raster_ds_by_geom(out_ds, aoi_geom)
         
+        # print(out_ds)
+        # return None
         if(bands is None):
             rgb_bands = [2,3,4]
         else:
@@ -193,7 +243,7 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
             data = scipy.ndimage.zoom(data, zoom=zoom_factors, order=0)
             data = np.nan_to_num(data)
             print(np.nanmax(data))
-            data = data.astype(np.float64) / 20000 #np.nanmax(data)
+            data = data.astype(np.float64) / vmax #np.nanmax(data)
             data = 255 * data
             data[data<0] = 0
             # print(np.nanmax(data), data[211,164])

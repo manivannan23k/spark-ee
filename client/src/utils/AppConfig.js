@@ -158,6 +158,16 @@ export const layers = {
         showLegend: false,
         showInLayerList: false
     },
+    'data': {
+        type: 'TILE',
+        id: 'data',
+        active: true,
+        url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=913543204&bands=4,3,2&vmin=0&vmax=20000&aoi_code=qwertyuiopasdfgh`,
+        name: 'Streets - Base',
+        sortOrder: 0,
+        showLegend: false,
+        showInLayerList: false
+    },
     'base': {
         type: 'TILE',
         id: 'base',

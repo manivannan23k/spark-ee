@@ -1,6 +1,6 @@
 const initialState = {
     showAddLayerDialog: false,
-    showModelBuilderDialog: true
+    showModelBuilderDialog: false
 };
 
 const DialogReducer = (state = initialState, action) => {

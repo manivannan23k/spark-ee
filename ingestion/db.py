@@ -79,7 +79,29 @@ class Db:
         cursor.close()
         conn.close()
         return rows
-    
+    def get_time_indexes_for_ds_aoi(aoi_code, dataset_id, from_ts, to_ts):
+        rows = []
+        conn = Db.get_db_conn()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        qry = f"""
+            with aoi as
+            (
+                select ST_Envelope(geom) as geom from user_aoi where aoi_code='{aoi_code}'
+            )
+            select ingest_master.ingest_id, ingest_master.dataset_id, ingest_master.time_index, ingest_master.date_time from ingest_master, aoi
+            where st_intersects(ingest_master.geom, aoi.geom) and ingest_master.dataset_id={dataset_id}
+        """
+        if(from_ts is not None):
+            qry += f" and ingest_master.date_time >= to_timestamp({from_ts/1000})::timestamp without time zone"
+        if(to_ts is not None):
+            qry += f" and ingest_master.date_time <= to_timestamp({to_ts/1000})::timestamp without time zone"
+        cursor.execute(qry)
+        for row in cursor:
+            rows.append(row)
+        cursor.close()
+        conn.close()
+        return rows
+
     def get_db_tile_by_zindex_zoom_ds(z_index, zoom_level, ds_id, x_index, y_index, tindex):
         rows = []
         conn = Db.get_db_conn()
@@ -92,6 +114,27 @@ class Db:
             ;
         """)
         row = cursor.fetchone()
+        # print(f"""
+        #     select
+        #         distinct ingest_id, dataset_id, time_index
+        #     from {config['tbl_tiles']}
+        #         where dataset_id={ds_id} and zoom_level={zoom_level} and z_index='{z_index}'
+        #     ;
+        # """, x_index, y_index, tindex)
+        # for row in cursor:
+        #     rows.append(row)
+        cursor.close()
+        conn.close()
+        return row
+    
+    def get_aoi_geom_by_aoi_code(aoi_code):
+        conn = Db.get_db_conn()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(f"""
+            select aoi_code, st_asgeojson(geom) as geom from user_aoi where aoi_code='{aoi_code}';
+        """)
+        row = cursor.fetchone()
+
         # print(f"""
         #     select
         #         distinct ingest_id, dataset_id, time_index
