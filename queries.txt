@@ -1,0 +1,82 @@
+-- Table: public.dataset_def
+
+-- DROP TABLE IF EXISTS public.dataset_def;
+
+CREATE TABLE IF NOT EXISTS public.dataset_def
+(
+    dataset_id integer NOT NULL DEFAULT nextval('dataset_def_dataset_id_seq'::regclass),
+    ds_name character varying(500) COLLATE pg_catalog."default",
+    ds_description character varying(500) COLLATE pg_catalog."default",
+    no_of_bands integer,
+    data_type character varying(500) COLLATE pg_catalog."default",
+    def_color_scheme character varying(1000) COLLATE pg_catalog."default",
+    band_meta text COLLATE pg_catalog."default"
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.dataset_def
+    OWNER to postgres;
+
+
+-- Table: public.ingest_master
+
+-- DROP TABLE IF EXISTS public.ingest_master;
+
+CREATE TABLE IF NOT EXISTS public.ingest_master
+(
+    ingest_id integer NOT NULL DEFAULT nextval('ingest_master_ingest_id_seq'::regclass),
+    dataset_id integer,
+    time_index bigint,
+    geom geometry(Polygon,4326),
+    date_time timestamp without time zone,
+    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    created_by character varying(500) COLLATE pg_catalog."default" DEFAULT 'admin'::character varying
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.ingest_master
+    OWNER to postgres;
+
+
+-- Table: public.tiles_local
+
+-- DROP TABLE IF EXISTS public.tiles_local;
+
+CREATE TABLE IF NOT EXISTS public.tiles_local
+(
+    tile_id integer NOT NULL DEFAULT nextval('tiles_local_tile_id_seq'::regclass),
+    ingest_id integer,
+    dataset_id integer,
+    zoom_level integer,
+    time_index bigint,
+    spatial_index_x integer,
+    spatial_index_y integer,
+    file_path character varying(500) COLLATE pg_catalog."default",
+    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    created_by character varying(500) COLLATE pg_catalog."default" DEFAULT 'admin'::character varying,
+    z_index character varying(500) COLLATE pg_catalog."default" DEFAULT '0'::character varying
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.tiles_local
+    OWNER to postgres;
+
+
+-- Table: public.user_aoi
+
+-- DROP TABLE IF EXISTS public.user_aoi;
+
+CREATE TABLE IF NOT EXISTS public.user_aoi
+(
+    id integer NOT NULL DEFAULT nextval('user_aoi_id_seq'::regclass),
+    aoi_code character varying(500) COLLATE pg_catalog."default",
+    geom geometry(Polygon,4326)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.user_aoi
+    OWNER to postgres;
