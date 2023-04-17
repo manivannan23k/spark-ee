@@ -28,6 +28,12 @@ export const addLayer = (layer) => {
         payload: layer
     }
 };
+export const removeLayer = (layerId) => {
+    return {
+        type: 'REMOVE_LAYER',
+        payload: layerId
+    }
+};
 export const addSearchLayer = (layer) => {
     return {
         type: 'ADD_SEARCH_LAYER',
@@ -72,5 +78,17 @@ export const toggleModelBuilderDialog = (flag) => {
     return {
         type: 'TOGGLE_MODEL_BUILDER',
         payload: flag
+    }
+};
+export const toggleQueryResultsDialog = (flag) => {
+    return {
+        type: 'TOGGLE_QUERY_RESULTS_DIALOG',
+        payload: flag
+    }
+};
+export const setQueryResults = (data) => {
+    return {
+        type: 'SET_QUERY_RESULTS',
+        payload: data
     }
 };

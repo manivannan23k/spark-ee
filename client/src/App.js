@@ -68,8 +68,8 @@ export default function App(props) {
             >
                 <Toolbar />
                 <Map />
-                <MapChart />
-                <TimeSlider />
+                {/* <MapChart />
+                <TimeSlider /> */}
             </Box>
         </Box>
     );

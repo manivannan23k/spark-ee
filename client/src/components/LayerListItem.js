@@ -3,7 +3,7 @@ import {connect, useDispatch} from 'react-redux';
 import Paper from '@mui/material/Paper';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { toggleLayerState } from '../actions/index';
+import { removeLayer, toggleLayerState } from '../actions/index';
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -38,7 +38,7 @@ const LayerListItem = (props) => {
                     />
                 </Grid>
                 <Grid item>
-                    {
+                    {/* {
                         props.layer.type!=='WMS' || !props.layer.showLegend ?'':(
                             <div style={{
                                 paddingTop: 12
@@ -46,7 +46,12 @@ const LayerListItem = (props) => {
                                 <img src={props.layer.url + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=' + props.layer.id}  alt={'legend'}/>
                             </div>
                         )
-                    }
+                    } */}
+                    <Button onClick={()=>{
+                        dispatch(removeLayer(props.layer.id))
+                    }}>
+                        X
+                    </Button>
                 </Grid>
             </Grid>
 

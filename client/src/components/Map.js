@@ -40,100 +40,6 @@ function MapViewChangeEvent() {
     return null
 }
 
-const EsriFeatureLayerQuery = {
-    point: function pointGeomQueryEsriFeatureLayer(featureLayerUrl, point, success, failure) {
-        let data = {
-            "where": "1=1",
-            "geometry": point.join(','),
-            "geometryType": "esriGeometryPoint",
-            "inSR": "4326",
-            "spatialRel": "esriSpatialRelIntersects",
-            "resultType": "none",
-            "distance": "0.0",
-            "units": "esriSRUnit_Meter",
-            "returnGeodetic": "false",
-            "outFields": "*",
-            "returnGeometry": "true",
-            "returnCentroid": "false",
-            "featureEncoding": "esriDefault",
-            "multipatchOption": "xyFootprint",
-            "applyVCSProjection": "false",
-            "returnIdsOnly": "false",
-            "returnUniqueIdsOnly": "false",
-            "returnCountOnly": "false",
-            "returnExtentOnly": "false",
-            "returnQueryGeometry": "false",
-            "returnDistinctValues": "false",
-            "cacheHint": "false",
-            "returnZ": "false",
-            "returnM": "false",
-            "returnExceededLimitFeatures": "true",
-            "sqlFormat": "none",
-            "f": "geojson",
-            // "resultRecordCount": 1
-        };
-        let formData = new FormData();
-        Object.keys(data).map(k => {
-            formData.append(k, data[k]);
-        })
-        fetch(featureLayerUrl, {
-            method: 'POST',
-            body: formData
-        }).then(r => r.json()).then(result => {
-            return success(result.features);
-        })
-            .catch(e => {
-                console.log(e);
-                return failure(e);
-            });
-    },
-    id: function pointGeomQueryEsriFeatureLayer(featureLayerUrl, id, success, failure) {
-        let data = {
-            "where": "id=" + id,
-            "geometry": '',
-            "geometryType": "esriGeometryPoint",
-            "inSR": "4326",
-            "spatialRel": "esriSpatialRelIntersects",
-            "resultType": "none",
-            "distance": "0.0",
-            "units": "esriSRUnit_Meter",
-            "returnGeodetic": "false",
-            "outFields": "*",
-            "returnGeometry": "true",
-            "returnCentroid": "false",
-            "featureEncoding": "esriDefault",
-            "multipatchOption": "xyFootprint",
-            "applyVCSProjection": "false",
-            "returnIdsOnly": "false",
-            "returnUniqueIdsOnly": "false",
-            "returnCountOnly": "false",
-            "returnExtentOnly": "false",
-            "returnQueryGeometry": "false",
-            "returnDistinctValues": "false",
-            "cacheHint": "false",
-            "returnZ": "false",
-            "returnM": "false",
-            "returnExceededLimitFeatures": "true",
-            "sqlFormat": "none",
-            "f": "json",
-            // "resultRecordCount": 1
-        };
-        let formData = new FormData();
-        Object.keys(data).map(k => {
-            formData.append(k, data[k]);
-        })
-        fetch(featureLayerUrl, {
-            method: 'POST',
-            body: formData
-        }).then(r => r.json()).then(result => {
-            return success(result.features);
-        })
-            .catch(e => {
-                console.log(e);
-                return failure(e);
-            });
-    }
-}
 
 const MapLayers = (props) => {
     let layers = Object.keys(props.map.layers).map(layerId => props.map.layers[layerId]);
@@ -164,6 +70,13 @@ const MapLayers = (props) => {
                     case 'TILE':
                         return <TileLayer key={layer.id}
                             url={layer.url}
+                            maxZoom={24}
+                        />
+
+                    case 'DATA_TILE':
+                        return <TileLayer key={layer.id}
+                            url={`http://localhost:8082/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=5,4,3&vmin=0&vmax=1500&aoi_code=${layer.aoiCode}`}
+                            //http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=913543204&bands=4,3,2&vmin=0&vmax=20000&aoi_code=qwertyuiopasdfgh
                             maxZoom={24}
                         />
                     case 'ESRI_FEATURE':

@@ -34,6 +34,23 @@ object RddUtils {
     (tiled, meta)
   }
 
+  def getMultiTiledRDDWithMeta(implicit sc: SparkContext, inputFile: String, tileSize: Int): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
+    val layer: RDD[(ProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, ProjectedExtent, MultibandTile](
+      path = new Path(inputFile),
+      uriToKey = {
+        case (uri, projectedExtent) =>
+          projectedExtent
+      },
+      options = HadoopGeoTiffRDD.Options.DEFAULT
+    )
+    val (zoom, meta) = CollectTileLayerMetadata.fromRDD[ProjectedExtent, MultibandTile, SpatialKey](layer, FloatingLayoutScheme(tileSize))
+    val tiled: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(
+      layer.tileToLayout(meta.cellType, meta.layout),
+      meta
+    )
+    tiled
+  }
+
   def getTiledRDD(implicit sc: SparkContext, inputFile: String, tileSize: Int): (RDD[(SpatialKey, Tile)], TileLayerMetadata[SpatialKey]) = {
     val layer: RDD[(ProjectedExtent, Tile)] = HadoopGeoTiffRDD[ProjectedExtent, ProjectedExtent, Tile](
       path = new Path(inputFile),

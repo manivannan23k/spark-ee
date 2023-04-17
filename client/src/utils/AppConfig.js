@@ -147,27 +147,31 @@ export const layers = {
     //     showLegend: true,
     //     showInLayerList: true
     // },
-    'project_sc:agri_regions': {
-        type: 'WMS',
-        id: 'project_sc:agri_regions',
-        active: true,
-        url: 'http://localhost:8082/geoserver/projectx/wms',
-        name: 'Agri Regions',
-        sortOrder: 3,
-        minZoom: 16,
-        showLegend: false,
-        showInLayerList: false
-    },
-    'data': {
-        type: 'TILE',
-        id: 'data',
-        active: true,
-        url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=913543204&bands=4,3,2&vmin=0&vmax=20000&aoi_code=qwertyuiopasdfgh`,
-        name: 'Streets - Base',
-        sortOrder: 0,
-        showLegend: false,
-        showInLayerList: false
-    },
+    // 'project_sc:agri_regions': {
+    //     type: 'WMS',
+    //     id: 'project_sc:agri_regions',
+    //     active: true,
+    //     url: 'http://localhost:8082/geoserver/projectx/wms',
+    //     name: 'Agri Regions',
+    //     sortOrder: 3,
+    //     minZoom: 16,
+    //     showLegend: false,
+    //     showInLayerList: false
+    // },
+    // 'data': {
+    //     type: 'DATA_TILE',
+    //     id: 'data',
+    //     active: true,
+    //     tIndex: 913543204,
+    //     tIndexes: [913543204],
+    //     aoiCode: 'qwertyuiopasdfgh',
+    //     dsId: 'Landsat_OLI',
+    //     url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=913543204&bands=4,3,2&vmin=0&vmax=20000&aoi_code=qwertyuiopasdfgh`,
+    //     name: 'Data Layer',
+    //     sortOrder: 0,
+    //     showLegend: false,
+    //     showInLayerList: true
+    // },
     'base': {
         type: 'TILE',
         id: 'base',

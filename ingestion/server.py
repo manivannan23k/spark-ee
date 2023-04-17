@@ -15,7 +15,7 @@ from osgeo import ogr, osr, gdal
 from starlette.responses import StreamingResponse
 from sindexing import generate_index, get_tile_intersection
 from ingestion import partition_data
-from retrieval import load_data, merge_tiles, clean_tmp_dir, time_indexes, time_indexes_ts, ts_to_tindex, tindex_to_ts, tilenum2deg, merge_tiles_tmp
+from retrieval import load_data, merge_tiles, clean_tmp_dir, time_indexes, time_indexes_ts, ts_to_tindex, tindex_to_ts, tilenum2deg, merge_tiles_tmp, load_data_ref
 from db import Db
 # import load_render as lr
 
@@ -96,18 +96,23 @@ def get_time_indexes(sensorName: str, fromTs: int = None, toTs: int = None, aoi_
     ds_def = Db.get_db_dataset_def_by_name(sensorName)
     result = Db.get_time_indexes_for_ds_aoi(aoi_code, ds_def['dataset_id'], fromTs, toTs)
     
-    ts = []
-    t_indexes = []
+    data = []
+    # ts = []
+    # t_indexes = []
     for t in result:
-        ts.append(int(datetime.datetime.timestamp(t['date_time'])) * 1000)
-        t_indexes.append(t['time_index'])
+        # ts.append(int(datetime.datetime.timestamp(t['date_time'])) * 1000)
+        # t_indexes.append(t['time_index'])
+        data.append({
+            "ts": int(datetime.datetime.timestamp(t['date_time'])) * 1000,
+            "tIndex": t['time_index'],
+            "dsName": ds_def['ds_name'],
+            "dsId": ds_def['dataset_id'],
+            "aoiCode": aoi_code
+        })
     return {
         "error": False,
         "message": "Success",
-        "data": {
-            "ts": ts,
-            "tIndexes": t_indexes
-        }
+        "data": data
     }
 
 
@@ -155,23 +160,105 @@ def image_to_byte_array(image: Image):
   imgByteArr.seek(0)
   return imgByteArr
 
+def clip_raster_ds_by_geom(ds, geom):
+    driver = ogr.GetDriverByName('ESRI Shapefile')
+    config = json.load(open("config.json"))
+    fname = ''.join(random.choices(string.ascii_uppercase, k=16))
+    fpath = os.path.join(config['temp_dir'], f'{fname}.shp')
+    memory_ds = driver.CreateDataSource(fpath)
+    memory_layer = memory_ds.CreateLayer('Layer', geom_type=ogr.wkbPolygon)
+    feature = ogr.Feature(memory_layer.GetLayerDefn())
+    feature.SetGeometry(geom)
+    memory_layer.CreateFeature(feature)
+    memory_layer = None
+    memory_ds = None
+    ds = gdal.Warp('', ds, format='VRT', cutlineDSName=fpath, cropToCutline=False)
+    return ds
+
+
+@app.get("/getDataForAoi/")
+def get_data_for_aoi(sensorName: str, level: int, tIndex: int, aoiCode: str):
+    start_time = time.time()
+
+    aoi_value = Db.get_aoi_geom_by_aoi_code(aoiCode)
+    gj = aoi_value['geom']
+    aoi_geom = ogr.CreateGeometryFromJson(gj)
+    target_srs = osr.SpatialReference()
+    target_srs.ImportFromEPSG(4326)
+    aoi_geom.AssignSpatialReference(target_srs)
+
+    tindex = tIndex
+    level = 12
+
+    bbox = aoi_geom.GetEnvelope()
+    print(bbox)
+
+    tiles = get_tile_intersection(level, [bbox[0], bbox[2], bbox[1], bbox[3]])
+    if(tiles is None):
+        print("Failed to read sIndex")
+        return None
+    tiles = [[int(i) for i in tile.split("#")] for tile in tiles]
+    merge_ds = []
+    for tile in tiles: 
+        ds = load_data(tile, tIndex, sensorName)
+        if(ds is not None):
+            merge_ds.append(ds)
+
+    # tiles = get_tile_intersection(level, [xmin, ymin, xmax, ymax]) # [n.object for n in index_dat[level].intersection([xmin, ymin, xmax, ymax], objects=True)]
+    # tiles = [[int(i) for i in tile.split("#")] for tile in tiles]
+    # merge_ds = []
+    # for tile in tiles: 
+    #     ds = load_data(tile, tindex, sensorName)
+    #     merge_ds.append(ds)
+    
+    out_path = merge_tiles(merge_ds, [bbox[0], bbox[3], bbox[1], bbox[2]])
+    # out_ds = clip_raster_ds_by_geom(out_ds, aoi_geom)
+    
+    print("--- %s seconds ---" % (time.time() - start_time))
+    return {
+        "error": False,
+        "message": "Success",
+        "data": out_path
+    }
+
+@app.get("/getDataRefForAoi/")
+def get_data_ref_for_aoi(sensorName: str, level: int, tIndex: int, aoiCode: str):
+    start_time = time.time()
+
+    aoi_value = Db.get_aoi_geom_by_aoi_code(aoiCode)
+    gj = aoi_value['geom']
+    aoi_geom = ogr.CreateGeometryFromJson(gj)
+    target_srs = osr.SpatialReference()
+    target_srs.ImportFromEPSG(4326)
+    aoi_geom.AssignSpatialReference(target_srs)
+
+    tindex = tIndex
+    level = 12
+
+    bbox = aoi_geom.GetEnvelope()
+
+    tiles = get_tile_intersection(level, [bbox[0], bbox[2], bbox[1], bbox[3]])
+    if(tiles is None):
+        print("Failed to read sIndex")
+        return None
+    tiles = [[int(i) for i in tile.split("#")] for tile in tiles]
+    merge_ds = []
+    for tile in tiles: 
+        ds = load_data_ref(tile, tIndex, sensorName)
+        if(ds is not None):
+            merge_ds.append(ds)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+    return {
+        "error": False,
+        "message": "Success",
+        "data": merge_ds
+    }
+
+
 @app.get("/tile/{sensorName}/{z}/{x}/{y}.png")
 def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = None, vmin: float = 0, vmax: float = 0.75, aoi_code: str = 'uTUYvVGHgcvchgxc'):
-    def clip_raster_ds_by_geom(ds, geom):
-        driver = ogr.GetDriverByName('ESRI Shapefile')
-        config = json.load(open("config.json"))
-        fname = ''.join(random.choices(string.ascii_uppercase, k=16))
-        fpath = os.path.join(config['temp_dir'], f'{fname}.shp')
-        memory_ds = driver.CreateDataSource(fpath)
-        memory_layer = memory_ds.CreateLayer('Layer', geom_type=ogr.wkbPolygon)
-        feature = ogr.Feature(memory_layer.GetLayerDefn())
-        feature.SetGeometry(geom)
-        memory_layer.CreateFeature(feature)
-        memory_layer = None
-        memory_ds = None
-        ds = gdal.Warp('', ds, format='VRT', cutlineDSName=fpath, cropToCutline=False)
-        return ds
-    
+
     aoi_value = Db.get_aoi_geom_by_aoi_code(aoi_code)
     start_time = time.time()
     gj = aoi_value['geom']
@@ -238,12 +325,13 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
         alpha_data = []
         for bid in rgb_bands:
             data = out_ds.GetRasterBand(bid).ReadAsArray()
+            # data = data * 2.75e-05 - 0.2
             # data[np.isnan(data)] = 0
             zoom_factors = (256/out_ds.RasterYSize, 256/out_ds.RasterXSize)
             data = scipy.ndimage.zoom(data, zoom=zoom_factors, order=0)
             data = np.nan_to_num(data)
             print(np.nanmax(data))
-            data = data.astype(np.float64) / vmax #np.nanmax(data)
+            data = data.astype(np.float64) / np.nanmax(data)
             data = 255 * data
             data[data<0] = 0
             # print(np.nanmax(data), data[211,164])

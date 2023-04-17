@@ -18,7 +18,8 @@ const initialState = {
     bands: [4, 3, 2],
     tIndex: null,
     vizMaxValue: 0.25,
-    chartData: null
+    chartData: null,
+    queryResults: []
 };
 
 const MapReducer = (state = initialState, action) => {
@@ -84,6 +85,13 @@ const MapReducer = (state = initialState, action) => {
                 ...state,
                 layers: layers
             }
+        case "REMOVE_LAYER":
+            if(layers[action.payload])
+                delete layers[action.payload]
+            return {
+                ...state,
+                layers: layers
+            }
         case "ADD_SEARCH_LAYER":
             if(Boolean(state.searchLayer) && Boolean(layers[state.searchLayer])){
                 delete layers[state.searchLayer];
@@ -92,6 +100,11 @@ const MapReducer = (state = initialState, action) => {
                 ...state,
                 searchLayer: action.payload,
                 layers: {...layers}
+            }
+        case "SET_QUERY_RESULTS":
+            return {
+                ...state,
+                queryResults: action.payload
             }
         default:
             return {

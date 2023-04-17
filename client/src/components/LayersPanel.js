@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import LayerList from '../components/LayerList';
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
@@ -7,6 +7,10 @@ import AppModal from "./AppModal";
 import { connect, useDispatch } from "react-redux";
 import { toggleAddLayerDialog } from "../actions";
 import ModelBuilder from "./ModelBuilder";
+import QueryResults from "./QueryResults";
+import go from 'gojs'
+
+import DataTable from 'react-data-table-component';
 
 const mapStateToProps = (state) => {
     return {
@@ -23,11 +27,12 @@ const LayersPanel = (props) => {
         {/* <Typography variant="h6" gutterBottom component="div">
             Layers
         </Typography> */}
-        {/* <LayerList /> */}
+        <LayerList />
         <AppModal btnText={"Add Layer"} flag={props.dialog.showAddLayerDialog} setFlag={(flag)=>{
             dispatch(toggleAddLayerDialog(flag))
         }} content=<QueryPanel /> />
         <ModelBuilder />
+        <QueryResults />
     </Paper>
 }
 

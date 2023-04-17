@@ -11,7 +11,7 @@ const mapStateToProps = (state) => {
 const LayerList = (props) => {
 
     let layers = Object.keys(props.map.layers).map(layerId=>props.map.layers[layerId]);
-    layers = layers.sort((a, b)=>{ return a.sortOrder - b.sortOrder });
+    // layers = layers.sort((a, b)=>{ return a.sortOrder - b.sortOrder });
 
     return <div>
         {

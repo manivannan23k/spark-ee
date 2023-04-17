@@ -1,6 +1,7 @@
 const initialState = {
     showAddLayerDialog: false,
-    showModelBuilderDialog: false
+    showModelBuilderDialog: false,
+    showQueryResultsDialog: false
 };
 
 const DialogReducer = (state = initialState, action) => {
@@ -14,6 +15,11 @@ const DialogReducer = (state = initialState, action) => {
             return {
                 ...state,
                 showModelBuilderDialog: action.payload
+            };
+        case 'TOGGLE_QUERY_RESULTS_DIALOG':
+            return {
+                ...state,
+                showQueryResultsDialog: action.payload
             };
         default:
             return {

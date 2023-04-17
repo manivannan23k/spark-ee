@@ -8,7 +8,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import DatePicker from 'react-datepicker';
 import { Button, Slider, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { addLayer, setTimeIndexes, updateRGBBands } from '../actions';
+import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 
 
 const QueryPanel = (props) => {
@@ -42,12 +42,13 @@ const QueryPanel = (props) => {
             .then(r => r.json())
             .then(r => {
                 console.log(r)
-                // setTimeValues(r.data.ts)
-                // dispatch(setTimeIndexes(
-                //     r.data.tIndexes.map((ti, i) => {
-                //         return { ts: r.data.ts[i], tIndex: ti }
-                //     })
-                // ))
+                if(r.data.length>0){
+                    dispatch(toggleAddLayerDialog(false))
+                    dispatch(setQueryResults(r.data))
+                    dispatch(toggleQueryResultsDialog(true))
+                }else{
+                    alert("No result")
+                }
             })
             .catch(e => {
                 console.log(e)
@@ -68,7 +69,9 @@ const QueryPanel = (props) => {
             >
                 <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
             </Select>
-            <br />
+        </FormControl>
+        <br/><br/>
+        <FormControl fullWidth>
             <InputLabel id="aoi-select">AOI</InputLabel>
             <Select
                 labelId="aoi-select"
@@ -81,7 +84,8 @@ const QueryPanel = (props) => {
                 <MenuItem value={'wwertyuiopasdfgh'}>AOI 3</MenuItem>
                 
             </Select>
-            <br />
+        </FormControl>
+        <br/><br/>
             <Typography variant="body2">From date</Typography>
             <DatePicker
                 style={{
@@ -103,7 +107,6 @@ const QueryPanel = (props) => {
 
             <br />
             <Button variant="contained" onClick={queryDataset}>Submit</Button>
-        </FormControl>
         <br />
 
         {/* <Typography variant="h6" gutterBottom component="div">

@@ -3,6 +3,7 @@ import DraggableComponent from "./DraggableComponent";
 import AppModal from "./AppModal";
 import { connect, useDispatch } from "react-redux";
 import { toggleModelBuilderDialog } from "../actions";
+import GoDiagram from "./GoDiagram";
 
 const mapStateToProps = (state) => {
     return {
@@ -89,6 +90,7 @@ const ModelBuilder = (props) => {
         setComponents([
             ...components,
             {
+                id: components.length,
                 type: c.type,
                 name: c.name
             }
@@ -98,72 +100,88 @@ const ModelBuilder = (props) => {
     return <AppModal btnText={"Open Model Builder"} flag={props.dialog.showModelBuilderDialog} setFlag={(f)=>{
         dispatch(toggleModelBuilderDialog(f))
     }} content=
-        <div style={{  }}>
+        <div style={{ display: 'flex' }}>
         
-            <ul style={{
-                listStyle: 'none',
-                margin: 0,
-                padding: 0
-            }}>
-                {
-                    [
-                        {
-                            type: 'input',
-                            components: [
-                                {
-                                    name: "Raster Layer",
-                                    type: "in_raster_layer"
-                                },
-                                {
-                                    name: "Raster Band",
-                                    type: "in_raster_band"
-                                }
-                            ]
-                        },
-                        {
-                            type: 'operation',
-                            components: [
-                                {
-                                    name: "Local Average",
-                                    type: "op_local_avg"
-                                }
-                            ]
-                        },
-                        {
-                            type: 'output',
-                            components: [
-                                {
-                                    name: "Output Layer",
-                                    type: "out_raster_layer"
-                                },
-                                {
-                                    name: "Output Band",
-                                    type: "out_raster_band"
-                                }
-                            ]
-                        },
+            <div style={{width: '20%', display: 'inline-block'}}>
+                <ul style={{
+                    listStyle: 'none',
+                    margin: 0,
+                    padding: 0
+                }}>
+                    {
+                        [
+                            {
+                                type: 'input',
+                                components: [
+                                    {
+                                        name: "Raster Layer",
+                                        type: "in_raster_layer"
+                                    },
+                                    {
+                                        name: "Raster Band",
+                                        type: "in_raster_band"
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'operation',
+                                components: [
+                                    {
+                                        name: "Local Average",
+                                        type: "op_local_avg"
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'output',
+                                components: [
+                                    {
+                                        name: "Output Layer",
+                                        type: "out_raster_layer"
+                                    },
+                                    {
+                                        name: "Output Band",
+                                        type: "out_raster_band"
+                                    }
+                                ]
+                            },
 
-                    ].map(e => {
-                        return <li>
-                            {e.type}
-                            <ul>
-                                {
-                                    e.components.map(c => {
-                                        return <li style={{
-                                            cursor: 'pointer'
-                                        }} onClick={() => { addComponent(c) }}>{c.name}</li>
-                                    })
-                                }
-                            </ul>
-                        </li>
-                    })
-                }
-            </ul>
-            {
+                        ].map(e => {
+                            return <li>
+                                {e.type}
+                                <ul>
+                                    {
+                                        e.components.map(c => {
+                                            return <li style={{
+                                                cursor: 'pointer'
+                                            }} onClick={() => { addComponent(c) }}>{c.name}</li>
+                                        })
+                                    }
+                                </ul>
+                            </li>
+                        })
+                    }
+                </ul>
+            </div>
+            {/* {
                 components.map((c, _i) => {
                     return <DraggableComponent key={_i} {...c} />
                 })
-            }
+            } */}
+            <div style={{width: '80%', display: 'inline-block', height: 'calc(100vh - 300px)'}}>
+                <GoDiagram components={components} modelChange={(changes)=>{
+                    console.log("Model updated", changes)
+                    if(changes.insertedLinkKeys){
+                        //new link
+                        console.log("Link added")
+                    }else if(changes.modifiedLinkData){
+                        //modified link
+                        console.log("Link updated")
+                    }else if(changes.removedLinkKeys){
+                        console.log("Link removed")
+                    }
+                }} />
+            </div>
         </div>
         
     />
