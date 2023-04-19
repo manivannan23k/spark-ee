@@ -29,9 +29,9 @@ function initDiagram() {
         $(go.Shape, 'Rectangle', {width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
         $(go.TextBlock, {position: new go.Point(0, 0), margin: 0, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
         $(go.TextBlock, {position: new go.Point(0, 30), margin: 10, text: "Select Layer: ", stroke: "red", editable: false, width: 200 }),
-        $(go.TextBlock, {position: new go.Point(80, 30), margin: 10, text: "-", stroke: "red", editable: true, width: 200 }, new go.Binding('choices','lchoices'), new go.Binding('textEdited', 'layerEdited')),
+        $(go.TextBlock, {position: new go.Point(80, 30), margin: 10, stroke: "red", editable: true, width: 200 }, new go.Binding('choices','lchoices'), new go.Binding('textEdited', 'layerEdited'), new go.Binding('text', 'defaultLayer')),
         $(go.TextBlock, {position: new go.Point(0, 60), margin: 10, text: "Select Band: ", stroke: "red", editable: false, width: 200 }),
-        $(go.TextBlock, {position: new go.Point(80, 60), margin: 10 ,text: "-", stroke: "red", editable: true, width: 200 }, new go.Binding('choices','bchoices'), new go.Binding('textEdited', 'bandEdited')),
+        $(go.TextBlock, {position: new go.Point(80, 60), margin: 10, stroke: "red", editable: true, width: 200 }, new go.Binding('choices','bchoices'), new go.Binding('textEdited', 'bandEdited'), new go.Binding('text', 'defaultBand')),
         makePort("InBand", 200, 10, true, false, [0, 90], 1, 0, $),
         // makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true, $),
         // makePort("R", go.Spot.Right, go.Spot.RightSide, true, true, $),
@@ -40,25 +40,36 @@ function initDiagram() {
     const nodeTemplateOpNDI = 
     $(
         go.Node, "Position", {width: 200, height: 100},
-        new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+        // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
         $(go.Shape, 'Rectangle', {width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
-        $(go.TextBlock, {position: new go.Point(0, 0), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
-        $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, text: "NDVI", stroke: "red", editable: false, width: 200 }),
+        $(go.TextBlock, {position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
+        // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
         makePort("OpNDI", 200, 10, false, true, [0, 0], 0, 1, $),
         makePort("OpNDI", 200, 10, true, false, [0, 90], 1, 0, $),
+    );
+    const nodeTemplateOpLocalAvg = 
+    $(
+        go.Node, "Position", {width: 200, height: 100},
+        // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+        $(go.Shape, 'Rectangle', {width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
+        $(go.TextBlock, {position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
+        // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
+        makePort("OpLocalAvg", 200, 10, false, true, [0, 0], 0, 1, $),
+        makePort("OpLocalAvg", 200, 10, true, false, [0, 90], 1, 0, $),
     );
     const nodeTemplateOutBand = 
     $(
         go.Node, "Position", {width: 200, height: 100},
         new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
         $(go.Shape, 'Rectangle', {width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
-        $(go.TextBlock, {position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
+        $(go.TextBlock, {position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200, text: "Output R.Band" }),
         makePort("OutBand", 200, 10, false, true, [0, 0], 0, 1, $),
     );
 
     templateMap.add('', nodeTemplateInputBand);
     templateMap.add('opNDI', nodeTemplateOpNDI);
     templateMap.add('outRasterband', nodeTemplateOutBand)
+    templateMap.add('opLocalAvg', nodeTemplateOpLocalAvg)
 
     const diagram =
       $(go.Diagram,
@@ -133,37 +144,69 @@ const GoDiagram = (props) => {
 
     useEffect(()=>{
         if(props.components){
+            // console.log(props.components)
             let nodes = [];
-            for (let i = 0; i < props.components.length; i++) {
+            let components = [...props.components.inputs, ...props.components.operations]
+            if(props.components.output){
+                components.push(props.components.output)
+            }
+            for (let i = 0; i < components.length; i++) {
                 let node = null;
-                const component = props.components[i];
+                const component = components[i];
                 switch(component.type){
                     case "in_raster_band":
                         node = { 
-                            key: i,
+                            key: component.componentId,
                             text: component.name,
                             color1: 'white',
-                            loc: '0 0',
-                            defaultBand: 'Band 1',
-                            bchoices: Array(7).fill(0).map((e, i)=>`Band ${i+1}`),
-                            lchoices: layers.map(l=>l.name),
+                            // loc: component.loc,
+                            defaultBand: component.band?`Band ${component.band}`:"-",
+                            bchoices: component.id?Array(component.noOfBands).fill(0).map((e, i)=>`Band ${i+1}`): [],
+                            lchoices: layers.map(l=>l.id),
+                            defaultLayer: component.id,
                             bandEdited: (e)=>{handleModelChange({
-                                id: component.id, value: e.text, type: 'inBandEdit'
+                                nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Band', nodeType: "inputs"
                             })},
                             layerEdited: (e)=>{handleModelChange({
-                                id: component.id, value: e.text, type: 'inLayerEdit'
+                                nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Layer', nodeType: "inputs"
                             })}
                         }
                         break;
+                    // case "out_raster_band":
+                    //     node = { key: i, text: component.name, color1: 'white', loc: '0 0', category: 'outRasterband'}
+                    //     break;
+                    case "op_ndi":
+                        node = { 
+                            key: component.componentId,
+                            text: component.name,
+                            color1: 'white',
+                            category: 'opNDI'
+                        }
+                    case "op_local_avg":
+                        node = { 
+                            key: component.componentId,
+                            text: component.name,
+                            color1: 'white',
+                            category: 'opLocalAvg'
+                        }
+                        break;
                     case "out_raster_band":
-                        node = { key: i, text: component.name, color1: 'white', loc: '0 0', category: 'outRasterband'}
+                        node = { 
+                            key: component.componentId,
+                            text: component.name,
+                            color1: 'white',
+                            category: 'outRasterband'
+                        }
                         break;
                     default:
-                        node = { key: i, text: 'Algorithm', color1: 'white', loc: '100 150', defaultBand: 'NDVI', category: 'opNDI' }
+                        // node = { key: i, text: 'Algorithm', color1: 'white', loc: '100 150', defaultBand: 'NDVI', category: 'opNDI' }
                         break;
                 }
-                nodes.push(node)
+                console.log(component.componentId, component.type, node)
+                if(node)
+                    nodes.push(node)
             }
+            // console.log(nodes)
             // console.log(nodes)
             setNodeArray(nodes);
         }
@@ -176,15 +219,7 @@ const GoDiagram = (props) => {
             initDiagram={initDiagram}
             divClassName='diagram-component'
             nodeDataArray={nodeArray}
-            linkDataArray={[
-            // { key: -1, from: 0, to: 2 },
-            // { key: -2, from: 1, to: 2 },
-            // { key: -3, from: 2, to: 3 },
-            // { key: -2, from: 0, to: 2 },
-            // { key: -3, from: 1, to: 1 },
-            // { key: -4, from: 2, to: 3 },
-            // { key: -5, from: 3, to: 0 }
-            ]}
+            linkDataArray={props.modelLinks}
             onModelChange={handleModelChange}
 
         />

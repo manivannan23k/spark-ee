@@ -17,7 +17,7 @@ const QueryPanel = (props) => {
     const [sensor, setSensor] = React.useState("Landsat_OLI")
     const [fromDate, setFromDate] = React.useState(new Date("2018-12-10"))
     const [toDate, setToDate] = React.useState(new Date("2018-12-30"))
-    const [aoi, setAoi] = React.useState('qwertyuiopasdfgh')
+    const [aoi, setAoi] = React.useState('0000000000000000')
 
     const [redBand, setRedBand] = React.useState(4)
     const [greenBand, setGreenBand] = React.useState(3)
@@ -38,7 +38,7 @@ const QueryPanel = (props) => {
     }
 
     const queryDataset = () => {
-        fetch(`http://localhost:8082/getTimeIndexes?sensorName=Landsat_OLI&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
+        fetch(`http://localhost:8082/getTimeIndexes?sensorName=${sensor}&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
             .then(r => r.json())
             .then(r => {
                 console.log(r)
@@ -68,6 +68,7 @@ const QueryPanel = (props) => {
                 onChange={(e) => { setSensor(e.target.value) }}
             >
                 <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
+                <MenuItem value={'SingleRasterBand'}>SingleRasterBand</MenuItem>
             </Select>
         </FormControl>
         <br/><br/>
@@ -82,6 +83,7 @@ const QueryPanel = (props) => {
                 <MenuItem value={'uTUYvVGHgcvchgxc'}>AOI 1</MenuItem>
                 <MenuItem value={'qwertyuiopasdfgh'}>AOI 2</MenuItem>
                 <MenuItem value={'wwertyuiopasdfgh'}>AOI 3</MenuItem>
+                <MenuItem value={'0000000000000000'}>AOI 4</MenuItem>
                 
             </Select>
         </FormControl>

@@ -1,0 +1,30 @@
+{
+    "inputs": [
+        {
+            "id": "I1",
+            "tIndexes": [914925604, 913543204],
+            "isTemporal": true,
+            "aoiCode": "qwertyuiopasdfgh",
+            "dsName": "Landsat_OLI"
+        }
+    ],
+    "operations": [
+        {
+            "id": "O1",
+            "type": "op_normalized_difference",
+            "inputs": [{
+                "layer": "I1",
+                "band": 4
+            },{
+                "layer": "I1",
+                "band": 3
+            }],
+            "output": {
+                "id": "O1"
+            }
+        }
+    ],
+    "output": {
+        "id": "O1"
+    }
+}

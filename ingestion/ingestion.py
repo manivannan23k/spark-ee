@@ -188,7 +188,7 @@ def partition_data(input_tiff, input_ts, sensor_name):
         "dataset_id": ds_def["dataset_id"],
         "geom": f"st_geomfromgeojson('{extent_geom.ExportToJson()}')",
         "time_index": time_index,
-        "date_time": f"to_timestamp('{config['start_time']}', 'YYYY-MM-DD hh24:mi:ss')::timestamp without time zone"
+        "date_time": f"to_timestamp('{input_ts/1000}')::timestamp without time zone"
     }
     ingest_id = add_db_ingestion(ingest_data)
     

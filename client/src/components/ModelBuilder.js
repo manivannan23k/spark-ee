@@ -84,18 +84,84 @@ const ModelBuilder = (props) => {
         }
     ]
 
-    const [components, setComponents] = useState([])
+    let inputTypes = ['in_raster_band', 'in_raster_layer'];
+    let outputTypes = ['out_raster_band'];
+    let operationTypes = ['op_ndi', 'op_local_avg'];
+    const [components, setComponents] = useState({
+        inputs: [],
+        output: null,
+        operations: []
+    })
+    const [modelLinks, setModelLinks] = useState([]);
 
-    const addComponent = (c) => {
-        setComponents([
-            ...components,
-            {
-                id: components.length,
-                type: c.type,
-                name: c.name
+    const getRandomString = (l) => (Math.random() + 1).toString(36).substring(l);
+
+    const addComponent = (componentType, c) => {
+        if(componentType==='input'){
+            let component = {
+                "componentId": getRandomString(6),
+                "id": "",
+                "tIndexes": [],
+                "isTemporal": false,
+                "aoiCode": "",
+                "dsName": "",
+                "layerName": "",
+                "type": c.type,
+                "name": c.name,
+                "noOfBands": 7,
+                "band": "",
+                "loc": "0 0",
+                "prevLoc": null
             }
-        ])
+            setComponents({
+                ...components,
+                inputs: [
+                    ...components.inputs,
+                    component
+                ]
+            })
+        }else if(componentType==='operation'){
+            let component = {
+                "componentId": getRandomString(6),
+                "id": "",
+                "type": c.type,
+                "name": c.name,
+                "inputs": [],
+                "output": {
+                    "id": "O1"
+                }
+            }
+            setComponents({
+                ...components,
+                operations: [
+                    ...components.operations,
+                    component
+                ]
+            })
+        }else if(componentType==='output'){
+            let component = {
+                "componentId": getRandomString(6),
+                "type": c.type,
+                "id": ""
+            }
+            setComponents({
+                ...components,
+                output: component
+            })
+        }
+        // setComponents([
+        //     ...components,
+        //     {
+        //         id: components.length,
+        //         type: c.type,
+        //         name: c.name
+        //     }
+        // ])
     }
+
+    // useEffect(()=>{
+    //     console.log(components)
+    // }, [components])
     
     return <AppModal btnText={"Open Model Builder"} flag={props.dialog.showModelBuilderDialog} setFlag={(f)=>{
         dispatch(toggleModelBuilderDialog(f))
@@ -127,6 +193,10 @@ const ModelBuilder = (props) => {
                                 type: 'operation',
                                 components: [
                                     {
+                                        name: "Normalized Difference",
+                                        type: "op_ndi"
+                                    },
+                                    {
                                         name: "Local Average",
                                         type: "op_local_avg"
                                     }
@@ -154,7 +224,7 @@ const ModelBuilder = (props) => {
                                         e.components.map(c => {
                                             return <li style={{
                                                 cursor: 'pointer'
-                                            }} onClick={() => { addComponent(c) }}>{c.name}</li>
+                                            }} onClick={() => { addComponent(e.type, c) }}>{c.name}</li>
                                         })
                                     }
                                 </ul>
@@ -169,18 +239,241 @@ const ModelBuilder = (props) => {
                 })
             } */}
             <div style={{width: '80%', display: 'inline-block', height: 'calc(100vh - 300px)'}}>
-                <GoDiagram components={components} modelChange={(changes)=>{
+                <GoDiagram components={components} modelLinks={modelLinks} modelChange={(changes)=>{
                     console.log("Model updated", changes)
-                    if(changes.insertedLinkKeys){
-                        //new link
-                        console.log("Link added")
-                    }else if(changes.modifiedLinkData){
-                        //modified link
-                        console.log("Link updated")
-                    }else if(changes.removedLinkKeys){
-                        console.log("Link removed")
+                    // if(changes.insertedLinkKeys){
+                    //     //new link
+                    //     console.log("Link added")
+                    // }else if(changes.modifiedLinkData){
+                    //     //modified link
+                    //     console.log("Link updated")
+                    // }else if(changes.removedLinkKeys){
+                    //     console.log("Link removed")
+                    // }
+
+                    try{
+                        if(changes.eventType === 'nodeUpdate'){
+                            let component = components[changes.nodeType].findIndex((c)=>c.componentId===changes.nodeId);
+                            if(inputTypes.indexOf(changes.type.split('#')[0])!==-1){
+                                let inputs = [...components.inputs];
+                                inputs.splice(component, 1);
+                                component = components[changes.nodeType][component];
+                                let layer = null;
+                                switch(changes.type){
+                                    case "in_raster_band#Layer":
+                                        layer = props.map.layers[changes.value]
+                                        component.tIndexes = layer.tIndexes;
+                                        component.aoiCode = layer.aoiCode;
+                                        component.isTemporal = layer.tIndexes.length>1;
+                                        component.dsName = layer.dsId;
+                                        component.id = changes.value
+                                        component.loc = '100 100'
+                                        break;
+                                    
+                                    case "in_raster_band#Band":
+                                        layer = props.map.layers[component.id]
+                                        component.band = changes.value.split(" ")[1]
+                                        component.loc = '200 150'
+                                        break;
+                                }
+                                setComponents({
+                                    ...components,
+                                    inputs: [
+                                        ...inputs,
+                                        component
+                                    ]
+                                })
+                            }
+                            
+                        }
+
+                        // if(changes.modifiedNodeData){
+                        //     let inputs = [...components["inputs"]];
+                        //     let upComponents = changes.modifiedNodeData.map(n=>{
+                        //         let componentIdx = inputs.findIndex((c)=>c.componentId===n.key);
+                        //         let component = inputs[componentIdx];
+                        //         if(component.loc!==n.loc && n.loc!==component.prevLoc){
+                        //             inputs.splice(componentIdx, 1);
+                        //             component.loc = n.loc;
+                        //             return component
+                        //         }else{
+                        //             return null;
+                        //         }
+                        //     }).filter(e=>Boolean(e))
+                        //     // console.log(upComponents)
+                        //     if(upComponents.length>0){
+                        //         // setComponents({
+                        //         //     ...components,
+                        //         //     inputs: [
+                        //         //         ...inputs,
+                        //         //         ...upComponents
+                        //         //     ]
+                        //         // })
+                        //     }
+                        // }
+                        if(changes.removedNodeKeys){
+                            let inputs = [...components["inputs"]];
+                            let operations = [...components["operations"]];
+                            // console.log(inputs)
+                            changes.removedNodeKeys.map(n=>{
+                                let componentIdx = inputs.findIndex((c)=>c.componentId===n);
+                                if(componentIdx!==-1){
+                                    inputs.splice(componentIdx, 1);
+                                }
+                                componentIdx = operations.findIndex((c)=>c.componentId===n);
+                                if(componentIdx!==-1){
+                                    operations.splice(componentIdx, 1);
+                                }
+                            });
+                            setComponents({
+                                ...components,
+                                inputs: [
+                                    ...inputs
+                                ],
+                                operations: [
+                                    ...operations
+                                ]
+                            })
+                        }
+
+                        if(changes.insertedLinkKeys){
+
+                            const getCompById = (id) => {
+                                let inputs = [...components["inputs"]];
+                                let operations = [...components["operations"]];
+
+                                let componentIdx = inputs.findIndex((c)=>c.componentId===id);
+                                if(componentIdx!==-1){
+                                    return {component: inputs[componentIdx], type: "inputs", index: componentIdx}
+                                }
+                                componentIdx = operations.findIndex((c)=>c.componentId===id);
+                                if(componentIdx!==-1){
+                                    return {component: operations[componentIdx], type: "operations", index: componentIdx}
+                                }
+                                if(components.output && components.output.componentId===id){
+                                    return {component: components.output, type: "operations", index: componentIdx}
+                                }
+                                return null;
+                            }
+
+                            let linkIds = changes.insertedLinkKeys;
+                            let newLink = changes.modifiedLinkData[0];
+                            if(modelLinks.map(e=>e.key).indexOf(newLink.key)!==-1){
+                                return console.log("Link Exists")
+                            }
+                            let fromComp = getCompById(newLink.from);
+                            let toComp = getCompById(newLink.to);
+                            if(inputTypes.indexOf(fromComp.component.type)!==-1 && operationTypes.indexOf(toComp.component.type) !== -1){
+                                let opInput = {
+                                    layer: fromComp.component.componentId,
+                                    band: fromComp.band
+                                };
+                                toComp.component.inputs.push(opInput)
+                                let operations = [...components.operations];
+                                operations.splice(toComp.index, 1);
+                                setComponents({
+                                    ...components,
+                                    operations: [
+                                        ...operations,
+                                        toComp.component
+                                    ]
+                                })
+                                setModelLinks([
+                                    ...modelLinks,
+                                    newLink
+                                ])
+                            }else if(operationTypes.indexOf(fromComp.component.type)!==-1 && outputTypes.indexOf(toComp.component.type) !== -1){
+                                let modelOutput = {...components.output};
+                                // modelOutput.id = fromComp.component.componentId
+                                let opOutput = {
+                                    layer: modelOutput.componentId,
+                                    band: fromComp.band
+                                };
+                                fromComp.component.output = opOutput
+                                let operations = [...components.operations];
+                                operations.splice(fromComp.index, 1);
+                                setComponents({
+                                    ...components,
+                                    operations: [
+                                        ...operations,
+                                        fromComp.component
+                                    ],
+                                    output: modelOutput
+                                })
+                                setModelLinks([
+                                    ...modelLinks,
+                                    newLink
+                                ])
+                            }
+                        }
+                    }catch(e){
+                        console.log(e);
                     }
                 }} />
+                <button onClick={()=>{
+                    setComponents({
+                        inputs: [],
+                        output: null,
+                        operations: []
+                    })
+                    setModelLinks([])
+                }}>Clear</button>
+                <button onClick={()=>{
+                    // console.log(components);
+                    let reqComps = {
+                        inputs: [], operations: [], output: {}
+                    };
+                    for (let i = 0; i < components.inputs.length; i++) {
+                        let input = components.inputs[i];
+                        input = {
+                            "id": input.componentId,
+                            "tIndexes": input.tIndexes,
+                            "isTemporal": input.isTemporal,
+                            "aoiCode": input.aoiCode,
+                            "dsName": input.dsName
+                        }
+                        reqComps.inputs.push(input)
+                    }
+                    
+                    for (let i = 0; i < components.operations.length; i++) {
+                        let operation = components.operations[i];
+                        operation = {
+                            "id": operation.componentId,
+                            "type": operation.type,
+                            "inputs": operation.inputs.map(inp=>{
+                                let il = components.inputs.filter(e=>{return e.componentId===inp.layer})[0]
+                                return {
+                                    id: inp.layer,
+                                    band: parseInt(il.band)
+                                }
+                            }),
+                            "output": {
+                                "id": operation.output.layer
+                            }
+                        }
+                        reqComps.operations.push(operation)
+                    }
+                    reqComps.output = {
+                        id: components.output.componentId
+                    }
+
+                    console.log(reqComps)
+                    fetch('http://localhost:8081/process', {
+                        body: JSON.stringify({
+                            data: JSON.stringify(reqComps)
+                        }),
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(r=>r.json())
+                    .then(r=>console.log(r))
+                    .catch(e=>console.log(e))
+
+
+                }}>Run</button>
             </div>
         </div>
         

@@ -32,13 +32,17 @@ import spray.json.DefaultJsonProtocol._
 
 import java.util.concurrent.atomic.LongAdder
 import scala.collection.concurrent.TrieMap
+import com.gishorizon.operations._
+import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 
-case class IngestionRequest(sensor: String, srcPath: String, dataTime: String) //2021-05-02T00:00:00Z
+case class IngestionRequest(sensor: String, srcPath: String, dataTime: String)
 case class IngestionResponse(response: Map[String, String])
 case class TestResponse(response: Map[String, String])
+case class ProcessRequest(data: String)
 
 object RequestResponseProtocol extends DefaultJsonProtocol {
   implicit val ingestRequest = jsonFormat3(IngestionRequest)
+  implicit val processRequest = jsonFormat1(ProcessRequest)
   implicit val ingestResponse = jsonFormat1(IngestionResponse)
   implicit val testResponse = jsonFormat1(TestResponse)
 }
@@ -183,6 +187,68 @@ object Server extends HttpApp with App {
             }
           }
         }
+      path("process") {
+        entity(as[ProcessRequest]) { processRequest =>
+          complete {
+            Future {
+              val json: JsValue = Json.parse(processRequest.data)
+              val inJsArray = json.asInstanceOf[JsObject].value("inputs").asInstanceOf[JsArray]
+              val opJsArray = json.asInstanceOf[JsObject].value("operations").asInstanceOf[JsArray]
+
+              val processConfig = new ProcessConfig()
+              var inputs: Array[ProcessInput] = Array()
+              var operations: Array[ProcessOperation] = Array()
+              val output = new ProcessOutput()
+              output.id = json.asInstanceOf[JsObject].value("output").asInstanceOf[JsObject].value("id").asInstanceOf[play.api.libs.json.JsString].value
+
+              for(inJs <- inJsArray.value.indices){
+                val iId = inJsArray.value(inJs).asInstanceOf[JsObject].value("id").asInstanceOf[play.api.libs.json.JsString].value
+                val tIndexes = inJsArray.value(inJs).asInstanceOf[JsObject].value("tIndexes").asInstanceOf[JsArray].value.map(e=>e.as[BigInt]).toArray
+                val aoiCode = inJsArray.value(inJs).asInstanceOf[JsObject].value("aoiCode").asInstanceOf[play.api.libs.json.JsString].value
+                val dsName = inJsArray.value(inJs).asInstanceOf[JsObject].value("dsName").asInstanceOf[play.api.libs.json.JsString].value
+                val pIn = new ProcessInput()
+                pIn.id = iId
+                pIn.tIndexes = tIndexes
+                pIn.isTemporal = true
+                pIn.aoiCode = aoiCode
+                pIn.dsName = dsName
+                inputs = inputs :+ pIn
+              }
+              for (opJs <- opJsArray.value.indices) {
+                val iId = opJsArray.value(opJs).asInstanceOf[JsObject].value("id").asInstanceOf[play.api.libs.json.JsString].value
+                val opInputs = opJsArray.value(opJs).asInstanceOf[JsObject].value("inputs").asInstanceOf[JsArray].value.map(e => {
+                  val lId = e.asInstanceOf[JsObject].value("id").asInstanceOf[play.api.libs.json.JsString].value
+                  val lBand = e.asInstanceOf[JsObject].value("band").asInstanceOf[play.api.libs.json.JsNumber].value
+                  val opIn = new ProcessInput()
+                  opIn.id = lId
+                  opIn.band = lBand.toInt
+                  opIn
+                }).toArray
+                val opType = opJsArray.value(opJs).asInstanceOf[JsObject].value("type").asInstanceOf[play.api.libs.json.JsString].value
+                val opOutput = new ProcessOutput()
+                val opId = opJsArray.value(opJs).asInstanceOf[JsObject].value("output").asInstanceOf[JsObject].value("id").asInstanceOf[play.api.libs.json.JsString].value
+                opOutput.id = opId
+                val pIn = new ProcessOperation()
+                pIn.id = iId
+                pIn.opType = opType
+                pIn.inputs = opInputs
+                pIn.output = opOutput
+                operations = operations :+ pIn
+              }
+
+              processConfig.inputs = inputs
+              processConfig.output = output
+              processConfig.operations = operations
+
+              WorkProcess.run(processConfig)
+
+              Map {
+                "message" -> "Success"
+              }
+            }
+          }
+        }
+      }
       }
   }
 

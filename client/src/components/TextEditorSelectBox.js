@@ -55,7 +55,11 @@ var customEditor = new go.HTMLInfo();
   }
 
   customEditor.hide = function(diagram, tool) {
-    diagram.div.removeChild(customSelectBox);
+    try{
+      diagram.div.removeChild(customSelectBox);
+    }catch(e){
+      console.log(e);
+    }
   }
 
   customEditor.valueFunction = function() { return customSelectBox.value; }

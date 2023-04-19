@@ -82,20 +82,20 @@ class GenerateSIndex(BaseModel):
 #         "data": out_path
 #     }
 
-# @app.get("/ingestData")
-# def ingest_data(filePath: str, sensorName: str, ts: int):
-#     result = partition_data(filePath, ts, sensorName)
-#     return {
-#         "error": False,
-#         "message": "Success",
-#         "data": result
-#     }
+@app.get("/ingestData")
+def ingest_data(filePath: str, sensorName: str, ts: int):
+    result = partition_data(filePath, ts, sensorName)
+    return {
+        "error": False,
+        "message": "Success",
+        "data": result
+    }
 
 @app.get("/getTimeIndexes")
 def get_time_indexes(sensorName: str, fromTs: int = None, toTs: int = None, aoi_code: str = 'uTUYvVGHgcvchgxc'):
     ds_def = Db.get_db_dataset_def_by_name(sensorName)
     result = Db.get_time_indexes_for_ds_aoi(aoi_code, ds_def['dataset_id'], fromTs, toTs)
-    
+    print(result)
     data = []
     # ts = []
     # t_indexes = []
@@ -259,6 +259,7 @@ def get_data_ref_for_aoi(sensorName: str, level: int, tIndex: int, aoiCode: str)
 @app.get("/tile/{sensorName}/{z}/{x}/{y}.png")
 def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = None, vmin: float = 0, vmax: float = 0.75, aoi_code: str = 'uTUYvVGHgcvchgxc'):
 
+    dataset_def = Db.get_db_dataset_def_by_name(sensorName)
     aoi_value = Db.get_aoi_geom_by_aoi_code(aoi_code)
     start_time = time.time()
     gj = aoi_value['geom']
@@ -320,6 +321,9 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
             rgb_bands = [2,3,4]
         else:
             rgb_bands = [int(b) for b in bands.split(',')]
+        
+        if(dataset_def['no_of_bands']==1):
+            rgb_bands = [1,1,1]
         
         rgb_data = []
         alpha_data = []
