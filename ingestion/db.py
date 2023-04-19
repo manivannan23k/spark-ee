@@ -91,6 +91,7 @@ class Db:
             select ingest_master.ingest_id, ingest_master.dataset_id, ingest_master.time_index, ingest_master.date_time from ingest_master, aoi
             where st_intersects(ingest_master.geom, aoi.geom) and ingest_master.dataset_id={dataset_id}
         """
+        print(qry)
         if(from_ts is not None):
             qry += f" and ingest_master.date_time >= to_timestamp({from_ts/1000})::timestamp without time zone"
         if(to_ts is not None):

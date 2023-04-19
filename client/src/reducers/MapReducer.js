@@ -2,13 +2,11 @@ import * as AppConfig from '../utils/AppConfig'
 
 const initialState = {
     // center: [-36.902306, 174.696037],
-    center: [25.71315688761512, 
-        90.12840270996094],
+    center: [30.035, 77.936],//[29.1653,79.6124],
     zoom: 11,
     layers: AppConfig.layers,
     mapView: {
-        center: [25.71315688761512, 
-            90.12840270996094],
+        center: [29.1653, 79.6124],
         zoom: 11
     },
     changeMapView: false,
@@ -86,20 +84,20 @@ const MapReducer = (state = initialState, action) => {
                 layers: layers
             }
         case "REMOVE_LAYER":
-            if(layers[action.payload])
+            if (layers[action.payload])
                 delete layers[action.payload]
             return {
                 ...state,
                 layers: layers
             }
         case "ADD_SEARCH_LAYER":
-            if(Boolean(state.searchLayer) && Boolean(layers[state.searchLayer])){
+            if (Boolean(state.searchLayer) && Boolean(layers[state.searchLayer])) {
                 delete layers[state.searchLayer];
             }
             return {
                 ...state,
                 searchLayer: action.payload,
-                layers: {...layers}
+                layers: { ...layers }
             }
         case "SET_QUERY_RESULTS":
             return {

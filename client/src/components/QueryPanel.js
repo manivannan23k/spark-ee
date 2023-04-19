@@ -14,10 +14,10 @@ import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggle
 const QueryPanel = (props) => {
 
     const dispatch = useDispatch()
-    const [sensor, setSensor] = React.useState("Landsat_OLI")
-    const [fromDate, setFromDate] = React.useState(new Date("2018-12-10"))
-    const [toDate, setToDate] = React.useState(new Date("2018-12-30"))
-    const [aoi, setAoi] = React.useState('0000000000000000')
+    const [sensor, setSensor] = React.useState("SampleTimeSeries")
+    const [fromDate, setFromDate] = React.useState(new Date("1991-01-01"))
+    const [toDate, setToDate] = React.useState(new Date("1991-01-02"))
+    const [aoi, setAoi] = React.useState('aoi_RJ_Park')
 
     const [redBand, setRedBand] = React.useState(4)
     const [greenBand, setGreenBand] = React.useState(3)
@@ -42,11 +42,11 @@ const QueryPanel = (props) => {
             .then(r => r.json())
             .then(r => {
                 console.log(r)
-                if(r.data.length>0){
+                if (r.data.length > 0) {
                     dispatch(toggleAddLayerDialog(false))
                     dispatch(setQueryResults(r.data))
                     dispatch(toggleQueryResultsDialog(true))
-                }else{
+                } else {
                     alert("No result")
                 }
             })
@@ -69,9 +69,10 @@ const QueryPanel = (props) => {
             >
                 <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
                 <MenuItem value={'SingleRasterBand'}>SingleRasterBand</MenuItem>
+                <MenuItem value={'SampleTimeSeries'}>SampleTimeSeries</MenuItem>
             </Select>
         </FormControl>
-        <br/><br/>
+        <br /><br />
         <FormControl fullWidth>
             <InputLabel id="aoi-select">AOI</InputLabel>
             <Select
@@ -80,35 +81,36 @@ const QueryPanel = (props) => {
                 label="AOI"
                 onChange={(e) => { setAoi(e.target.value) }}
             >
-                <MenuItem value={'uTUYvVGHgcvchgxc'}>AOI 1</MenuItem>
-                <MenuItem value={'qwertyuiopasdfgh'}>AOI 2</MenuItem>
-                <MenuItem value={'wwertyuiopasdfgh'}>AOI 3</MenuItem>
-                <MenuItem value={'0000000000000000'}>AOI 4</MenuItem>
-                
+                <MenuItem value={'aoi_haldwani'}>AOI Haldwani</MenuItem>
+                <MenuItem value={'aoi_shilma'}>AOI Shimla</MenuItem>
+                <MenuItem value={'aoi_haldwani_tw'}>AOI Haldwani Town</MenuItem>
+                <MenuItem value={'aoi_haldwani_outer'}>AOI Haldwani Outer</MenuItem>
+                <MenuItem value={'aoi_RJ_Park'}>AOI Rajaji Park</MenuItem>
+
             </Select>
         </FormControl>
-        <br/><br/>
-            <Typography variant="body2">From date</Typography>
-            <DatePicker
-                style={{
-                    "padding": 8
-                }}
-                selected={fromDate}
-                onChange={(date) => setFromDate(date)}
-            />
-            <br />
-            <Typography variant="body2">To date</Typography>
-            <DatePicker
-                style={{
-                    "padding": 8
-                }}
-                selected={toDate}
-                onChange={(date) => setToDate(date)}
-            />
-            <br />
+        <br /><br />
+        <Typography variant="body2">From date</Typography>
+        <DatePicker
+            style={{
+                "padding": 8
+            }}
+            selected={fromDate}
+            onChange={(date) => setFromDate(date)}
+        />
+        <br />
+        <Typography variant="body2">To date</Typography>
+        <DatePicker
+            style={{
+                "padding": 8
+            }}
+            selected={toDate}
+            onChange={(date) => setToDate(date)}
+        />
+        <br />
 
-            <br />
-            <Button variant="contained" onClick={queryDataset}>Submit</Button>
+        <br />
+        <Button variant="contained" onClick={queryDataset}>Submit</Button>
         <br />
 
         {/* <Typography variant="h6" gutterBottom component="div">

@@ -95,7 +95,7 @@ def ingest_data(filePath: str, sensorName: str, ts: int):
 def get_time_indexes(sensorName: str, fromTs: int = None, toTs: int = None, aoi_code: str = 'uTUYvVGHgcvchgxc'):
     ds_def = Db.get_db_dataset_def_by_name(sensorName)
     result = Db.get_time_indexes_for_ds_aoi(aoi_code, ds_def['dataset_id'], fromTs, toTs)
-    print(result)
+    # print(result)
     data = []
     # ts = []
     # t_indexes = []
@@ -301,6 +301,7 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
     if(level < 4):
         level = 4
     tiles = get_tile_intersection(level, [bbox[0], bbox[3], bbox[2], bbox[1]]) #[n.object for n in index_dat[level].intersection([bbox[0], bbox[3], bbox[2], bbox[1]], objects=True)]
+    # print(tiles)
     if(tiles is None):
         print("Failed to read sIndex")
         return None
@@ -327,6 +328,12 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
         
         rgb_data = []
         alpha_data = []
+        if(dataset_def['ds_name']=='Landsat_OLI'):
+            vmax = 20000
+        elif(dataset_def['ds_name']=='SampleTimeSeries'):
+            vmax = 255
+        else:
+            vmax = 0.5
         for bid in rgb_bands:
             data = out_ds.GetRasterBand(bid).ReadAsArray()
             # data = data * 2.75e-05 - 0.2
@@ -335,7 +342,7 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
             data = scipy.ndimage.zoom(data, zoom=zoom_factors, order=0)
             data = np.nan_to_num(data)
             print(np.nanmax(data))
-            data = data.astype(np.float64) / np.nanmax(data)
+            data = data.astype(np.float64) / vmax #np.nanmax(data)
             data = 255 * data
             data[data<0] = 0
             # print(np.nanmax(data), data[211,164])

@@ -186,7 +186,7 @@ def partition_data(input_tiff, input_ts, sensor_name):
     ds_def = get_db_dataset_def_by_name(sensor_name)
     ingest_data = {
         "dataset_id": ds_def["dataset_id"],
-        "geom": f"st_geomfromgeojson('{extent_geom.ExportToJson()}')",
+        "geom": f"st_setsrid(st_geomfromgeojson('{extent_geom.ExportToJson()}'), 4326)",
         "time_index": time_index,
         "date_time": f"to_timestamp('{input_ts/1000}')::timestamp without time zone"
     }

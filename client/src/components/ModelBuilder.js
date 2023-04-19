@@ -97,7 +97,7 @@ const ModelBuilder = (props) => {
     const getRandomString = (l) => (Math.random() + 1).toString(36).substring(l);
 
     const addComponent = (componentType, c) => {
-        if(componentType==='input'){
+        if (componentType === 'input') {
             let component = {
                 "componentId": getRandomString(6),
                 "id": "",
@@ -120,7 +120,7 @@ const ModelBuilder = (props) => {
                     component
                 ]
             })
-        }else if(componentType==='operation'){
+        } else if (componentType === 'operation') {
             let component = {
                 "componentId": getRandomString(6),
                 "id": "",
@@ -138,7 +138,7 @@ const ModelBuilder = (props) => {
                     component
                 ]
             })
-        }else if(componentType==='output'){
+        } else if (componentType === 'output') {
             let component = {
                 "componentId": getRandomString(6),
                 "type": c.type,
@@ -162,13 +162,13 @@ const ModelBuilder = (props) => {
     // useEffect(()=>{
     //     console.log(components)
     // }, [components])
-    
-    return <AppModal btnText={"Open Model Builder"} flag={props.dialog.showModelBuilderDialog} setFlag={(f)=>{
+
+    return <AppModal btnText={"Open Model Builder"} flag={props.dialog.showModelBuilderDialog} setFlag={(f) => {
         dispatch(toggleModelBuilderDialog(f))
     }} content=
         <div style={{ display: 'flex' }}>
-        
-            <div style={{width: '20%', display: 'inline-block'}}>
+
+            <div style={{ width: '20%', display: 'inline-block' }}>
                 <ul style={{
                     listStyle: 'none',
                     margin: 0,
@@ -178,6 +178,7 @@ const ModelBuilder = (props) => {
                         [
                             {
                                 type: 'input',
+                                name: "Input Types",
                                 components: [
                                     {
                                         name: "Raster Layer",
@@ -191,6 +192,7 @@ const ModelBuilder = (props) => {
                             },
                             {
                                 type: 'operation',
+                                name: "Operations",
                                 components: [
                                     {
                                         name: "Normalized Difference",
@@ -204,6 +206,7 @@ const ModelBuilder = (props) => {
                             },
                             {
                                 type: 'output',
+                                name: "Output Types",
                                 components: [
                                     {
                                         name: "Output Layer",
@@ -217,13 +220,34 @@ const ModelBuilder = (props) => {
                             },
 
                         ].map(e => {
-                            return <li>
-                                {e.type}
-                                <ul>
+                            return <li style={{
+                                margin: 6,
+                                background: '#eee',
+                                padding: 8,
+                                width: 'fit-content',
+                                borderRadius: 4,
+                                boxShadow: '2px 2px 2px -1px #7A7A79',
+                                fontFamily: 'fangsong',
+                                fontSize: '16',
+                                fontWeight: 500
+                            }}>
+                                {e.name}
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
                                     {
                                         e.components.map(c => {
                                             return <li style={{
-                                                cursor: 'pointer'
+                                                width: '150px',
+                                                cursor: 'pointer',
+                                                padding: '4px',
+                                                textDecoration: 'none',
+                                                background: e.type === 'input' ? 'rgb(151 255 178)' : (e.type === 'output' ? 'rgb(142 224 255)' : 'rgb(255 251 133)'),
+                                                borderRadius: '4px',
+                                                boxShadow: '2px 2px 2px -1px #7A7A79',
+                                                textAlign: 'center',
+                                                margin: '2px',
+                                                fontFamily: 'fangsong',
+                                                fontSize: '14px',
+                                                fontWeight: 300
                                             }} onClick={() => { addComponent(e.type, c) }}>{c.name}</li>
                                         })
                                     }
@@ -238,8 +262,8 @@ const ModelBuilder = (props) => {
                     return <DraggableComponent key={_i} {...c} />
                 })
             } */}
-            <div style={{width: '80%', display: 'inline-block', height: 'calc(100vh - 300px)'}}>
-                <GoDiagram components={components} modelLinks={modelLinks} modelChange={(changes)=>{
+            <div style={{ width: '80%', display: 'inline-block', height: 'calc(100vh - 300px)' }}>
+                <GoDiagram components={components} modelLinks={modelLinks} modelChange={(changes) => {
                     console.log("Model updated", changes)
                     // if(changes.insertedLinkKeys){
                     //     //new link
@@ -251,25 +275,25 @@ const ModelBuilder = (props) => {
                     //     console.log("Link removed")
                     // }
 
-                    try{
-                        if(changes.eventType === 'nodeUpdate'){
-                            let component = components[changes.nodeType].findIndex((c)=>c.componentId===changes.nodeId);
-                            if(inputTypes.indexOf(changes.type.split('#')[0])!==-1){
+                    try {
+                        if (changes.eventType === 'nodeUpdate') {
+                            let component = components[changes.nodeType].findIndex((c) => c.componentId === changes.nodeId);
+                            if (inputTypes.indexOf(changes.type.split('#')[0]) !== -1) {
                                 let inputs = [...components.inputs];
                                 inputs.splice(component, 1);
                                 component = components[changes.nodeType][component];
                                 let layer = null;
-                                switch(changes.type){
+                                switch (changes.type) {
                                     case "in_raster_band#Layer":
                                         layer = props.map.layers[changes.value]
                                         component.tIndexes = layer.tIndexes;
                                         component.aoiCode = layer.aoiCode;
-                                        component.isTemporal = layer.tIndexes.length>1;
+                                        component.isTemporal = layer.tIndexes.length > 1;
                                         component.dsName = layer.dsId;
                                         component.id = changes.value
                                         component.loc = '100 100'
                                         break;
-                                    
+
                                     case "in_raster_band#Band":
                                         layer = props.map.layers[component.id]
                                         component.band = changes.value.split(" ")[1]
@@ -284,7 +308,7 @@ const ModelBuilder = (props) => {
                                     ]
                                 })
                             }
-                            
+
                         }
 
                         // if(changes.modifiedNodeData){
@@ -311,17 +335,17 @@ const ModelBuilder = (props) => {
                         //         // })
                         //     }
                         // }
-                        if(changes.removedNodeKeys){
+                        if (changes.removedNodeKeys) {
                             let inputs = [...components["inputs"]];
                             let operations = [...components["operations"]];
                             // console.log(inputs)
-                            changes.removedNodeKeys.map(n=>{
-                                let componentIdx = inputs.findIndex((c)=>c.componentId===n);
-                                if(componentIdx!==-1){
+                            changes.removedNodeKeys.map(n => {
+                                let componentIdx = inputs.findIndex((c) => c.componentId === n);
+                                if (componentIdx !== -1) {
                                     inputs.splice(componentIdx, 1);
                                 }
-                                componentIdx = operations.findIndex((c)=>c.componentId===n);
-                                if(componentIdx!==-1){
+                                componentIdx = operations.findIndex((c) => c.componentId === n);
+                                if (componentIdx !== -1) {
                                     operations.splice(componentIdx, 1);
                                 }
                             });
@@ -336,34 +360,34 @@ const ModelBuilder = (props) => {
                             })
                         }
 
-                        if(changes.insertedLinkKeys){
+                        if (changes.insertedLinkKeys) {
 
                             const getCompById = (id) => {
                                 let inputs = [...components["inputs"]];
                                 let operations = [...components["operations"]];
 
-                                let componentIdx = inputs.findIndex((c)=>c.componentId===id);
-                                if(componentIdx!==-1){
-                                    return {component: inputs[componentIdx], type: "inputs", index: componentIdx}
+                                let componentIdx = inputs.findIndex((c) => c.componentId === id);
+                                if (componentIdx !== -1) {
+                                    return { component: inputs[componentIdx], type: "inputs", index: componentIdx }
                                 }
-                                componentIdx = operations.findIndex((c)=>c.componentId===id);
-                                if(componentIdx!==-1){
-                                    return {component: operations[componentIdx], type: "operations", index: componentIdx}
+                                componentIdx = operations.findIndex((c) => c.componentId === id);
+                                if (componentIdx !== -1) {
+                                    return { component: operations[componentIdx], type: "operations", index: componentIdx }
                                 }
-                                if(components.output && components.output.componentId===id){
-                                    return {component: components.output, type: "operations", index: componentIdx}
+                                if (components.output && components.output.componentId === id) {
+                                    return { component: components.output, type: "operations", index: componentIdx }
                                 }
                                 return null;
                             }
 
                             let linkIds = changes.insertedLinkKeys;
                             let newLink = changes.modifiedLinkData[0];
-                            if(modelLinks.map(e=>e.key).indexOf(newLink.key)!==-1){
+                            if (modelLinks.map(e => e.key).indexOf(newLink.key) !== -1) {
                                 return console.log("Link Exists")
                             }
                             let fromComp = getCompById(newLink.from);
                             let toComp = getCompById(newLink.to);
-                            if(inputTypes.indexOf(fromComp.component.type)!==-1 && operationTypes.indexOf(toComp.component.type) !== -1){
+                            if (inputTypes.indexOf(fromComp.component.type) !== -1 && operationTypes.indexOf(toComp.component.type) !== -1) {
                                 let opInput = {
                                     layer: fromComp.component.componentId,
                                     band: fromComp.band
@@ -382,8 +406,8 @@ const ModelBuilder = (props) => {
                                     ...modelLinks,
                                     newLink
                                 ])
-                            }else if(operationTypes.indexOf(fromComp.component.type)!==-1 && outputTypes.indexOf(toComp.component.type) !== -1){
-                                let modelOutput = {...components.output};
+                            } else if (operationTypes.indexOf(fromComp.component.type) !== -1 && outputTypes.indexOf(toComp.component.type) !== -1) {
+                                let modelOutput = { ...components.output };
                                 // modelOutput.id = fromComp.component.componentId
                                 let opOutput = {
                                     layer: modelOutput.componentId,
@@ -406,11 +430,11 @@ const ModelBuilder = (props) => {
                                 ])
                             }
                         }
-                    }catch(e){
+                    } catch (e) {
                         console.log(e);
                     }
                 }} />
-                <button onClick={()=>{
+                <button onClick={() => {
                     setComponents({
                         inputs: [],
                         output: null,
@@ -418,7 +442,7 @@ const ModelBuilder = (props) => {
                     })
                     setModelLinks([])
                 }}>Clear</button>
-                <button onClick={()=>{
+                <button onClick={() => {
                     // console.log(components);
                     let reqComps = {
                         inputs: [], operations: [], output: {}
@@ -434,14 +458,14 @@ const ModelBuilder = (props) => {
                         }
                         reqComps.inputs.push(input)
                     }
-                    
+
                     for (let i = 0; i < components.operations.length; i++) {
                         let operation = components.operations[i];
                         operation = {
                             "id": operation.componentId,
                             "type": operation.type,
-                            "inputs": operation.inputs.map(inp=>{
-                                let il = components.inputs.filter(e=>{return e.componentId===inp.layer})[0]
+                            "inputs": operation.inputs.map(inp => {
+                                let il = components.inputs.filter(e => { return e.componentId === inp.layer })[0]
                                 return {
                                     id: inp.layer,
                                     band: parseInt(il.band)
@@ -468,15 +492,15 @@ const ModelBuilder = (props) => {
                             'Content-Type': 'application/json'
                         }
                     })
-                    .then(r=>r.json())
-                    .then(r=>console.log(r))
-                    .catch(e=>console.log(e))
+                        .then(r => r.json())
+                        .then(r => console.log(r))
+                        .catch(e => console.log(e))
 
 
                 }}>Run</button>
             </div>
         </div>
-        
+
     />
 }
 

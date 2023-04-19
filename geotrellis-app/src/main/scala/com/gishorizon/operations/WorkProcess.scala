@@ -65,23 +65,6 @@ object WorkProcess {
     processConfig
   }
 
-//  def main(args: Array[String]): Unit = {
-//    val process = sampleProcess()
-//    val sc = Spark.context
-//    val inputsData: mutable.Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]] = InputReader.getInputs(sc, process.inputs)
-//    for(operation <- process.operations){
-//      val result = NDI.runProcess(inputsData.toMap, operation)
-//      inputsData += (operation.output.id -> result)
-//    }
-//    val outputData = inputsData(process.output.id)
-//
-////    val rdd = inputsData("")
-//    print(outputData)
-//    val rdd = outputData(0)
-//    val raster: Raster[MultibandTile] = rdd.stitch
-//    GeoTiff(raster, rdd.metadata.crs).write("C:\\Users\\ManiChan\\Desktop\\Project\\spark-ee\\geotrellis-app\\data\\test.tif")
-//  }
-
   def run(process: ProcessConfig): Unit = {
     implicit val sc = Spark.context
     val inputsData: mutable.Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]] = InputReader.getInputs(sc, process.inputs)
@@ -127,7 +110,7 @@ object WorkProcess {
     val result = ContextRDD(out, meta)
     val rdd = result.tileToLayout(meta)
     val raster: Raster[MultibandTile] = rdd.stitch
-    val fPath = f"C:\\Users\\ManiChan\\Desktop\\Project\\spark-ee\\geotrellis-app\\data\\${
+    val fPath = f"E:\\Mani\\ProjectData\\temp_data\\${
       Iterator.continually(Random.nextPrintableChar)
         .filter(_.isLetter)
         .take(16)
@@ -137,13 +120,13 @@ object WorkProcess {
     //ingest
     val ts = ZonedDateTime.now().toInstant.toEpochMilli
 
-//    val url = s"http://localhost:8082/ingestData?filePath=${fPath}&ts=${ts}&sensorName=SingleRasterBand"
-//    val ingestResult = HttpUtils.getRequestSync(url)
-//    val f = new File(fPath)
-//    if(f.exists()){
-//      f.delete()
-//    }
-//    println(ingestResult)
+    val url = s"http://localhost:8082/ingestData?filePath=${fPath}&ts=${ts}&sensorName=SingleRasterBand"
+    val ingestResult = HttpUtils.getRequestSync(url)
+    val f = new File(fPath)
+    if(f.exists()){
+      f.delete()
+    }
+    println(ingestResult)
   }
 
 }

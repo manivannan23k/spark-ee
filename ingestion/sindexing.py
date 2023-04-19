@@ -55,6 +55,9 @@ def load_indexes(level_ids):
 
 def get_tile_intersection(level, bbox):
     try:
+        level_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12]
+        index_dat = load_indexes(level_ids)
+        # print([n.object for n in index_dat[5].intersection(bbox, objects=True)])
         return [n.object for n in index_dat[level].intersection(bbox, objects=True)]
     except Exception as e:
         print(e)
@@ -64,6 +67,5 @@ def get_tile_intersection(level, bbox):
 
 
 config = json.load(open("config.json"))
-level_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12]
-index_dat = load_indexes(level_ids)
-print(f"Spatial Index loaded for {level_ids}")
+# index_dat = load_indexes(level_ids)
+# print(f"Spatial Index loaded for {level_ids}")

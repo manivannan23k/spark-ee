@@ -27,30 +27,14 @@ object NDI {
               if (v1 + v2 == 0) {
                 0.toDouble
               } else {
-                (v1 - v2) / (v1 + v2).toDouble
+                (v1 - v2) / (v1 + v2)
               }
             }
           }
-//          DoubleArrayTile(.toArray().map(e => e.toDouble), meta.layout.tileCols, meta.layout.tileRows)
         )
         mt
       }), m)
       outRdds = outRdds :+ rdd
-//        .aggregateByKey(in1(i).first()._2)({
-//          (l, t)=>{
-////            val t1 = l.band(b1)
-////            val t2 = l.band(b2)
-//            MultibandTile(l.band(0), t.band(0))
-//          }
-//        }, {
-//          (ti1, ti2) => {
-//            val t1 = ti1.band(b1)
-//            val t2 = ti2.band(b2)
-//            val r = t1-t2
-//            MultibandTile(r)
-////            MultibandTile(Array.concat(t1.bands.toArray[Tile], t2.bands.toArray[Tile]))//Array.concat(t1.bands.toArray[Tile], t2.bands.toArray[Tile])
-//          }
-//        })
 
     }
     outRdds

@@ -15,17 +15,17 @@ import geotrellis.spark._
 
 object SavGolFilter {
 
-  def main(args: Array[String]): Unit = {
-    try {
-      run(Spark.context)
-    } finally {
-      Spark.session.stop()
-    }
-  }
+//  def main(args: Array[String]): Unit = {
+//    try {
+//      run(Spark.context)
+//    } finally {
+//      Spark.session.stop()
+//    }
+//  }
 
-  def run(implicit sc: SparkContext): Unit = {
+  def run(implicit sc: SparkContext, rdd: RDD[(SpatialKey, MultibandTile)], meta: TileLayerMetadata[SpatialKey]): Unit = {
     val tileSize = 5
-    val (rdd, meta) = getMultiTiledRDD(sc, "data/NDVISampleTest/Test1998-99.tif", tileSize)
+//    val (rdd, meta) = getMultiTiledRDD(sc, "data/NDVISampleTest/Test1998-99.tif", tileSize)
     //TODO: Recalculate SavGol Based on Score
     val result: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(rdd.map {
       case (k, t) => {
@@ -81,7 +81,7 @@ object SavGolFilter {
     }, meta)
     println("------------Saving----------")
     val rasterTile: Raster[MultibandTile] =  result.stitch()
-    GeoTiffWriter.write(GeoTiff(rasterTile, meta.crs), "data/out/result.tif")
+    GeoTiffWriter.write(GeoTiff(rasterTile, meta.crs), "data/result.tif")
     println("------------Done----------")
   }
 
