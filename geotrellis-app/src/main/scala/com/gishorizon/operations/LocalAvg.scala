@@ -1,13 +1,39 @@
 package com.gishorizon.operations
 
-import geotrellis.layer.{Metadata, SpatialKey, TileLayerMetadata}
-import geotrellis.raster.{CellType, MultibandTile}
-import geotrellis.spark.ContextRDD
+import geotrellis.layer.{LayoutDefinition, Metadata, SpatialKey, TileLayerMetadata}
+import geotrellis.raster.{CellType, MultibandTile, TileLayout}
+import geotrellis.spark.{ContextRDD, withTileRDDMergeMethods}
+import geotrellis.vector.ProjectedExtent
 import org.apache.spark.rdd.RDD
+import com.gishorizon.Spark
+import com.gishorizon.reader.{HttpUtils, InputReader}
+import geotrellis.layer.{LayoutDefinition, Metadata, SpatialKey, TileLayerMetadata}
+import geotrellis.raster.io.geotiff.GeoTiff
+import geotrellis.raster.resample.NearestNeighbor
+import geotrellis.raster.{MultibandTile, Raster, Tile}
+import org.apache.spark.rdd.RDD
+import geotrellis.raster.{io => _, _}
+import geotrellis.spark._
+import geotrellis.spark.stitch._
 
 object LocalAvg {
 
   def runProcess(inputs: Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]], operation: ProcessOperation): Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = {
+
+    var inRdds: Array[RDD[(SpatialKey, Tile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
+
+    for(i <- operation.inputs.indices){
+      val op = operation.inputs(i)
+      val rdd = mergeRdds(inputs(op.id))
+      val r: RDD[(SpatialKey, Tile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(rdd.map {
+        case (k, mt) => {
+          (k, mt.band(op.band))
+        }
+      }, rdd.metadata)
+      inRdds = inRdds :+ r
+    }
+
+
     var in1: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = inputs(operation.inputs(0).id)
     var in2: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = inputs(operation.inputs(1).id)
 
@@ -54,6 +80,38 @@ object LocalAvg {
 
     }
     outRdds
+  }
+
+  def mergeRdds(outputData: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
+    var meta = outputData(0).metadata
+    outputData.foreach {
+      o => {
+        meta = meta.merge(o.metadata)
+      }
+    }
+    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin) / (meta.extent.ymax - meta.extent.ymin)) / (((outputData(0).metadata.extent.xmax - outputData(0).metadata.extent.xmin)) / ((outputData(0).metadata.extent.ymax - outputData(0).metadata.extent.ymin))))
+    val xTileSize = 256 * (outputData.length * ratio)
+    val yTileSize = 256 * (outputData.length / ratio)
+    meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1, 1, yTileSize.toInt, xTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
+    println(meta)
+    val outProj: Array[RDD[(ProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = outputData.map(o => {
+      ContextRDD(
+        o.map {
+          case (k, t) => {
+            (ProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs), t)
+          }
+        }, o.metadata
+      )
+    })
+    var out: RDD[(ProjectedExtent, MultibandTile)] = outProj(0)
+    outProj.foreach {
+      o => {
+        out = out.merge(o)
+      }
+    }
+    val result = ContextRDD(out, meta)
+
+    result.tileToLayout(meta)
   }
 
 

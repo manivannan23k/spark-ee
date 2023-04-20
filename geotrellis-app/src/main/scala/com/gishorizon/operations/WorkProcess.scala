@@ -124,14 +124,14 @@ object WorkProcess {
     //ingest
     val ts = ZonedDateTime.now().toInstant.toEpochMilli
 
-    val url = s"http://localhost:8082/ingestData?filePath=${fPath}&ts=${ts}&sensorName=SingleRasterBand"
-    val ingestResult = HttpUtils.getRequestSync(url)
-    val f = new File(fPath)
-    println(fPath)
+//    val url = s"http://localhost:8082/ingestData?filePath=${fPath}&ts=${ts}&sensorName=SingleRasterBand"
+//    val ingestResult = HttpUtils.getRequestSync(url)
+//    val f = new File(fPath)
+//    println(fPath)
 //    if(f.exists()){
 //      f.delete()
 //    }
-    println(ingestResult)
+//    println(ingestResult)
   }
 
 }
