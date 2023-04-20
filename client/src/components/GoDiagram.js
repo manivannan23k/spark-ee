@@ -30,10 +30,10 @@ function initDiagram() {
             // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
             getTitleText($, "top"),
             // $(go.TextBlock, { position: new go.Point(0, 0), margin: 0, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
-            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Select Layer: ", stroke: "red", editable: false, width: 200 }),
-            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "red", editable: true, width: 200 }, new go.Binding('choices', 'lchoices'), new go.Binding('textEdited', 'layerEdited'), new go.Binding('text', 'defaultLayer')),
-            $(go.TextBlock, { position: new go.Point(0, 60), margin: 10, text: "Select Band: ", stroke: "red", editable: false, width: 200 }),
-            $(go.TextBlock, { position: new go.Point(80, 60), margin: 10, stroke: "red", editable: true, width: 200 }, new go.Binding('choices', 'bchoices'), new go.Binding('textEdited', 'bandEdited'), new go.Binding('text', 'defaultBand')),
+            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Select Layer: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'lchoices'), new go.Binding('textEdited', 'layerEdited'), new go.Binding('text', 'defaultLayer')),
+            $(go.TextBlock, { position: new go.Point(0, 60), margin: 10, text: "Select Band: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 60), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'bchoices'), new go.Binding('textEdited', 'bandEdited'), new go.Binding('text', 'defaultBand')),
             makePort("InBand", 190, 10, true, false, [5, 90], 1, 0, $),
             // makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true, $),
             // makePort("R", go.Spot.Right, go.Spot.RightSide, true, true, $),
@@ -45,10 +45,10 @@ function initDiagram() {
             new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
             getNodeShape($),
             // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
-            getTitleText($),
+            getTitleText($, "top"),
             // $(go.TextBlock, { position: new go.Point(0, 0), margin: 0, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
-            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Select Layer: ", stroke: "red", editable: false, width: 200 }),
-            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "red", editable: true, width: 200 }, new go.Binding('choices', 'lchoices'), new go.Binding('textEdited', 'layerEdited'), new go.Binding('text', 'defaultLayer')),
+            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Select Layer: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "black", font: '12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'lchoices'), new go.Binding('textEdited', 'layerEdited'), new go.Binding('text', 'defaultLayer')),
             // $(go.TextBlock, { position: new go.Point(0, 60), margin: 10, text: "Select Band: ", stroke: "red", editable: false, width: 200 }),
             // $(go.TextBlock, { position: new go.Point(80, 60), margin: 10, stroke: "red", editable: true, width: 200 }, new go.Binding('choices', 'bchoices'), new go.Binding('textEdited', 'bandEdited'), new go.Binding('text', 'defaultBand')),
             makePort("InLayer", 190, 10, true, false, [5, 90], 1, 0, $),
@@ -141,19 +141,53 @@ function initDiagram() {
     diagram.addDiagramListener("TextEdited", e => {
         // changeEvt(e)
     });
+    diagram.linkTemplate = $(go.Link,
+        {
+            curve: go.Link.Bezier,
+            toEndSegmentLength: 30, fromEndSegmentLength: 30
+        },
+        $(go.Shape, { strokeWidth: 1.5 }),
+        $(go.Shape,
+            { toArrow: "standard", strokeWidth: 0, fill: "black" }),
+    );
+    // diagram.linkTemplate =
+    //     $(go.Link,  // the whole link panel
+    //         {
+    //             routing: go.Link.AvoidsNodes,
+    //             curve: go.Link.JumpOver,
+    //             corner: 5, toShortLength: 4,
+    //             relinkableFrom: true,
+    //             relinkableTo: true,
+    //             reshapable: true,
+    //             resegmentable: true,
+    //             // mouse-overs subtly highlight links:
+    //             mouseEnter: (e, link) => link.findObject("HIGHLIGHT").stroke = "rgba(30,144,255,0.2)",
+    //             mouseLeave: (e, link) => link.findObject("HIGHLIGHT").stroke = "transparent",
+    //             selectionAdorned: false
+    //         },
+    //         new go.Binding("points").makeTwoWay(),
+    //         $(go.Shape,  // the highlight shape, normally transparent
+    //             { isPanelMain: true, strokeWidth: 8, stroke: "transparent", name: "HIGHLIGHT" }),
+    //         $(go.Shape,  // the link path shape
+    //             { isPanelMain: true, stroke: "dodgerblue", strokeWidth: 2 },
+    //             new go.Binding("stroke", "dodgerblue").ofObject()),
+    //         $(go.Shape,  // the arrowhead
+    //             { toArrow: "standard", strokeWidth: 0, fill: "dodgerblue" }),
+
+    //     );
 
     return diagram;
 }
 
 function getNodeShape($) {
-    return $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: '#F1F5EE', strokeWidth: 0 })
+    return $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: '#F1F5EE', strokeWidth: 0 }, new go.Binding('fill', 'color1'))
 }
 
 function getTitleText($, loc) {
     if (loc === 'top') {
-        return $(go.TextBlock, { position: new go.Point(0, 0), margin: 10, font: '12px fangsong', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay())
+        return $(go.TextBlock, { position: new go.Point(0, 0), margin: 10, font: '12px "Roboto", sans-serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay())
     }
-    return $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: '12px fangsong', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay())
+    return $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: '12px "Roboto", sans-serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay())
 }
 
 
@@ -221,12 +255,12 @@ const GoDiagram = (props) => {
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(151 255 178)',
                             // loc: component.loc,
                             defaultBand: component.band ? `Band ${component.band}` : "-",
                             bchoices: component.id ? Array(component.noOfBands).fill(0).map((e, i) => `Band ${i + 1}`) : [],
                             lchoices: layers.map(l => l.id),
-                            defaultLayer: component.id,
+                            defaultLayer: component.id ? `Layer: ${component.id}` : "-",
                             bandEdited: (e) => {
                                 handleModelChange({
                                     nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Band', nodeType: "inputs"
@@ -244,7 +278,7 @@ const GoDiagram = (props) => {
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(151 255 178)',
                             bchoices: component.id ? Array(component.noOfBands).fill(0).map((e, i) => `Band ${i + 1}`) : [],
                             lchoices: layers.map(l => l.id),
                             defaultLayer: component.id,
@@ -264,14 +298,14 @@ const GoDiagram = (props) => {
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(255 251 133)',
                             category: 'opNDI'
                         }
                     case "op_local_avg":
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(255 251 133)',
                             category: 'opLocalAvg'
                         }
                         break;
@@ -279,7 +313,7 @@ const GoDiagram = (props) => {
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(255 251 133)',
                             category: 'opLocalAvg'
                         }
                         break;
@@ -287,7 +321,7 @@ const GoDiagram = (props) => {
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(255 251 133)',
                             category: 'opSavGol'
                         }
                         break;
@@ -295,7 +329,7 @@ const GoDiagram = (props) => {
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(142 224 255)',
                             category: 'outRasterband'
                         }
                         break;
@@ -303,7 +337,7 @@ const GoDiagram = (props) => {
                         node = {
                             key: component.componentId,
                             text: component.name,
-                            color1: 'white',
+                            color1: 'rgb(142 224 255)',
                             category: 'outRasterlayer'
                         }
                         break;
@@ -322,8 +356,8 @@ const GoDiagram = (props) => {
     }, [props.components])
 
 
-    return <div style={{ width: '100%', height: '100%', backgroundColor: 'grey' }}>
-        <ReactDiagram style={{ width: '100%', height: '100%', backgroundColor: 'grey' }}
+    return <div style={{ width: '100%', height: '100%', backgroundColor: '#999' }}>
+        <ReactDiagram style={{ width: '100%', height: '100%', backgroundColor: '#999' }}
             ref={diagramRef}
             initDiagram={initDiagram}
             divClassName='diagram-component'

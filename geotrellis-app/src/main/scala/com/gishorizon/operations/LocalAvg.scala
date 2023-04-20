@@ -1,5 +1,6 @@
 package com.gishorizon.operations
 
+import com.gishorizon.RddUtils.mergeRdds
 import geotrellis.layer.{LayoutDefinition, Metadata, SpatialKey, TileLayerMetadata}
 import geotrellis.raster.{CellType, MultibandTile, TileLayout}
 import geotrellis.spark.{ContextRDD, withTileRDDMergeMethods}
@@ -18,101 +19,57 @@ import geotrellis.spark.stitch._
 
 object LocalAvg {
 
-  def runProcess(inputs: Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]], operation: ProcessOperation): Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = {
+  def runProcess(inputs: Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]], operation: ProcessOperation): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
 
-    var inRdds: Array[RDD[(SpatialKey, Tile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
+    var inRdds: Array[RDD[(SpatialKey, MultibandTile)]] = Array()
+    var meta: TileLayerMetadata[SpatialKey] = null
+    val iCount = operation.inputs.length
 
     for(i <- operation.inputs.indices){
       val op = operation.inputs(i)
-      val rdd = mergeRdds(inputs(op.id))
-      val r: RDD[(SpatialKey, Tile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(rdd.map {
-        case (k, mt) => {
-          (k, mt.band(op.band))
+      val rdd = inputs(op.id)
+      val bid = op.band
+      val r: RDD[(SpatialKey, MultibandTile)] = rdd.map {
+        case (k: SpatialKey, mt: MultibandTile) => {
+          val _mt: MultibandTile = ArrayMultibandTile(mt.band(bid))
+          (k, _mt)
         }
-      }, rdd.metadata)
+      }
+      meta = rdd.metadata
       inRdds = inRdds :+ r
     }
-
-
-    var in1: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = inputs(operation.inputs(0).id)
-    var in2: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = inputs(operation.inputs(1).id)
-
-    var b1 = operation.inputs(0).band
-    var b2 = operation.inputs(1).band
-
-    var outRdds: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
-    for(i <- in1.indices){
-      val meta = in1(i).metadata
-      val m = TileLayerMetadata(CellType.fromName("float64"), meta.layout, meta.extent, meta.crs, meta.bounds)
-      val rdd: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(in1(i).++(in2(i))
-        .reduceByKey(
-      (t1: MultibandTile, t2: MultibandTile) => {
-        val mt = MultibandTile(
-          t1.band(b1).convert(CellType.fromName("float64")).combineDouble(t2.band(b2).convert(CellType.fromName("float64"))) {
-            (v1, v2) => {
-              if (v1 + v2 == 0) {
-                0.toDouble
-              } else {
-                (v1 - v2) / (v1 + v2).toDouble
-              }
-            }
+    val or: RDD[(SpatialKey, MultibandTile)] = inRdds.reduce{
+      (rdd1, rdd2) => {
+        rdd1.++(rdd2).reduceByKey(
+          (t1: MultibandTile, t2: MultibandTile) => {
+            ArrayMultibandTile(t1.band(0).convert(CellType.fromName("float32"))
+              .combineDouble(t2.band(0).convert(CellType.fromName("float32"))) {
+                (v1, v2) => {
+                  v1 + v2
+                }
+              })
           }
-//          DoubleArrayTile(.toArray().map(e => e.toDouble), meta.layout.tileCols, meta.layout.tileRows)
         )
-        mt
-      }), m)
-      outRdds = outRdds :+ rdd
-//        .aggregateByKey(in1(i).first()._2)({
-//          (l, t)=>{
-////            val t1 = l.band(b1)
-////            val t2 = l.band(b2)
-//            MultibandTile(l.band(0), t.band(0))
-//          }
-//        }, {
-//          (ti1, ti2) => {
-//            val t1 = ti1.band(b1)
-//            val t2 = ti2.band(b2)
-//            val r = t1-t2
-//            MultibandTile(r)
-////            MultibandTile(Array.concat(t1.bands.toArray[Tile], t2.bands.toArray[Tile]))//Array.concat(t1.bands.toArray[Tile], t2.bands.toArray[Tile])
-//          }
-//        })
-
-    }
-    outRdds
-  }
-
-  def mergeRdds(outputData: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
-    var meta = outputData(0).metadata
-    outputData.foreach {
-      o => {
-        meta = meta.merge(o.metadata)
       }
-    }
-    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin) / (meta.extent.ymax - meta.extent.ymin)) / (((outputData(0).metadata.extent.xmax - outputData(0).metadata.extent.xmin)) / ((outputData(0).metadata.extent.ymax - outputData(0).metadata.extent.ymin))))
-    val xTileSize = 256 * (outputData.length * ratio)
-    val yTileSize = 256 * (outputData.length / ratio)
-    meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1, 1, yTileSize.toInt, xTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
-    println(meta)
-    val outProj: Array[RDD[(ProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = outputData.map(o => {
-      ContextRDD(
-        o.map {
-          case (k, t) => {
-            (ProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs), t)
+    }.map{
+      case (k, mt) => {
+        (k, mt.mapDouble(0){
+          (v)=>{
+            v/iCount
           }
-        }, o.metadata
-      )
-    })
-    var out: RDD[(ProjectedExtent, MultibandTile)] = outProj(0)
-    outProj.foreach {
-      o => {
-        out = out.merge(o)
+        })
       }
     }
-    val result = ContextRDD(out, meta)
-
-    result.tileToLayout(meta)
+//      .map{
+//      case(k, t) => {
+//        val mt: MultibandTile = new ArrayMultibandTile(Array(t))
+//        (k, mt)
+//      }
+//    }
+    ContextRDD(or, meta)
   }
+
+
 
 
 }

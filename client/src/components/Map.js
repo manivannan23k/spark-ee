@@ -75,7 +75,7 @@ const MapLayers = (props) => {
 
                     case 'DATA_TILE':
                         return <TileLayer key={layer.id}
-                            url={`http://localhost:8082/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=5,4,3&vmin=0&vmax=1500&aoi_code=${layer.aoiCode}`}
+                            url={`http://localhost:8082/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=3,2,1&vmin=0&vmax=1500&aoi_code=${layer.aoiCode}`}
                             //http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=913543204&bands=4,3,2&vmin=0&vmax=20000&aoi_code=qwertyuiopasdfgh
                             maxZoom={24}
                         />

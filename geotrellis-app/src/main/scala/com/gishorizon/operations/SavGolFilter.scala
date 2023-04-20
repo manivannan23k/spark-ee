@@ -23,15 +23,11 @@ object SavGolFilter {
 //    }
 //  }
 
-  def runProcess(inputs: Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]], operation: ProcessOperation): Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = {
+  def runProcess(inputs: Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]], operation: ProcessOperation): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
     var outRdds: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
-    var in1: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = inputs(operation.inputs(0).id)
-    for(i <- in1.indices){
-      val rdd = in1(i)
-      val r = runForRdd(rdd, rdd.metadata)
-      outRdds = outRdds :+ r
-    }
-    outRdds
+    var in1: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = inputs(operation.inputs(0).id)
+    val rdd = in1
+    runForRdd(rdd, rdd.metadata)
   }
 
   def runForRdd(rdd: RDD[(SpatialKey, MultibandTile)], meta: TileLayerMetadata[SpatialKey]): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {

@@ -65,73 +65,74 @@ object WorkProcess {
     processConfig
   }
 
-  def run(process: ProcessConfig): Unit = {
+  def run(process: ProcessConfig): String = {
     implicit val sc = Spark.context
-    val inputsData: mutable.Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]] = InputReader.getInputs(sc, process.inputs)
+    val inputsData: mutable.Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = InputReader.getInputs(sc, process.inputs)
     for (operation <- process.operations) {
       if(operation.opType=="op_ndi"){
         val result = NDI.runProcess(inputsData.toMap, operation)
         inputsData += (operation.output.id -> result)
       }
-      if (operation.opType == "op_lavg") {
-//        val result = NDI.runProcess(inputsData.toMap, operation)
-//        inputsData += (operation.output.id -> result)
+      if (operation.opType == "op_local_avg") {
+        val result = LocalAvg.runProcess(inputsData.toMap, operation)
+        inputsData += (operation.output.id -> result)
       }
       if (operation.opType == "op_savgol") {
-                val result = SavGolFilter.runProcess(inputsData.toMap, operation)
-                inputsData += (operation.output.id -> result)
+        val result = SavGolFilter.runProcess(inputsData.toMap, operation)
+        inputsData += (operation.output.id -> result)
       }
 
 
     }
     val outputData = inputsData(process.output.id)
-    var meta = outputData(0).metadata
-    outputData.foreach{
-      o => {
-        meta = meta.merge(o.metadata)
-      }
-    }
-    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin)/(meta.extent.ymax - meta.extent.ymin))/(((outputData(0).metadata.extent.xmax-outputData(0).metadata.extent.xmin))/((outputData(0).metadata.extent.ymax-outputData(0).metadata.extent.ymin))))
-    val xTileSize = 256 * (outputData.length*ratio)
-    val yTileSize = 256 * (outputData.length/ratio)
-    meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1,1,yTileSize.toInt, xTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
-    println(meta)
-    val outProj: Array[RDD[(ProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = outputData.map(o=>{
-      ContextRDD(
-        o.map {
-          case (k, t) => {
-            (ProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs), t)
-          }
-        }, o.metadata
-      )
-    })
-    var out: RDD[(ProjectedExtent, MultibandTile)] = outProj(0)
-    outProj.foreach{
-      o=>{
-        out = out.merge(o)
-      }
-    }
-    val result = ContextRDD(out, meta)
-    val rdd = result.tileToLayout(meta)
-    val raster: Raster[MultibandTile] = rdd.stitch
+//    var meta = outputData(0).metadata
+//    outputData.foreach{
+//      o => {
+//        meta = meta.merge(o.metadata)
+//      }
+//    }
+//    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin)/(meta.extent.ymax - meta.extent.ymin))/(((outputData(0).metadata.extent.xmax-outputData(0).metadata.extent.xmin))/((outputData(0).metadata.extent.ymax-outputData(0).metadata.extent.ymin))))
+//    val xTileSize = 256 * (outputData.length*ratio)
+//    val yTileSize = 256 * (outputData.length/ratio)
+//    meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1,1,yTileSize.toInt, xTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
+//    println(meta)
+//    val outProj: Array[RDD[(ProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = outputData.map(o=>{
+//      ContextRDD(
+//        o.map {
+//          case (k, t) => {
+//            (ProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs), t)
+//          }
+//        }, o.metadata
+//      )
+//    })
+//    var out: RDD[(ProjectedExtent, MultibandTile)] = outProj(0)
+//    outProj.foreach{
+//      o=>{
+//        out = out.merge(o)
+//      }
+//    }
+//    val result = ContextRDD(out, meta)
+//    val rdd = result.tileToLayout(meta)
+    val raster: Raster[MultibandTile] = outputData.stitch
     val fPath = f"E:\\Mani\\ProjectData\\temp_data\\${
       Iterator.continually(Random.nextPrintableChar)
         .filter(_.isLetter)
         .take(16)
         .mkString}.tif"
-    GeoTiff(raster, rdd.metadata.crs).write(fPath)
+    GeoTiff(raster, outputData.metadata.crs).write(fPath)
 
     //ingest
     val ts = ZonedDateTime.now().toInstant.toEpochMilli
 
-//    val url = s"http://localhost:8082/ingestData?filePath=${fPath}&ts=${ts}&sensorName=SingleRasterBand"
+    val url = s"http://localhost:8082/ingestData?filePath=${fPath}&ts=${ts}&sensorName=SingleRasterBand"
 //    val ingestResult = HttpUtils.getRequestSync(url)
 //    val f = new File(fPath)
-//    println(fPath)
+    println(fPath)
 //    if(f.exists()){
 //      f.delete()
 //    }
 //    println(ingestResult)
+    return fPath
   }
 
 }

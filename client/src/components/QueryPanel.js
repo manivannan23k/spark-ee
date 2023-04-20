@@ -14,12 +14,12 @@ import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggle
 const QueryPanel = (props) => {
 
     const dispatch = useDispatch()
-    const [sensor, setSensor] = React.useState("Landsat_OLI")
+    const [sensor, setSensor] = React.useState("LISS3")
     // const [fromDate, setFromDate] = React.useState(new Date("1991-01-01"))
     // const [toDate, setToDate] = React.useState(new Date("1991-01-02"))
-    const [fromDate, setFromDate] = React.useState(new Date("2023-01-25"))
-    const [toDate, setToDate] = React.useState(new Date("2023-01-27"))
-    const [aoi, setAoi] = React.useState('aoi_RJP_Field')
+    const [fromDate, setFromDate] = React.useState(new Date("2017-11-19"))
+    const [toDate, setToDate] = React.useState(new Date("2017-11-21"))
+    const [aoi, setAoi] = React.useState('aoi_uk_1')
 
     const [redBand, setRedBand] = React.useState(4)
     const [greenBand, setGreenBand] = React.useState(3)
@@ -70,6 +70,7 @@ const QueryPanel = (props) => {
                 onChange={(e) => { setSensor(e.target.value) }}
             >
                 <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
+                <MenuItem value={'LISS3'}>LISS3</MenuItem>
                 <MenuItem value={'SingleRasterBand'}>SingleRasterBand</MenuItem>
                 <MenuItem value={'SampleTimeSeries'}>SampleTimeSeries</MenuItem>
                 <MenuItem value={'SampleTimeSeriesOut'}>Sample TS Output</MenuItem>
@@ -90,6 +91,7 @@ const QueryPanel = (props) => {
                 <MenuItem value={'aoi_haldwani_tw'}>AOI Haldwani Town</MenuItem>
                 <MenuItem value={'aoi_haldwani_outer'}>AOI Haldwani Outer</MenuItem>
                 <MenuItem value={'aoi_RJ_Park'}>AOI Rajaji Park</MenuItem>
+                <MenuItem value={'aoi_uk_1'}>AOI UK</MenuItem>
 
             </Select>
         </FormControl>

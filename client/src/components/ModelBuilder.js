@@ -14,6 +14,8 @@ const mapStateToProps = (state) => {
 
 const ModelBuilder = (props) => {
     const dispatch = useDispatch()
+
+    const [processResult, setProcessResult] = useState("")
     /***
      * Block Types:
      * 1) Raster Input - Single band, Multi band, Multi Temporal
@@ -539,11 +541,12 @@ const ModelBuilder = (props) => {
                         }
                     })
                         .then(r => r.json())
-                        .then(r => console.log(r))
+                        .then(r => { console.log(r); setProcessResult(r.data) })
                         .catch(e => console.log(e))
 
 
                 }}>Run</button>
+                <div>{processResult}</div>
             </div>
         </div>
 

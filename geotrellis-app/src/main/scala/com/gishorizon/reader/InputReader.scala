@@ -35,7 +35,7 @@ object InputReader {
 
 
 
-  private def getInputRdd(sc: SparkContext, processInput: ProcessInput): Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = {
+  private def getInputRdd(sc: SparkContext, processInput: ProcessInput): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
     val data = HttpUtils.getRequestSync(s"http://localhost:8082/getDataRefForAoi/?sensorName=${processInput.dsName}&tIndex=${processInput.tIndexes(0)}&level=12&aoiCode=${processInput.aoiCode}")
     val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
     var rdds: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
@@ -44,7 +44,7 @@ object InputReader {
       var rdd = RddUtils.getMultiTiledRDDWithMeta(sc, filePath, 256)
       rdds = rdds :+ rdd
     }
-    rdds
+    RddUtils.mergeRdds(rdds)
   }
 
   def main(args: Array[String]): Unit = {
@@ -76,8 +76,8 @@ object InputReader {
 
   }
 
-  def getInputs(sc: SparkContext, inputs: Array[ProcessInput]): mutable.Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]] = {
-    var rddMap = mutable.Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]]()
+  def getInputs(sc: SparkContext, inputs: Array[ProcessInput]): mutable.Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = {
+    var rddMap = mutable.Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]()
     for(input <- inputs){
       val rdd = getInputRdd(sc, input)
       rddMap += (

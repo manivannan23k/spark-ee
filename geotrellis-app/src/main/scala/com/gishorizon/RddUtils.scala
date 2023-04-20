@@ -5,7 +5,7 @@ import geotrellis.raster.{MultibandTile, Tile, TileLayout}
 import geotrellis.raster.geotiff.GeoTiffRasterSource
 import geotrellis.raster.io.geotiff.reader.GeoTiffReader
 import geotrellis.spark.store.file.FileLayerWriter
-import geotrellis.spark.{CollectTileLayerMetadata, ContextRDD, MultibandTileLayerRDD, RasterSourceRDD, withTilerMethods}
+import geotrellis.spark.{CollectTileLayerMetadata, ContextRDD, MultibandTileLayerRDD, RasterSourceRDD, withTileRDDMergeMethods, withTilerMethods}
 import geotrellis.spark.store.hadoop.HadoopGeoTiffRDD
 import geotrellis.store.LayerId
 import geotrellis.store.file.FileAttributeStore
@@ -302,5 +302,42 @@ object RddUtils {
     val writer = FileLayerWriter(attributeStore)
     writer.write(LayerId(layerName, zoom), rdd, ZCurveKeyIndexMethod)
     println(f"Saved $layerName")
+  }
+
+  def mergeRdds(outputData: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
+    var meta = outputData(0).metadata
+    outputData.foreach {
+      o => {
+        meta = meta.merge(o.metadata)
+      }
+    }
+    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin) / (meta.extent.ymax - meta.extent.ymin)) / (((outputData(0).metadata.extent.xmax - outputData(0).metadata.extent.xmin)) / ((outputData(0).metadata.extent.ymax - outputData(0).metadata.extent.ymin))))
+    val xTileSize = 256 * (outputData.length * ratio)
+    val yTileSize = 256 * (outputData.length / ratio)
+    meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1, 1, yTileSize.toInt, xTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
+    println(meta)
+    val outProj: Array[RDD[(ProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = outputData.map(o => {
+      ContextRDD(
+        o.map {
+          case (k, t) => {
+            (ProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs), t)
+          }
+        }, o.metadata
+      )
+    })
+    var out: RDD[(ProjectedExtent, MultibandTile)] = outProj(0)
+    outProj.foreach {
+      o => {
+        out = out.merge(o)
+      }
+    }
+    val result = ContextRDD(out, meta)
+
+    val (zoom, newmeta) = CollectTileLayerMetadata.fromRDD[ProjectedExtent, MultibandTile, SpatialKey](result, FloatingLayoutScheme(256))
+    ContextRDD(result.tileToLayout(newmeta.cellType, newmeta.layout), newmeta)
+
+//    result.tileToLayout(
+//      meta
+//    )
   }
 }

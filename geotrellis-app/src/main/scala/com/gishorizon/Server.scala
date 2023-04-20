@@ -240,10 +240,11 @@ object Server extends HttpApp with App {
               processConfig.output = output
               processConfig.operations = operations
 
-              WorkProcess.run(processConfig)
+              val result = WorkProcess.run(processConfig)
 
               Map {
                 "message" -> "Success"
+                "data" -> result
               }
             }
           }

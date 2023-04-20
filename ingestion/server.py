@@ -333,7 +333,7 @@ def get_tile(tIndex: int, z: int, x: int, y: int, sensorName: str, bands: str = 
         elif(dataset_def['ds_name']=='SampleTimeSeries'):
             vmax = 255
         else:
-            vmax = 0.5
+            vmax = 1000
         for bid in rgb_bands:
             data = out_ds.GetRasterBand(bid).ReadAsArray()
             # data = data * 2.75e-05 - 0.2

@@ -2,11 +2,11 @@ import * as AppConfig from '../utils/AppConfig'
 
 const initialState = {
     // center: [-36.902306, 174.696037],
-    center: [30.035, 77.936],//[29.1653,79.6124],
+    center: [30.439, 80.446],//[29.1653,79.6124],
     zoom: 11,
     layers: AppConfig.layers,
     mapView: {
-        center: [29.1653, 79.6124],
+        center: [30.439, 80.446],
         zoom: 11
     },
     changeMapView: false,
