@@ -14,10 +14,12 @@ import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggle
 const QueryPanel = (props) => {
 
     const dispatch = useDispatch()
-    const [sensor, setSensor] = React.useState("SampleTimeSeries")
-    const [fromDate, setFromDate] = React.useState(new Date("1991-01-01"))
-    const [toDate, setToDate] = React.useState(new Date("1991-01-02"))
-    const [aoi, setAoi] = React.useState('aoi_RJ_Park')
+    const [sensor, setSensor] = React.useState("Landsat_OLI")
+    // const [fromDate, setFromDate] = React.useState(new Date("1991-01-01"))
+    // const [toDate, setToDate] = React.useState(new Date("1991-01-02"))
+    const [fromDate, setFromDate] = React.useState(new Date("2023-01-25"))
+    const [toDate, setToDate] = React.useState(new Date("2023-01-27"))
+    const [aoi, setAoi] = React.useState('aoi_RJP_Field')
 
     const [redBand, setRedBand] = React.useState(4)
     const [greenBand, setGreenBand] = React.useState(3)
@@ -70,6 +72,7 @@ const QueryPanel = (props) => {
                 <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
                 <MenuItem value={'SingleRasterBand'}>SingleRasterBand</MenuItem>
                 <MenuItem value={'SampleTimeSeries'}>SampleTimeSeries</MenuItem>
+                <MenuItem value={'SampleTimeSeriesOut'}>Sample TS Output</MenuItem>
             </Select>
         </FormControl>
         <br /><br />
@@ -81,7 +84,8 @@ const QueryPanel = (props) => {
                 label="AOI"
                 onChange={(e) => { setAoi(e.target.value) }}
             >
-                <MenuItem value={'aoi_haldwani'}>AOI Haldwani</MenuItem>
+                <MenuItem value={'aoi_RJ_Park_small'}>AOI Rajaji Park (Small)</MenuItem>
+                <MenuItem value={'aoi_RJP_Field'}>AOI Rajaji Park (Field)</MenuItem>
                 <MenuItem value={'aoi_shilma'}>AOI Shimla</MenuItem>
                 <MenuItem value={'aoi_haldwani_tw'}>AOI Haldwani Town</MenuItem>
                 <MenuItem value={'aoi_haldwani_outer'}>AOI Haldwani Outer</MenuItem>

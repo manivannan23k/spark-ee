@@ -77,6 +77,10 @@ object WorkProcess {
 //        val result = NDI.runProcess(inputsData.toMap, operation)
 //        inputsData += (operation.output.id -> result)
       }
+      if (operation.opType == "op_savgol") {
+                val result = SavGolFilter.runProcess(inputsData.toMap, operation)
+                inputsData += (operation.output.id -> result)
+      }
 
 
     }
@@ -123,9 +127,10 @@ object WorkProcess {
     val url = s"http://localhost:8082/ingestData?filePath=${fPath}&ts=${ts}&sensorName=SingleRasterBand"
     val ingestResult = HttpUtils.getRequestSync(url)
     val f = new File(fPath)
-    if(f.exists()){
-      f.delete()
-    }
+    println(fPath)
+//    if(f.exists()){
+//      f.delete()
+//    }
     println(ingestResult)
   }
 

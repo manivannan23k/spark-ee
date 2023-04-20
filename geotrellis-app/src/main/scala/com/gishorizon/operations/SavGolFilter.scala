@@ -23,7 +23,18 @@ object SavGolFilter {
 //    }
 //  }
 
-  def run(implicit sc: SparkContext, rdd: RDD[(SpatialKey, MultibandTile)], meta: TileLayerMetadata[SpatialKey]): Unit = {
+  def runProcess(inputs: Map[String, Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]]], operation: ProcessOperation): Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = {
+    var outRdds: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
+    var in1: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = inputs(operation.inputs(0).id)
+    for(i <- in1.indices){
+      val rdd = in1(i)
+      val r = runForRdd(rdd, rdd.metadata)
+      outRdds = outRdds :+ r
+    }
+    outRdds
+  }
+
+  def runForRdd(rdd: RDD[(SpatialKey, MultibandTile)], meta: TileLayerMetadata[SpatialKey]): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
     val tileSize = 5
 //    val (rdd, meta) = getMultiTiledRDD(sc, "data/NDVISampleTest/Test1998-99.tif", tileSize)
     //TODO: Recalculate SavGol Based on Score
@@ -79,10 +90,11 @@ object SavGolFilter {
         )
       }
     }, meta)
-    println("------------Saving----------")
-    val rasterTile: Raster[MultibandTile] =  result.stitch()
-    GeoTiffWriter.write(GeoTiff(rasterTile, meta.crs), "data/result.tif")
-    println("------------Done----------")
+    result
+//    println("------------Saving----------")
+//    val rasterTile: Raster[MultibandTile] =  result.stitch()
+//    GeoTiffWriter.write(GeoTiff(rasterTile, meta.crs), "data/result.tif")
+//    println("------------Done----------")
   }
 
   def getLeaseSquareError(x: Array[Double], y: Array[Double]): Double = {

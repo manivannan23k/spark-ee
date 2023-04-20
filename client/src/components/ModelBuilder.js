@@ -85,8 +85,8 @@ const ModelBuilder = (props) => {
     ]
 
     let inputTypes = ['in_raster_band', 'in_raster_layer'];
-    let outputTypes = ['out_raster_band'];
-    let operationTypes = ['op_ndi', 'op_local_avg'];
+    let outputTypes = ['out_raster_band', 'out_raster_layer'];
+    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol'];
     const [components, setComponents] = useState({
         inputs: [],
         output: null,
@@ -142,7 +142,8 @@ const ModelBuilder = (props) => {
             let component = {
                 "componentId": getRandomString(6),
                 "type": c.type,
-                "id": ""
+                "id": "",
+                "name": c.name
             }
             setComponents({
                 ...components,
@@ -201,6 +202,10 @@ const ModelBuilder = (props) => {
                                     {
                                         name: "Local Average",
                                         type: "op_local_avg"
+                                    },
+                                    {
+                                        name: "SavGol Filter",
+                                        type: "op_savgol"
                                     }
                                 ]
                             },
@@ -264,7 +269,7 @@ const ModelBuilder = (props) => {
             } */}
             <div style={{ width: '80%', display: 'inline-block', height: 'calc(100vh - 300px)' }}>
                 <GoDiagram components={components} modelLinks={modelLinks} modelChange={(changes) => {
-                    console.log("Model updated", changes)
+                    // console.log("Model updated", changes)
                     // if(changes.insertedLinkKeys){
                     //     //new link
                     //     console.log("Link added")
@@ -298,6 +303,16 @@ const ModelBuilder = (props) => {
                                         layer = props.map.layers[component.id]
                                         component.band = changes.value.split(" ")[1]
                                         component.loc = '200 150'
+                                        break;
+
+                                    case "in_raster_layer#Layer":
+                                        layer = props.map.layers[changes.value]
+                                        component.tIndexes = layer.tIndexes;
+                                        component.aoiCode = layer.aoiCode;
+                                        component.isTemporal = layer.tIndexes.length > 1;
+                                        component.dsName = layer.dsId;
+                                        component.id = changes.value
+                                        component.loc = '100 100'
                                         break;
                                 }
                                 setComponents({
@@ -383,7 +398,7 @@ const ModelBuilder = (props) => {
                             let linkIds = changes.insertedLinkKeys;
                             let newLink = changes.modifiedLinkData[0];
                             if (modelLinks.map(e => e.key).indexOf(newLink.key) !== -1) {
-                                return console.log("Link Exists")
+                                // return console.log("Link Exists")
                             }
                             let fromComp = getCompById(newLink.from);
                             let toComp = getCompById(newLink.to);
@@ -428,6 +443,30 @@ const ModelBuilder = (props) => {
                                     ...modelLinks,
                                     newLink
                                 ])
+                            } else if (operationTypes.indexOf(fromComp.component.type) !== -1 && operationTypes.indexOf(toComp.component.type) !== -1) {
+                                console.log(fromComp.component, toComp.component);
+                                if (!fromComp.component.output.layer || (components.output && components.output.componentId === fromComp.component.output.layer))
+                                    fromComp.component.output.layer = getRandomString(6);
+                                let opInput = {
+                                    layer: fromComp.component.output.layer,
+                                    band: fromComp.component.output.band
+                                };
+                                toComp.component.inputs.push(opInput)
+                                let operations = [...components.operations];
+                                operations.splice(toComp.index, 1);
+                                setComponents({
+                                    ...components,
+                                    operations: [
+                                        ...operations,
+                                        toComp.component
+                                    ]
+                                })
+                                setModelLinks([
+                                    ...modelLinks,
+                                    newLink
+                                ])
+
+
                             }
                         }
                     } catch (e) {
@@ -466,9 +505,16 @@ const ModelBuilder = (props) => {
                             "type": operation.type,
                             "inputs": operation.inputs.map(inp => {
                                 let il = components.inputs.filter(e => { return e.componentId === inp.layer })[0]
+                                if (!il) {
+                                    //from operation
+                                    return {
+                                        id: inp.layer,
+                                        band: 0
+                                    }
+                                }
                                 return {
                                     id: inp.layer,
-                                    band: parseInt(il.band)
+                                    band: il.band ? parseInt(il.band) : 0
                                 }
                             }),
                             "output": {
