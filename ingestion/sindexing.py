@@ -45,7 +45,7 @@ def generate_index(shapefile_path):
     idx.close()
     return True
 
-def load_indexes(level_ids):
+def load_indexes(level_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12]):
     index_data = {}
     for level_id in level_ids:
         f_path = os.path.join(config['sindex_dir'], f"spatial_index_{level_id}")
@@ -55,8 +55,7 @@ def load_indexes(level_ids):
 
 def get_tile_intersection(level, bbox):
     try:
-        level_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12]
-        index_dat = load_indexes(level_ids)
+        # index_dat = load_indexes(level_ids)
         # print([n.object for n in index_dat[5].intersection(bbox, objects=True)])
         return [n.object for n in index_dat[level].intersection(bbox, objects=True)]
     except Exception as e:
@@ -66,6 +65,53 @@ def get_tile_intersection(level, bbox):
 
 
 
+def get_index(shapefile_path):
+    ds = ogr.Open(shapefile_path)
+    idx = None
+    lyr = ds.GetLayer()
+    f_count = lyr.GetFeatureCount()
+    f_i = 1
+    # index_data = []
+    for feature in lyr:
+        g = feature.GetGeometryRef()
+        spatial_partition_index = tuple(map(int, feature.GetField('id').replace('(','').replace(')','').split(',')))
+        level_id = spatial_partition_index[2]
+        x_id = spatial_partition_index[0]
+        y_id = spatial_partition_index[1]
+        uid = f"{level_id}#{x_id}#{y_id}"
+        g = g.GetEnvelope()
+        g = (g[0], g[2], g[1], g[3])
+        print(f"{f_i}/{f_count}, {g}", end="\r")
+
+        if(idx is None):
+            p = rtree.index.Property()
+            # p.dat_extension = 'data'
+            # p.idx_extension = 'index'
+            idx = rtree.index.Index(properties=p)
+        idx.insert(f_i, g, obj=uid)
+        # index_data.append({
+        #     "id": f_i, "bbox": g, "obj": uid
+        # })
+        f_i += 1
+    return idx, level_id
+
+
+def reload_index():
+    shapefile_paths = []
+    index_data = {}
+    for f in os.listdir(config['grid_dir']):
+        if(f.endswith(".shp")):
+            shapefile_paths.append(os.path.join(config['grid_dir'], f))
+    for shapefile_path in shapefile_paths:
+        print(shapefile_path)
+        idx, level_id = get_index(
+            shapefile_path
+        )
+        index_data[level_id] = idx
+    return index_data
+
+
 config = json.load(open("config.json"))
-# index_dat = load_indexes(level_ids)
+index_dat = load_indexes()
+# reload_index()
 # print(f"Spatial Index loaded for {level_ids}")

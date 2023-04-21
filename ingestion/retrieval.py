@@ -7,17 +7,12 @@ import math
 import glob
 import zCurve as z
 from db import Db
-import random
-import string
+from utils import generate_string, tilenum2deg
 
-def generate_string():
-    name = ''.join(random.choices(string.ascii_uppercase, k=16))
-    return name
 
 config = json.load(open("config.json"))
 
 def load_data(tile, tindex, sensor_name):
-    # print(sensor_name)
     ds_def = Db.get_db_dataset_def_by_name(sensor_name)
     ds_id = ds_def['dataset_id']
     dir_path = config["tile_dir"]
@@ -26,19 +21,16 @@ def load_data(tile, tindex, sensor_name):
     y_index = tile[2]
     z_index = z.interlace(tindex, y_index, x_index)
     tile_data = Db.get_db_tile_by_zindex_zoom_ds(z_index, zoom_level, ds_id, x_index, y_index, tindex)
-    # print(tile_data)
     if tile_data is None:
         return None
-    # print(os.path.join(dir_path, sensor_name, f"{tile[0]}/{tile[1]}/{tile[2]}.tif"))
-    # file_path = os.path.join(dir_path, sensor_name, f"{tile[0]}/{tile[1]}/{tile[2]}/{tindex}.tif")
     file_path = os.path.join(dir_path, tile_data['file_path'])
     if(not os.path.exists(file_path)):
+        print("No data", file_path)
         return None
     ds = gdal.Open(file_path)
     return ds
 
 def load_data_ref(tile, tindex, sensor_name):
-    # print(sensor_name)
     ds_def = Db.get_db_dataset_def_by_name(sensor_name)
     ds_id = ds_def['dataset_id']
     dir_path = config["tile_dir"]
@@ -47,11 +39,8 @@ def load_data_ref(tile, tindex, sensor_name):
     y_index = tile[2]
     z_index = z.interlace(tindex, y_index, x_index)
     tile_data = Db.get_db_tile_by_zindex_zoom_ds(z_index, zoom_level, ds_id, x_index, y_index, tindex)
-    # print(tile_data)
     if tile_data is None:
         return None
-    # print(os.path.join(dir_path, sensor_name, f"{tile[0]}/{tile[1]}/{tile[2]}.tif"))
-    # file_path = os.path.join(dir_path, sensor_name, f"{tile[0]}/{tile[1]}/{tile[2]}/{tindex}.tif")
     file_path = os.path.join(dir_path, tile_data['file_path'])
     if(not os.path.exists(file_path)):
         return None
@@ -100,18 +89,6 @@ def ts_to_tindex(ts):
 def tindex_to_ts(ts):
     start_ts = int(datetime.timestamp(datetime.strptime(config["start_time"], '%Y-%m-%d %H:%M:%S'))*1000)
     return [start_ts + r*1000 for r in ts]
-
-def tilenum2deg(xtile, ytile, zoom):
-    n = 2.0 ** zoom
-    lon_deg1 = xtile / n * 360.0 - 180.0
-    lat_rad1 = math.atan(math.sinh(math.pi * (1 - 2 * ytile / n)))
-    lat_deg1 = math.degrees(lat_rad1)
-    
-    lon_deg2 = (xtile+1) / n * 360.0 - 180.0
-    lat_rad2 = math.atan(math.sinh(math.pi * (1 - 2 * (ytile+1) / n)))
-    lat_deg2 = math.degrees(lat_rad2)
-
-    return [lon_deg1, lat_deg1, lon_deg2, lat_deg2]
 
 def get_xyz_tile_res(bbox):
     return (bbox[2]-bbox[0])/256
