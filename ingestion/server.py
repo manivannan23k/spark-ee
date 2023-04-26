@@ -100,6 +100,58 @@ def ingest_data(filePath: str, sensorName: str, ts: int):
             "data": None
         }
 
+@app.get("/getDatasets")
+def get_datasets():
+    try:
+        ds = Db.get_db_all_dataset_def()
+        return {
+            "error": False,
+            "message": "Success",
+            "data": ds
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "error": True,
+            "message": "Exception",
+            "data": None
+        }
+    
+
+@app.get("/getAois")
+def get_aois():
+    try:
+        aois = Db.get_db_all_aoi_names()
+        return {
+            "error": False,
+            "message": "Success",
+            "data": aois
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "error": True,
+            "message": "Exception",
+            "data": None
+        }
+
+@app.get("/getAoiByCode")
+def get_aoi_by_code(aoiCode: str):
+    try:
+        aoi = Db.get_aoi_geom_by_aoi_code(aoiCode)
+        return {
+            "error": False,
+            "message": "Success",
+            "data": aoi
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "error": True,
+            "message": "Exception",
+            "data": None
+        }
+
 @app.get("/getTimeIndexes")
 def get_time_indexes(sensorName: str, fromTs: int = None, toTs: int = None, aoi_code: str = 'uTUYvVGHgcvchgxc'):
     try:

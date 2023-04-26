@@ -1,5 +1,6 @@
 const initialState = {
     showAddLayerDialog: false,
+    showAddAoiDialog: false,
     showModelBuilderDialog: false,
     showQueryResultsDialog: false
 };
@@ -21,6 +22,11 @@ const DialogReducer = (state = initialState, action) => {
                 ...state,
                 showQueryResultsDialog: action.payload
             };
+        case "TOGGLE_ADD_AOI":
+            return {
+                ...state,
+                showAddAoiDialog: action.payload
+            }
         default:
             return {
                 ...state

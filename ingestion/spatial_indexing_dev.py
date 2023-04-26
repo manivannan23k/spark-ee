@@ -10,7 +10,7 @@ def get_index(shapefile_path):
     lyr = ds.GetLayer()
     f_count = lyr.GetFeatureCount()
     f_i = 1
-    index_data = []
+    # index_data = []
     for feature in lyr:
         g = feature.GetGeometryRef()
         spatial_partition_index = tuple(map(int, feature.GetField('id').replace('(','').replace(')','').split(',')))
@@ -27,12 +27,12 @@ def get_index(shapefile_path):
             # p.dat_extension = 'data'
             # p.idx_extension = 'index'
             idx = rtree.index.Index(properties=p)
-        # idx.insert(f_i, g, obj=uid)
-        index_data.append({
-            "id": f_i, "bbox": g, "obj": uid
-        })
+        idx.insert(f_i, g, obj=uid)
+        # index_data.append({
+        #     "id": f_i, "bbox": g, "obj": uid
+        # })
         f_i += 1
-    return index_data
+    return idx
 
 idx = get_index(r"E:\Mani\ProjectData\grids\IndiaWGS84GCS10.shp")
 print(idx)

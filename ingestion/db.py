@@ -58,6 +58,19 @@ class Db:
         cursor.close()
         conn.close()
         return rows
+    
+    def get_db_all_aoi_names():
+        rows = []
+        conn = Db.get_db_conn()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(f"""
+            select aoi_code, id, aoi_name from user_aoi;
+        """)
+        for row in cursor:
+            rows.append(row)
+        cursor.close()
+        conn.close()
+        return rows
 
     def get_time_indexes_for_ds(dataset_id, from_ts, to_ts):
         rows = []
@@ -132,7 +145,7 @@ class Db:
         conn = Db.get_db_conn()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(f"""
-            select aoi_code, st_asgeojson(geom) as geom from user_aoi where aoi_code='{aoi_code}';
+            select aoi_code, st_asgeojson(geom) as geom, aoi_name from user_aoi where aoi_code='{aoi_code}';
         """)
         row = cursor.fetchone()
 

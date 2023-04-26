@@ -14,6 +14,10 @@ import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggle
 const QueryPanel = (props) => {
 
     const dispatch = useDispatch()
+
+    const [datasets, setDatasets] = React.useState([])
+
+
     const [sensor, setSensor] = React.useState("LISS3")
     // const [fromDate, setFromDate] = React.useState(new Date("1991-01-01"))
     // const [toDate, setToDate] = React.useState(new Date("1991-01-02"))
@@ -38,6 +42,30 @@ const QueryPanel = (props) => {
             vizMaxValue: vizMaxValue
         }))
     }
+
+    const getDatasets = () => {
+        fetch(`http://localhost:8082/getDatasets`)
+            .then(r => r.json())
+            .then(r => {
+                setDatasets(r.data.filter(e => e.is_querable).map(d => {
+                    return {
+                        name: d.ds_name,
+                        bands: JSON.parse(d.band_meta),
+                        style: JSON.parse(d.def_color_scheme),
+                        id: d.dataset_id,
+                        description: d.ds_description,
+                        vmin: d.vmin,
+                        vmax: d.vmax,
+                        noOfBands: d.no_of_bands
+                    }
+                }))
+            })
+            .catch(er => console.log(er))
+    }
+
+    React.useEffect(() => {
+        getDatasets()
+    }, [])
 
     const queryDataset = () => {
         fetch(`http://localhost:8082/getTimeIndexes?sensorName=${sensor}&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
@@ -69,11 +97,11 @@ const QueryPanel = (props) => {
                 label="Sensor"
                 onChange={(e) => { setSensor(e.target.value) }}
             >
-                <MenuItem value={'Landsat_OLI'}>Landsat8</MenuItem>
-                <MenuItem value={'LISS3'}>LISS3</MenuItem>
-                <MenuItem value={'SingleRasterBand'}>SingleRasterBand</MenuItem>
-                <MenuItem value={'SampleTimeSeries'}>SampleTimeSeries</MenuItem>
-                <MenuItem value={'SampleTimeSeriesOut'}>Sample TS Output</MenuItem>
+                {
+                    datasets.map(ds => {
+                        return <MenuItem key={ds.name} value={ds.name}>{`${ds.name} - ${ds.description}`}</MenuItem>
+                    })
+                }
             </Select>
         </FormControl>
         <br /><br />

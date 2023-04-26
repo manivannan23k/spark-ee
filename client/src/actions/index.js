@@ -1,7 +1,7 @@
 export const toggleLayerState = (layerId, active) => {
     return {
         type: 'TOGGLE_LAYER_STATE',
-        payload: {layerId, active}
+        payload: { layerId, active }
     }
 };
 export const changeMapZoom = (zoom) => {
@@ -13,13 +13,13 @@ export const changeMapZoom = (zoom) => {
 export const changeMapView = (center, zoom) => {
     return {
         type: 'CHANGE_MAP_VIEW',
-        payload: {center, zoom}
+        payload: { center, zoom }
     }
 }
 export const mapViewWasSet = (center, zoom) => {
     return {
         type: 'MAP_VIEW_WAS_SET',
-        payload: {center, zoom}
+        payload: { center, zoom }
     }
 }
 export const addLayer = (layer) => {
@@ -71,6 +71,12 @@ export const updateChartData = (data) => {
 export const toggleAddLayerDialog = (flag) => {
     return {
         type: 'TOGGLE_ADD_LAYER',
+        payload: flag
+    }
+};
+export const toggleAddAoiDialog = (flag) => {
+    return {
+        type: 'TOGGLE_ADD_AOI',
         payload: flag
     }
 };
