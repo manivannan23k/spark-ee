@@ -16,10 +16,16 @@ export const changeMapView = (center, zoom) => {
         payload: { center, zoom }
     }
 }
-export const mapViewWasSet = (center, zoom) => {
+export const changeMapExtent = (extent) => {
+    return {
+        type: 'CHANGE_MAP_EXTENT',
+        payload: { extent }
+    }
+}
+export const mapViewWasSet = (center, zoom, extent) => {
     return {
         type: 'MAP_VIEW_WAS_SET',
-        payload: { center, zoom }
+        payload: { center, zoom, extent }
     }
 }
 export const addLayer = (layer) => {

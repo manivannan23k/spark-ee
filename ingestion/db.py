@@ -145,7 +145,7 @@ class Db:
         conn = Db.get_db_conn()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(f"""
-            select aoi_code, st_asgeojson(geom) as geom, aoi_name from user_aoi where aoi_code='{aoi_code}';
+            select aoi_code, st_asgeojson(geom) as geom, st_asgeojson(st_envelope(geom)) as aoi_extent, aoi_name from user_aoi where aoi_code='{aoi_code}';
         """)
         row = cursor.fetchone()
 

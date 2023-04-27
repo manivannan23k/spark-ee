@@ -7,7 +7,9 @@ const initialState = {
     layers: AppConfig.layers,
     mapView: {
         center: [30.439, 80.446],
-        zoom: 11
+        zoom: 11,
+        extent: [[40.712, -74.227],
+        [40.774, -74.125]]
     },
     changeMapView: false,
     searchLayer: null,
@@ -35,7 +37,20 @@ const MapReducer = (state = initialState, action) => {
                 center: action.payload.center,
                 mapView: {
                     zoom: action.payload.zoom,
-                    center: action.payload.center
+                    center: action.payload.center,
+                    extent: state.mapView.extent
+                },
+                changeMapView: true
+            };
+        case "CHANGE_MAP_EXTENT":
+            return {
+                ...state,
+                zoom: action.payload.zoom,
+                center: action.payload.center,
+                mapView: {
+                    zoom: state.mapView.zoom,
+                    center: state.mapView.center,
+                    extent: action.payload.extent
                 },
                 changeMapView: true
             };
@@ -46,7 +61,8 @@ const MapReducer = (state = initialState, action) => {
                 center: action.payload.center,
                 mapView: {
                     zoom: action.payload.zoom,
-                    center: action.payload.center
+                    center: action.payload.center,
+                    extent: action.payload.extent
                 },
                 changeMapView: false
             };

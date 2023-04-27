@@ -31,11 +31,18 @@ function ChangeMapView({ zoom, center, changeMapView }) {
     }
     return null;
 }
+function ChangeMapExtent({ extent, changeMapView }) {
+    const map = useMap();
+    if (changeMapView) {
+        map.fitBounds(extent);
+    }
+    return null;
+}
 
 function MapViewChangeEvent() {
     const dispatch = useDispatch();
     const map = useMapEvent('moveend', () => {
-        dispatch(mapViewWasSet(map.getCenter(), map.getZoom()))
+        dispatch(mapViewWasSet(map.getCenter(), map.getZoom(), map.getBounds()))
     })
     return null
 }
@@ -75,41 +82,10 @@ const MapLayers = (props) => {
 
                     case 'DATA_TILE':
                         return <TileLayer key={layer.id}
-                            url={`http://localhost:8082/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=3,2,1&vmin=0&vmax=1500&aoi_code=${layer.aoiCode}`}
+                            url={`http://localhost:8082/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}&aoi_code=${layer.aoiCode}`}
                             //http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=913543204&bands=4,3,2&vmin=0&vmax=20000&aoi_code=qwertyuiopasdfgh
                             maxZoom={24}
                         />
-                    case 'ESRI_FEATURE':
-                        return props.map.zoom > 16 ? (
-                            <FeatureLayer
-                                key={layer.id}
-                                url={layer.url}
-                                // where={"status = 'LIVE'"}
-                                // where={"spatial_extents_shared = 'F'"}
-                                style={() => {
-                                    return {
-                                        color: "#888",
-                                        weight: 0.5,
-                                        fillOpacity: 0
-                                    }
-                                }}
-                                pointToLayer={(geojson, latlng) => {
-                                    return L.marker(latlng, {
-                                        icon: L.divIcon({
-                                            // iconUrl: 'https://esri.github.io/esri-leaflet/img/earthquake-icon.png',
-                                            iconSize: null,
-                                            html: '<div>' + geojson.properties['full_address_number'] + '</div>'
-                                            // iconAnchor: [13.5, 17.5],
-                                            // popupAnchor: [0, -11]
-                                        })
-                                    });
-                                }}
-                            />
-                        ) : '';
-                    case 'VECTOR_GJ':
-                        return true ? (
-                            <GeoJSON data={layer.data} key={layer.id} />
-                        ) : '';
                 }
                 return '';
             })
@@ -119,31 +95,9 @@ const MapLayers = (props) => {
 
 
 function ClickEvent(props) {
-    // return;
     const dispatch = useDispatch();
     const map = useMapEvent('click', (e) => {
         console.log(e.latlng)
-        // let fromTs = null, toTs = null;
-        // props.setMarkerPos(e.latlng)
-        // if (props.timeIndexes && props.timeIndexes.length > 0) {
-        //     fromTs = props.timeIndexes[0]['ts']
-        //     toTs = props.timeIndexes[props.timeIndexes.length - 1]['ts']
-        // } else {
-        //     return;
-        // }
-        // fetch(`http://localhost:8082/getPixelAt?sensorName=Landsat&fromTs=${fromTs}&toTs=${toTs}&y=${e.latlng.lat}&x=${e.latlng.lng}`)
-        //     .then(r => r.json())
-        //     .then(r => {
-        //         dispatch(updateChartData({
-        //             type: 'line',
-        //             labels: props.timeIndexes.map(p => new Date(p['ts']).toLocaleDateString()),
-        //             values: r.data.map(b => b[4] - b[3])
-        //         }))
-        //         console.log(r.data.map(b => b[4] - b[3]))
-        //     })
-        //     .catch(e => {
-        //         console.log(e)
-        //     })
     })
     return null
 }
@@ -151,23 +105,6 @@ function ClickEvent(props) {
 const Map = (props) => {
     const dispatch = useDispatch()
     const [markerPos, setMarkerPos] = useState(null)
-    useEffect(() => {
-        if (!props.map.tIndex) {
-            return;
-        }
-        // dispatch(addLayer({
-        //     type: 'TILE',
-        //     id: 'data',
-        //     active: true,
-        //     url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=${props.map.tIndex}&bands=${props.map.bands.join(",")}&vmin=0&vmax=${props.map.vizMaxValue}`,
-        //     name: 'Streets - Base',
-        //     sortOrder: 0,
-        //     showLegend: false,
-        //     showInLayerList: false
-        // }))
-    }, [props.map.tIndex, props.map.bands])
-
-    // console.log(props.map.searchLayer)
     return (
         <MapContainer maxZoom={24} style={{ height: 'calc(100vh - 120px)', width: '100%' }} center={props.map.center} zoom={props.map.zoom}>
             {/*<ChangeMapZoom zoom={props.map.zoom} />*/}
@@ -177,9 +114,13 @@ const Map = (props) => {
             <MapViewChangeEvent />
             <ClickEvent timeIndexes={props.map.timeIndexes} tIndex={props.map.tIndex} setMarkerPos={setMarkerPos} />
 
-            <ChangeMapView
+            {/* <ChangeMapView
                 center={props.map.mapView.center}
                 zoom={props.map.mapView.zoom}
+                changeMapView={props.map.changeMapView}
+            /> */}
+            <ChangeMapExtent
+                extent={props.map.mapView.extent}
                 changeMapView={props.map.changeMapView}
             />
             <MapLayers map={props.map} />

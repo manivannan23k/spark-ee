@@ -9,6 +9,7 @@ import DatePicker from 'react-datepicker';
 import { Button, Slider, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
+import DataService from '../services.js/Data';
 
 
 const AddAoiLayer = (props) => {
@@ -34,21 +35,20 @@ const AddAoiLayer = (props) => {
     }
 
     const getAoiByCode = () => {
-        fetch(`http://localhost:8082/getAoiByCode?aoiCode=${aoi}`)
-            .then(r => r.json())
+        DataService.getAoiByCode(aoi)
             .then(r => {
                 dispatch(addLayer({
                     type: 'VECTOR',
                     id: `AOI_${aoi}`,
                     active: true,
                     data: JSON.parse(r.data.geom),
+                    aoiCode: aoi,
                     name: aoi,
                     sortOrder: 0,
                     showLegend: false,
                     showInLayerList: true
                 }))
-            })
-            .catch(er => console.log(er))
+            }).catch(e => e);
     }
 
     React.useEffect(() => {
