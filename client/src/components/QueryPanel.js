@@ -7,9 +7,15 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import DatePicker from 'react-datepicker';
 import { Button, Slider, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 
+const mapStateToProps = (state) => {
+    return {
+        map: state.MapReducer,
+        dialog: state.DialogReducer
+    }
+}
 
 const QueryPanel = (props) => {
 
@@ -85,6 +91,9 @@ const QueryPanel = (props) => {
             })
     }
 
+    const aoiLayers = Object.keys(props.map.layers).filter(lk => props.map.layers[lk].group === "AOI").map(lk => props.map.layers[lk])
+    console.log(aoiLayers)
+
     return <>
         <Typography variant="h6" gutterBottom component="div">
             Query Datasets
@@ -113,13 +122,18 @@ const QueryPanel = (props) => {
                 label="AOI"
                 onChange={(e) => { setAoi(e.target.value) }}
             >
-                <MenuItem value={'aoi_RJ_Park_small'}>AOI Rajaji Park (Small)</MenuItem>
+                {/* <MenuItem value={'aoi_RJ_Park_small'}>AOI Rajaji Park (Small)</MenuItem>
                 <MenuItem value={'aoi_RJP_Field'}>AOI Rajaji Park (Field)</MenuItem>
                 <MenuItem value={'aoi_shilma'}>AOI Shimla</MenuItem>
                 <MenuItem value={'aoi_haldwani_tw'}>AOI Haldwani Town</MenuItem>
                 <MenuItem value={'aoi_haldwani_outer'}>AOI Haldwani Outer</MenuItem>
                 <MenuItem value={'aoi_RJ_Park'}>AOI Rajaji Park</MenuItem>
-                <MenuItem value={'aoi_uk_1'}>AOI UK</MenuItem>
+                <MenuItem value={'aoi_uk_1'}>AOI UK</MenuItem> */}
+                {
+                    aoiLayers.map(aoiLayer => {
+                        return <MenuItem value={aoiLayer.aoiCode}>{aoiLayer.name}</MenuItem>
+                    })
+                }
 
             </Select>
         </FormControl>
@@ -211,4 +225,4 @@ const QueryPanel = (props) => {
     </>
 }
 
-export default QueryPanel;
+export default connect(mapStateToProps)(QueryPanel);

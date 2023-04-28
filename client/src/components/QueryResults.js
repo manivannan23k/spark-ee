@@ -48,6 +48,7 @@ const QueryResults = (props) => {
                     let lId = (Math.random() + 1).toString(36).substring(6);
                     let layer = {
                         type: 'DATA_TILE',
+                        group: 'RASTER_DATA',
                         id: lId,
                         active: true,
                         tIndex: firstResult.tIndex,

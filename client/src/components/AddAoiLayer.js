@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import DatePicker from 'react-datepicker';
-import { Button, Slider, Typography } from '@mui/material';
+import { Button, Slider, Tab, Tabs, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 import DataService from '../services.js/Data';
@@ -39,6 +39,7 @@ const AddAoiLayer = (props) => {
             .then(r => {
                 dispatch(addLayer({
                     type: 'VECTOR',
+                    group: 'AOI',
                     id: `AOI_${aoi}`,
                     active: true,
                     data: JSON.parse(r.data.geom),
@@ -55,26 +56,70 @@ const AddAoiLayer = (props) => {
         getDatasets()
     }, [])
 
+    const [selectedTab, setSelectedTab] = React.useState(0);
+
+    const TabPanel = (props) => {
+        const { value, index } = props;
+        return (
+            <div
+                role="tabpanel"
+                hidden={value !== index}
+                id={`add-aoi-tabpanel-${index}`}
+            >
+                {value === index && (
+                    <props.ChildComp />
+                )}
+            </div>
+        )
+    }
 
     return <>
         <Typography variant="h6" gutterBottom component="div">
             Add AOI
         </Typography>
-        <FormControl fullWidth>
-            <InputLabel id="aoi-select">Existing AOI</InputLabel>
-            <Select
-                labelId="aoi-select"
-                value={aoi}
-                label="Existing AOI"
-                onChange={(e) => { setAoi(e.target.value) }}
+        <Box sx={{ width: '100%' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={selectedTab} onChange={(e, v) => {
+                    setSelectedTab(v);
+                }}>
+                    <Tab label="Existing" />
+                    <Tab label="Add new" />
+                </Tabs>
+            </Box>
+            <div
+                role="tabpanel"
+                hidden={selectedTab !== 0}
             >
-                {
-                    datasets.map(ds => {
-                        return <MenuItem key={ds.code} value={ds.code}>{`${ds.name} (${ds.code})`}</MenuItem>
-                    })
-                }
-            </Select>
-        </FormControl>
+                <FormControl fullWidth>
+                    <InputLabel id="aoi-select">Existing AOI</InputLabel>
+                    <Select
+                        labelId="aoi-select"
+                        value={aoi}
+                        label="Existing AOI"
+                        onChange={(e) => { setAoi(e.target.value) }}
+                    >
+                        {
+                            datasets.map(ds => {
+                                return <MenuItem key={ds.code} value={ds.code}>{`${ds.name} (${ds.code})`}</MenuItem>
+                            })
+                        }
+                    </Select>
+                </FormControl>
+            </div>
+
+            <div
+                role="tabpanel"
+                hidden={selectedTab !== 1}
+            >
+                <FormControl fullWidth>
+                    <TextField
+                        label="Multiline"
+                        multiline
+                        rows={4}
+                    />
+                </FormControl>
+            </div>
+        </Box>
         <br />
         <br />
         <Button variant="contained" onClick={() => { getAoiByCode(); }}>Add</Button>
