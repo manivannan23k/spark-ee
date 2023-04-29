@@ -4,6 +4,12 @@ export const toggleLayerState = (layerId, active) => {
         payload: { layerId, active }
     }
 };
+export const changeLayerStyle = (layerId, style) => {
+    return {
+        type: 'CHANGE_LAYER_STYLE',
+        payload: { layerId, style }
+    }
+};
 export const changeMapZoom = (zoom) => {
     return {
         type: 'CHANGE_ZOOM',

@@ -8,7 +8,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import DatePicker from 'react-datepicker';
 import { Button, Slider, Tab, Tabs, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
+import { addLayer, setQueryResults, setTimeIndexes, toggleAddAoiDialog, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 import DataService from '../services.js/Data';
 
 
@@ -18,6 +18,9 @@ const AddAoiLayer = (props) => {
 
     const [datasets, setDatasets] = React.useState([])
     const [aoi, setAoi] = React.useState("")
+
+    const [aoiGj, setAoiGj] = React.useState("")
+    const [aoiName, setAoiName] = React.useState("")
 
     const getDatasets = () => {
         fetch(`http://localhost:8082/getAois`)
@@ -34,7 +37,7 @@ const AddAoiLayer = (props) => {
             .catch(er => console.log(er))
     }
 
-    const getAoiByCode = () => {
+    const getAoiByCode = (aoi) => {
         DataService.getAoiByCode(aoi)
             .then(r => {
                 dispatch(addLayer({
@@ -49,6 +52,15 @@ const AddAoiLayer = (props) => {
                     showLegend: false,
                     showInLayerList: true
                 }))
+                dispatch(toggleAddAoiDialog(false))
+            }).catch(e => e);
+    }
+
+    const addAoi = () => {
+        DataService.addAoi(JSON.stringify(JSON.parse(aoiGj)), aoiName)
+            .then(r => {
+                setAoi(r.data);
+                getAoiByCode(r.data)
             }).catch(e => e);
     }
 
@@ -113,16 +125,38 @@ const AddAoiLayer = (props) => {
             >
                 <FormControl fullWidth>
                     <TextField
-                        label="Multiline"
+                        label="AOI GeoJSON"
                         multiline
                         rows={4}
+                        value={aoiGj}
+                        onChange={(e) => {
+                            setAoiGj(e.target.value)
+                        }}
+                    />
+                </FormControl>
+
+                <br />
+                <br />
+                <FormControl fullWidth>
+                    <TextField
+                        label="AOI Name"
+                        value={aoiName}
+                        onChange={(e) => {
+                            setAoiName(e.target.value)
+                        }}
                     />
                 </FormControl>
             </div>
         </Box>
         <br />
         <br />
-        <Button variant="contained" onClick={() => { getAoiByCode(); }}>Add</Button>
+        <Button variant="contained" onClick={() => {
+            if (selectedTab === 0) {
+                getAoiByCode(aoi);
+            } else {
+                addAoi()
+            }
+        }}>Add</Button>
         <br />
     </>
 }

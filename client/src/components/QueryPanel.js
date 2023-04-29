@@ -77,7 +77,6 @@ const QueryPanel = (props) => {
         fetch(`http://localhost:8082/getTimeIndexes?sensorName=${sensor}&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
             .then(r => r.json())
             .then(r => {
-                console.log(r)
                 if (r.data.length > 0) {
                     dispatch(toggleAddLayerDialog(false))
                     dispatch(setQueryResults(r.data))
@@ -92,7 +91,6 @@ const QueryPanel = (props) => {
     }
 
     const aoiLayers = Object.keys(props.map.layers).filter(lk => props.map.layers[lk].group === "AOI").map(lk => props.map.layers[lk])
-    console.log(aoiLayers)
 
     return <>
         <Typography variant="h6" gutterBottom component="div">

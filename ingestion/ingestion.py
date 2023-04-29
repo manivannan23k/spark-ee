@@ -7,11 +7,12 @@ import math
 import zCurve as z
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import config as app_config
 
 
 tiff_driver = gdal.GetDriverByName('GTiff')
 shp_driver = ogr.GetDriverByName("ESRI Shapefile")
-config = json.load(open("config.json"))
+config = app_config.config
 
 def get_db_conn():
     try:

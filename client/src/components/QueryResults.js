@@ -55,6 +55,7 @@ const QueryResults = (props) => {
                         tIndexes: props.map.queryResults.map(qr => qr.tIndex),
                         aoiCode: firstResult['aoiCode'],
                         dsId: firstResult['dsName'],
+                        noOfBands: firstResult['dsData']['no_of_bands'],
                         name: 'Layer: ' + lId,
                         sortOrder: 0,
                         showLegend: false,
@@ -63,7 +64,7 @@ const QueryResults = (props) => {
                             min: 0,
                             max: 1,
                             bands: [4, 3, 2],
-                            type: "tcc"
+                            type: "rgb"
                         }
                     }
                     dispatch(addLayer(layer));

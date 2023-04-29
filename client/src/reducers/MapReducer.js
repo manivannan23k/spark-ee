@@ -83,6 +83,13 @@ const MapReducer = (state = initialState, action) => {
                 ...state,
                 layers: layers
             }
+        case "CHANGE_LAYER_STYLE":
+            layers[action.payload.layerId].style = action.payload.style;
+            console.log(layers[action.payload.layerId].style)
+            return {
+                ...state,
+                layers: layers
+            }
         case "SET_TIME_INDEXEX":
             return {
                 ...state,

@@ -1,8 +1,9 @@
 from sindexing import generate_index
 import json
 import os
+import config as app_config
 
-config = json.load(open("config.json"))
+config = app_config.config
 
 shapefile_paths = [
 

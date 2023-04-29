@@ -8,9 +8,10 @@ import glob
 import zCurve as z
 from db import Db
 from utils import generate_string, tilenum2deg
+import config as app_config
 
 
-config = json.load(open("config.json"))
+config = app_config.config
 
 def load_data(tile, tindex, sensor_name):
     ds_def = Db.get_db_dataset_def_by_name(sensor_name)

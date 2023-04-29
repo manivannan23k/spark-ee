@@ -3,13 +3,14 @@ import { connect, useDispatch } from 'react-redux';
 import Paper from '@mui/material/Paper';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { changeMapExtent, removeLayer, toggleLayerState } from '../actions/index';
+import { changeLayerStyle, changeMapExtent, removeLayer, toggleLayerState } from '../actions/index';
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Grid from "@material-ui/core/Grid";
 import DataService from "../services.js/Data";
+import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 
 const mapStateToProps = (state) => {
     return {
@@ -21,6 +22,12 @@ const LayerListItem = (props) => {
     const dispatch = useDispatch();
     const handleLayerToggle = (e) => {
         dispatch(toggleLayerState(props.layer.id, e.target.checked));
+    }
+
+    const changeVizBand = (color, band) => {
+        let nLayer = { ...props.layer };
+        nLayer.style.bands[color] = band;
+        dispatch(changeLayerStyle(nLayer.id, nLayer.style))
     }
 
     return (
@@ -68,6 +75,44 @@ const LayerListItem = (props) => {
                     </Button>
                 </Grid>
             </Grid>
+
+            {
+                props.layer.type === "DATA_TILE" ? (
+                    <>
+                        <FormControl>
+                            <InputLabel>R</InputLabel>
+                            <Select value={props.layer.style.bands[0]} onChange={(e) => changeVizBand(0, e.target.value)}>
+                                {
+                                    Array(props.layer.noOfBands).fill(0).map((v, i) => {
+                                        return <MenuItem key={i} value={i + 1}>{`Band ${i + 1}`}</MenuItem>
+                                    })
+                                }
+                            </Select>
+                        </FormControl>
+                        <FormControl>
+                            <InputLabel>G</InputLabel>
+                            <Select value={props.layer.style.bands[1]} onChange={(e) => changeVizBand(1, e.target.value)}>
+                                {
+                                    Array(props.layer.noOfBands).fill(0).map((v, i) => {
+                                        return <MenuItem key={i} value={i + 1}>{`Band ${i + 1}`}</MenuItem>
+                                    })
+                                }
+                            </Select>
+                        </FormControl>
+                        <FormControl>
+                            <InputLabel>B</InputLabel>
+                            <Select value={props.layer.style.bands[2]} onChange={(e) => changeVizBand(2, e.target.value)}>
+                                {
+                                    Array(props.layer.noOfBands).fill(0).map((v, i) => {
+                                        return <MenuItem key={i} value={i + 1}>{`Band ${i + 1}`}</MenuItem>
+                                    })
+                                }
+                            </Select>
+                        </FormControl>
+                    </>
+                ) : ''
+            }
+
 
         </Paper>
     )

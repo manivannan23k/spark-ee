@@ -9,7 +9,8 @@ import string
 import scipy.ndimage
 import numpy as np
 import glob
-from retrieval import load_data, merge_tiles, merge_tiles_tmp
+from retrieval import load_data, merge_tiles_tmp
+import config as app_config
 
 def image_to_byte_array(image: Image):
   # BytesIO is a fake file stored in memory
@@ -24,7 +25,7 @@ def image_to_byte_array(image: Image):
 
 def clip_raster_ds_by_geom(ds, geom):
     driver = ogr.GetDriverByName('ESRI Shapefile')
-    config = json.load(open("config.json"))
+    config = app_config.config
     fname = ''.join(random.choices(string.ascii_uppercase, k=16))
     fpath = os.path.join(config['temp_dir'], f'{fname}.shp')
     memory_ds = driver.CreateDataSource(fpath)
@@ -68,7 +69,7 @@ def render_png(tiles, tIndex, sensorName, bbox, aoi_geom, bands, dataset_def, vm
         
         rgb_data = []
         alpha_data = []
-        vmax = 1
+        # vmax = 1
 
 
         for bid in rgb_bands:

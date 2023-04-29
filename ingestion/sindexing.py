@@ -3,7 +3,7 @@ from osgeo import ogr, osr
 import osgeo
 import json
 import os
-
+import config as app_config
 
 def reproject(geometry, in_srs, out_srs):
     src_srs = osr.SpatialReference()
@@ -111,7 +111,7 @@ def reload_index():
     return index_data
 
 
-config = json.load(open("config.json"))
+config = app_config.config
 index_dat = load_indexes()
 # reload_index()
 # print(f"Spatial Index loaded for {level_ids}")
