@@ -9,6 +9,7 @@ import DatePicker from 'react-datepicker';
 import { Button, Slider, Typography } from '@mui/material';
 import { connect, useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
+import Config from '../config.js';
 
 const mapStateToProps = (state) => {
     return {
@@ -27,8 +28,8 @@ const QueryPanel = (props) => {
     const [sensor, setSensor] = React.useState("LISS3")
     // const [fromDate, setFromDate] = React.useState(new Date("1991-01-01"))
     // const [toDate, setToDate] = React.useState(new Date("1991-01-02"))
-    const [fromDate, setFromDate] = React.useState(new Date("1998-01-01"))
-    const [toDate, setToDate] = React.useState(new Date("1998-12-31"))
+    const [fromDate, setFromDate] = React.useState(new Date("2019-01-01"))
+    const [toDate, setToDate] = React.useState(new Date("2019-12-31"))
     const [aoi, setAoi] = React.useState('aoi_uk_1')
 
     const [redBand, setRedBand] = React.useState(4)
@@ -50,7 +51,7 @@ const QueryPanel = (props) => {
     }
 
     const getDatasets = () => {
-        fetch(`http://localhost:8082/getDatasets`)
+        fetch(`${Config.DATA_HOST}/getDatasets`)
             .then(r => r.json())
             .then(r => {
                 setDatasets(r.data
@@ -76,7 +77,7 @@ const QueryPanel = (props) => {
     }, [])
 
     const queryDataset = () => {
-        fetch(`http://localhost:8082/getTimeIndexes?sensorName=${sensor}&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
+        fetch(`${Config.DATA_HOST}/getTimeIndexes?sensorName=${sensor}&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
             .then(r => r.json())
             .then(r => {
                 if (r.data.length > 0) {

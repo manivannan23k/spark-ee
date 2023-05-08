@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 
 // import {addLayer, addSearchLayer, changeMapView} from "../actions";
 import { BasemapLayer, FeatureLayer } from "react-esri-leaflet";
+import Config from '../config.js';
 
 import RasterLayer from "./RasterLayer";
 import { addLayer, addSearchLayer, changeMapView, changeMapZoom, mapViewWasSet, updateChartData } from "../actions";
@@ -82,7 +83,7 @@ const MapLayers = (props) => {
 
                     case 'DATA_TILE':
                         return <TileLayer key={layer.id}
-                            url={`http://localhost:8082/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}&aoi_code=${layer.aoiCode}`}
+                            url={`${Config.DATA_HOST}/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}&aoi_code=${layer.aoiCode}`}
                             maxZoom={24}
                         />
                 }

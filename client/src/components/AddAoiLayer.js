@@ -10,7 +10,7 @@ import { Button, Slider, Tab, Tabs, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddAoiDialog, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 import DataService from '../services.js/Data';
-
+import Config from '../config.js';
 
 const AddAoiLayer = (props) => {
 
@@ -23,7 +23,7 @@ const AddAoiLayer = (props) => {
     const [aoiName, setAoiName] = React.useState("")
 
     const getDatasets = () => {
-        fetch(`http://localhost:8082/getAois`)
+        fetch(`${Config.DATA_HOST}/getAois`)
             .then(r => r.json())
             .then(r => {
                 setDatasets(r.data.map(d => {

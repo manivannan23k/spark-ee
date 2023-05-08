@@ -67,9 +67,11 @@ object FpcaDev {
       val FPCAVals = components * (scores.t)
       (components, FPCAVals)
     }
-    finally {
-      println("Error FPCA")
-      return (null, null)
+    catch {
+      case (e) => {
+        println("Error FPCA")
+        (null, null)
+      }
     }
   }
   def distCompute(arr: Array[IndexedRow]): (BlockMatrix, BlockMatrix) ={

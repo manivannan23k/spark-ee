@@ -1,8 +1,9 @@
+import Config from '../config.js';
 
 const DataService = {
     getAoiByCode: (aoi) => {
         return new Promise((resolve, reject) => {
-            fetch(`http://localhost:8082/getAoiByCode?aoiCode=${aoi}`)
+            fetch(`${Config.DATA_HOST}/getAoiByCode?aoiCode=${aoi}`)
                 .then(r => r.json())
                 .then(r => {
                     return resolve(r)
@@ -15,7 +16,7 @@ const DataService = {
     },
     addAoi: (aoiGj, aoiName) => {
         return new Promise((resolve, reject) => {
-            fetch(`http://localhost:8082/addAoi`, {
+            fetch(`${Config.DATA_HOST}/addAoi`, {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',

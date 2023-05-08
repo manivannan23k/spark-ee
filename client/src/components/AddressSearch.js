@@ -8,6 +8,7 @@ import Typography from "@material-ui/core/Typography";
 import { useDispatch } from "react-redux";
 import { addLayer, addSearchLayer, changeMapView } from "../actions";
 import { generateId, loadparcelIdFromAddressId, fetchGetWithSignal } from "../utils/helpers";
+import Config from '../config.js';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -68,7 +69,7 @@ const AddressSearch = () => {
         if (!Boolean(searchText)) {
             return;
         }
-        let addressUrl = `http://localhost:8082/data/searchAddress?searchText=${searchText}`;
+        let addressUrl = `${Config.DATA_HOST}/data/searchAddress?searchText=${searchText}`;
         if (ctrl !== null) {
             ctrl.abort();
         }

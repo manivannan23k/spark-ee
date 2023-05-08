@@ -69,7 +69,15 @@ object FpcaTemporal {
               tils = tils :+ t1.band(i)
                 .combineDouble(t2.band(i)) {
                   (v1, v2) => {
-                    (v1 + v2) / 2
+                    if(v1==0 && v2==0){
+                      0.0
+                    }else if(v1==0){
+                      v2
+                    }else if(v2==0){
+                      v1
+                    }else{
+                      (v1 + v2) / 2
+                    }
                   }
                 }
             }

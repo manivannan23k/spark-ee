@@ -4,6 +4,7 @@ import AppModal from "./AppModal";
 import { connect, useDispatch } from "react-redux";
 import { toggleModelBuilderDialog } from "../actions";
 import GoDiagram from "./GoDiagram";
+import Config from '../config.js';
 
 const mapStateToProps = (state) => {
     return {
@@ -534,7 +535,7 @@ const ModelBuilder = (props) => {
                     }
 
                     console.log(reqComps)
-                    fetch('http://localhost:8081/process', {
+                    fetch(`${Config.DATA_HOST}/process`, {
                         body: JSON.stringify({
                             data: JSON.stringify(reqComps)
                         }),
