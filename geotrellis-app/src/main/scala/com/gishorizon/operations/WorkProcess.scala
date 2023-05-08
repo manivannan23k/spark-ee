@@ -2,7 +2,7 @@ package com.gishorizon.operations
 
 import com.gishorizon.Spark
 import com.gishorizon.reader.{HttpUtils, InputReader}
-import geotrellis.layer.{LayoutDefinition, Metadata, SpatialKey, TileLayerMetadata}
+import geotrellis.layer.{Bounds, LayoutDefinition, Metadata, SpaceTimeKey, SpatialKey, TileLayerMetadata}
 import geotrellis.raster.io.geotiff.GeoTiff
 import geotrellis.raster.resample.NearestNeighbor
 import geotrellis.raster.{MultibandTile, Raster, Tile}
@@ -67,7 +67,7 @@ object WorkProcess {
 
   def run(process: ProcessConfig): String = {
     implicit val sc = Spark.context
-    val inputsData: mutable.Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = InputReader.getInputs(sc, process.inputs)
+    val inputsData: mutable.Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = InputReader.getInputs(sc, process.inputs)
     for (operation <- process.operations) {
       if(operation.opType=="op_ndi"){
         val result = NDI.runProcess(inputsData.toMap, operation)
@@ -79,6 +79,10 @@ object WorkProcess {
       }
       if (operation.opType == "op_savgol") {
         val result = SavGolFilter.runProcess(inputsData.toMap, operation)
+        inputsData += (operation.output.id -> result)
+      }
+      if (operation.opType == "op_fpca") {
+        val result = FpcaTemporal.runProcess(inputsData.toMap, operation)
         inputsData += (operation.output.id -> result)
       }
 
@@ -113,8 +117,11 @@ object WorkProcess {
 //    }
 //    val result = ContextRDD(out, meta)
 //    val rdd = result.tileToLayout(meta)
-    val raster: Raster[MultibandTile] = outputData.stitch
-    val fPath = f"E:\\Mani\\ProjectData\\temp_data\\${
+    val od: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(outputData.map {
+      case (k, v) => (k.spatialKey, v)
+    }, TileLayerMetadata(outputData.metadata.cellType, outputData.metadata.layout, outputData.metadata.extent, outputData.metadata.crs, outputData.metadata.bounds.asInstanceOf[Bounds[SpatialKey]]))
+    val raster: Raster[MultibandTile] = od.stitch
+    val fPath = f"G:\\ProjectData\\temp_data\\${
       Iterator.continually(Random.nextPrintableChar)
         .filter(_.isLetter)
         .take(16)

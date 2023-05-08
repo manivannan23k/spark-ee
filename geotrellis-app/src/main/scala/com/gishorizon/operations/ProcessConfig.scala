@@ -26,6 +26,7 @@ class ProcessOperation {
   var opType: String = ""
   var inputs: Array[ProcessInput] = Array()
   var output: ProcessOutput = new ProcessOutput()
+  var params: String = ""
 }
 
 

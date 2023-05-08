@@ -1,0 +1,1477 @@
+[
+    {
+        "dataTime": "2018-05-04 05:11:08",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20180504_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-05-04 05:11:32",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20180504_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-05-11 05:16:51",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20180511_20201015_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-05-11 05:17:15",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20180511_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-05-13 05:04:52",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20180513_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-05-20 05:10:57",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20180520_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-05-20 05:11:21",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20180520_20201015_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-06-12 05:16:38",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20180612_20200831_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-06-12 05:17:02",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20180612_20200831_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-06-21 05:10:57",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20180621_20200831_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-06-21 05:11:21",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20180621_20200831_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-07-07 05:11:06",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20180707_20200831_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-07-07 05:11:30",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20180707_20200831_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-08-15 05:17:13",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20180815_20200831_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-09-16 05:17:24",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20180916_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-09-16 05:17:48",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20180916_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-09-18 05:05:27",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20180918_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-09-25 05:11:41",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20180925_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-02 05:17:32",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20181002_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-02 05:17:56",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20181002_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-04 05:05:35",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20181004_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-11 05:12:13",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20181011_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-18 05:17:38",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20181018_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-18 05:18:02",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20181018_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-20 05:05:41",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20181020_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-27 05:11:54",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20181027_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-10-27 05:12:18",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20181027_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-11-05 05:05:45",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20181105_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-11-12 05:11:56",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20181112_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-11-12 05:12:20",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20181112_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-11-19 05:17:43",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20181119_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-11-19 05:18:07",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20181119_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-11-21 05:05:45",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20181121_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-05 05:17:41",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20181205_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-05 05:18:05",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20181205_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-07 05:05:43",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20181207_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-14 05:11:52",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20181214_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-14 05:12:16",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20181214_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-21 05:17:39",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20181221_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-21 05:18:03",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20181221_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-23 05:05:42",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20181223_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-30 05:11:52",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20181230_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-12-30 05:12:16",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20181230_20200830_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-01-08 05:05:41",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20190108_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-01-24 05:05:37",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20190124_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-02-09 05:05:35",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20190209_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-02-23 05:17:30",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190223_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-02-23 05:17:54",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20190223_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-03-04 05:11:40",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20190304_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-03-04 05:12:04",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190304_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-03-20 05:11:59",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190320_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-03-27 05:17:21",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190327_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-03-29 05:05:22",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20190329_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-04-05 05:11:31",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20190405_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-04-05 05:11:55",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190405_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-04-12 05:17:16",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190412_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-04-14 05:05:17",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20190414_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-04-21 05:11:49",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190421_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-04-28 05:17:11",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190428_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-04-28 05:17:35",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20190428_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-05-07 05:11:29",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20190507_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-05-07 05:11:53",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190507_20200829_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-05-23 05:12:03",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190523_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-05-30 05:17:30",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190530_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-05-30 05:17:54",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20190530_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-06-01 05:05:33",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20190601_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-06-08 05:11:47",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20190608_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-06-08 05:12:11",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190608_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-06-15 05:17:36",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190615_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-06-15 05:18:00",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20190615_20200828_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-06-24 05:12:16",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190624_20200827_02_T2.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-07-01 05:17:41",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190701_20200827_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-07-01 05:18:05",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20190701_20200827_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-08-27 05:12:35",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190827_20200826_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-09-19 05:18:05",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20190919_20200826_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-09-28 05:12:44",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20190928_20200825_02_T2.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-10-14 05:12:23",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20191014_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-10-14 05:12:47",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20191014_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-10-21 05:18:11",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20191021_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-10-21 05:18:35",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20191021_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-10-23 05:06:13",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20191023_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-11-06 05:18:10",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20191106_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-11-06 05:18:34",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20191106_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-11-15 05:12:45",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20191115_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-11-24 05:06:08",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20191124_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-01 05:12:19",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20191201_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-01 05:12:43",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20191201_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-08 05:18:06",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20191208_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-08 05:18:30",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20191208_20200824_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-10 05:06:08",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20191210_20200824_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-17 05:12:17",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20191217_20201023_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-24 05:18:03",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20191224_20200824_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-24 05:18:26",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20191224_20200824_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2019-12-26 05:06:04",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20191226_20200824_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-01-09 05:17:59",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200109_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-01-09 05:18:23",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20200109_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-01-11 05:06:01",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20200111_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-03 05:12:04",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20200203_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-03 05:12:28",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20200203_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-10 05:17:50",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200210_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-10 05:18:14",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20200210_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-12 05:05:52",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20200212_20200823_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-26 05:17:46",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200226_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-26 05:18:10",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20200226_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-02-28 05:05:48",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20200228_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-03-22 05:11:48",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20200322_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-03-22 05:12:12",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20200322_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-03-29 05:17:31",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200329_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-03-29 05:17:54",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20200329_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-03-31 05:05:31",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20200331_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-04-07 05:11:39",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20200407_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-04-07 05:12:03",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20200407_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-04-14 05:17:23",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200414_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-04-14 05:17:47",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20200414_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-04-16 05:05:25",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20200416_20200822_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-05-09 05:11:23",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20200509_20200820_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-05-09 05:11:47",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20200509_20200820_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-05-16 05:17:12",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200516_20200820_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-05-16 05:17:36",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20200516_20200820_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-05-25 05:11:27",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20200525_20200820_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-05-25 05:11:51",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20200525_20200820_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-06-10 05:11:36",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20200610_20200825_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-06-10 05:12:00",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20200610_20200824_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-07-03 05:17:35",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200703_20200913_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-09-05 05:17:58",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200905_20200918_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-09-21 05:18:03",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20200921_20201007_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-09-21 05:18:27",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20200921_20201007_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-09-30 05:12:19",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20200930_20201006_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-09-30 05:12:42",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20200930_20201006_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-07 05:18:07",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20201007_20220526_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-07 05:18:30",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20201007_20220526_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-09 05:06:09",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20201009_20201016_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-16 05:12:20",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20201016_20201105_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-16 05:12:44",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20201016_20201105_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-23 05:18:07",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20201023_20201105_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-23 05:18:31",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20201023_20201105_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-10-25 05:06:09",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20201025_20201106_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-11-10 05:06:06",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20201110_20210316_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-11-17 05:12:18",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20201117_20210315_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-11-17 05:12:42",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20201117_20210315_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-12-03 05:12:21",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20201203_20210313_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-12-03 05:12:45",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145040_20201203_20210313_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-12-10 05:18:32",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20201210_20210313_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-12-19 05:12:20",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_145039_20201219_20210310_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-12-26 05:18:06",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146038_20201226_20210310_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-12-26 05:18:29",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_146039_20201226_20210310_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2020-12-28 05:06:07",
+        "srcPath": "/mnt/data/instance-1/raw_data/LC08_L2SP_144039_20201228_20210310_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-01-07 05:12:04",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160107_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-01-07 05:12:28",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160107_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-01-16 05:05:54",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20160116_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-01-23 05:12:05",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160123_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-01-30 05:17:51",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20160130_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-01-30 05:18:14",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20160130_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-02-01 05:05:52",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20160201_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-02-08 05:12:00",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160208_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-02-08 05:12:24",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160208_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-02-17 05:05:44",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20160217_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-02-24 05:11:54",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160224_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-02-24 05:12:18",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160224_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-03-04 05:05:42",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20160304_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-03 05:17:26",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20160403_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-03 05:17:50",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20160403_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-05 05:05:28",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20160405_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-12 05:11:36",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160412_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-12 05:12:00",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160412_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-21 05:05:21",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20160421_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-28 05:11:34",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160428_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-04-28 05:11:58",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160428_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-05-14 05:11:32",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160514_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-05-14 05:11:56",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160514_20200907_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-05-21 05:17:23",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20160521_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-05-21 05:17:47",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20160521_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-07-08 05:17:41",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20160708_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-07-17 05:12:22",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160717_20200906_02_T2.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-08-25 05:18:19",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20160825_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-03 05:12:12",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160903_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-03 05:12:36",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160903_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-10 05:18:00",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20160910_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-19 05:12:14",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20160919_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-19 05:12:38",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20160919_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-26 05:18:01",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20160926_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-26 05:18:25",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20160926_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-09-28 05:06:03",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20160928_20200906_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-12 05:18:06",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20161012_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-12 05:18:30",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20161012_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-14 05:06:09",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20161014_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-21 05:12:21",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20161021_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-21 05:12:45",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20161021_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-28 05:18:08",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20161028_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-28 05:18:32",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20161028_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-10-30 05:06:10",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20161030_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-06 05:12:20",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20161106_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-06 05:12:44",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20161106_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-13 05:18:07",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20161113_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-13 05:18:31",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20161113_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-15 05:06:09",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20161115_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-22 05:12:21",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20161122_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-22 05:12:44",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20161122_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-29 05:18:07",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20161129_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-11-29 05:18:31",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20161129_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-01 05:06:09",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20161201_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-08 05:12:18",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20161208_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-15 05:18:03",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20161215_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-15 05:18:27",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20161215_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-17 05:06:05",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20161217_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-24 05:12:14",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20161224_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-24 05:12:38",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20161224_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2016-12-31 05:18:01",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20161231_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-01-02 05:06:02",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20170102_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-01-09 05:12:11",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170109_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-01-09 05:12:35",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170109_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-02-01 05:17:49",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20170201_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-02-03 05:05:51",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20170203_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-02-10 05:11:57",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170210_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-02-10 05:12:21",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170210_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-02-26 05:11:53",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170226_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-02-26 05:12:17",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170226_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-05 05:17:36",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20170305_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-05 05:18:00",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20170305_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-07 05:05:37",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20170307_20200905_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-14 05:11:44",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170314_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-14 05:12:08",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170314_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-23 05:05:27",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20170323_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-30 05:11:35",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170330_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-03-30 05:11:59",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170330_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-04-08 05:05:20",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20170408_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-04-15 05:11:27",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170415_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-04-15 05:11:51",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170415_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-04-24 05:05:11",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20170424_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-05-01 05:11:17",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170501_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-05-01 05:11:41",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170501_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-05-08 05:17:07",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20170508_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-05-08 05:17:31",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20170508_20200904_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-05-24 05:17:43",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20170524_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-06-02 05:11:37",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20170602_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-06-02 05:12:01",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170602_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-09-06 05:12:31",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20170906_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-09-13 05:17:53",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20170913_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-09-13 05:18:17",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20170913_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-09-15 05:05:56",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20170915_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-09-29 05:18:00",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20170929_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-09-29 05:18:24",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20170929_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-01 05:06:03",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20171001_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-08 05:12:16",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20171008_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-08 05:12:40",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20171008_20200903_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-15 05:18:04",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20171015_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-15 05:18:28",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20171015_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-17 05:06:07",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20171017_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-24 05:12:18",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20171024_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-24 05:12:42",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20171024_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-31 05:18:05",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20171031_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-10-31 05:18:29",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20171031_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-11-02 05:06:07",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20171102_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-11-09 05:12:17",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20171109_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-11-16 05:18:01",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20171116_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-11-16 05:18:25",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20171116_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-11-18 05:06:03",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20171118_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-11-25 05:12:11",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20171125_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-11-25 05:12:35",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20171125_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-02 05:17:56",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20171202_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-02 05:18:20",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20171202_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-11 05:12:09",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20171211_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-11 05:12:33",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20171211_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-18 05:17:58",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20171218_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-18 05:18:22",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20171218_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-27 05:12:11",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20171227_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2017-12-27 05:12:35",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20171227_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-01-03 05:17:55",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20180103_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-01-05 05:05:57",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20180105_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-01-12 05:12:28",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20180112_20200902_02_T2.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-01-19 05:17:48",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20180119_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-01-19 05:18:12",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20180119_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-01-21 05:05:49",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20180121_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-01-28 05:11:55",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20180128_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-02-04 05:17:39",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20180204_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-02-04 05:18:03",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20180204_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-02-13 05:12:13",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20180213_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-02-20 05:17:33",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20180220_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-02-20 05:17:57",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20180220_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-01 05:11:42",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20180301_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-01 05:12:06",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20180301_20200902_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-08 05:17:25",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20180308_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-08 05:17:49",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20180308_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-10 05:05:26",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20180310_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-17 05:11:33",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20180317_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-17 05:11:57",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20180317_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-24 05:17:17",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20180324_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-24 05:17:41",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20180324_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-03-26 05:05:19",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_144039_20180326_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-04-02 05:11:26",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20180402_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-04-02 05:11:50",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20180402_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-04-18 05:11:17",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145039_20180418_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-04-18 05:11:41",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_145040_20180418_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-04-25 05:17:00",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146038_20180425_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    },
+    {
+        "dataTime": "2018-04-25 05:17:24",
+        "srcPath": "/mnt/data/master-instance/raw_data/LC08_L2SP_146039_20180425_20200901_02_T1.tif",
+        "sensor": "Landsat8"
+    }
+]

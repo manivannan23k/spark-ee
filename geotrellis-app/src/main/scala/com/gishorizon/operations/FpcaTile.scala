@@ -19,48 +19,48 @@ import javax.imageio.ImageIO
 
 object FpcaTile {
 
-  def main(args: Array[String]): Unit = {
-    implicit val sc: SparkContext = Spark.context
-
-//    val outputCatalogPath = "data/out/multiTiffCombinedTsRdd"
-//    val layerName = "multiTiffCombinedTsRdd"
-//    val attributeStore = FileAttributeStore(outputCatalogPath)
+//  def main(args: Array[String]): Unit = {
+//    implicit val sc: SparkContext = Spark.context
 //
-//    val reader = FileLayerReader(attributeStore)
-//    val queryResult = reader
-//      .query[SpaceTimeKey, Tile, TileLayerMetadata[SpaceTimeKey]](LayerId(layerName, 0))
-//      .where(
-//        Intersects(
-//          new SpatialKey(0, 0).extent(attributeStore.readMetadata[TileLayerMetadata[SpaceTimeKey]](LayerId(layerName, 0)))
-//        )
-//      ).result
-
-    val (rdd, _) = singleTiffTimeSeriesRdd(sc, "data/NDVISampleTest/Test1998-99.tif", 0)
-    val _ks = rdd.keys.collect()
-    val maxT = _ks.map(m=>m.instant).max
-    val minT = _ks.map(m=>m.instant).min
-    val indexedRowRDD = rdd.map {
-      case (key, tile) =>
-        (key, Vectors.dense(tile.toArray().map(a => (a.toDouble))))
-    }.map {
-      case (key, vectors) =>
-//        IndexedRow(((1356652800000L - key.instant) / 1000L * 60 * 60 * 24 * 10).toInt, vectors)
-        IndexedRow(((maxT - key.instant) / (1000L * 60 * 60 * 24 * 10)).toInt, vectors)
-    }
-    val res = FPCA.run(sc, new IndexedRowMatrix(indexedRowRDD).toBlockMatrix().cache())
-    val data = res._1.toLocalMatrix().toArray
-    val at: Tile = ArrayTile(data, rdd.metadata.cols.toInt ,rdd.metadata.rows.toInt)
-    val image: BufferedImage = new BufferedImage(rdd.metadata.cols.toInt ,rdd.metadata.rows.toInt, BufferedImage.TYPE_INT_RGB)
-    for (y <- 0 until image.getHeight) {
-      for (x <- 0 until image.getWidth) {
-        val v = 255 * (data(y * image.getWidth + x) - data.min) / (data.max - data.min)
-        image.setRGB(x, y, new Color(v.toInt, v.toInt, v.toInt, v.toInt).getRGB)
-      }
-    }
-    val out = new File("data/out/pca.png")
-    ImageIO.write(image, "png", out)
-
-  }
+////    val outputCatalogPath = "data/out/multiTiffCombinedTsRdd"
+////    val layerName = "multiTiffCombinedTsRdd"
+////    val attributeStore = FileAttributeStore(outputCatalogPath)
+////
+////    val reader = FileLayerReader(attributeStore)
+////    val queryResult = reader
+////      .query[SpaceTimeKey, Tile, TileLayerMetadata[SpaceTimeKey]](LayerId(layerName, 0))
+////      .where(
+////        Intersects(
+////          new SpatialKey(0, 0).extent(attributeStore.readMetadata[TileLayerMetadata[SpaceTimeKey]](LayerId(layerName, 0)))
+////        )
+////      ).result
+//
+//    val (rdd, _) = singleTiffTimeSeriesRdd(sc, "data/NDVISampleTest/Test1998-99.tif", 0)
+//    val _ks = rdd.keys.collect()
+//    val maxT = _ks.map(m=>m.instant).max
+//    val minT = _ks.map(m=>m.instant).min
+//    val indexedRowRDD = rdd.map {
+//      case (key, tile) =>
+//        (key, Vectors.dense(tile.toArray().map(a => (a.toDouble))))
+//    }.map {
+//      case (key, vectors) =>
+////        IndexedRow(((1356652800000L - key.instant) / 1000L * 60 * 60 * 24 * 10).toInt, vectors)
+//        IndexedRow(((maxT - key.instant) / (1000L * 60 * 60 * 24 * 10)).toInt, vectors)
+//    }
+//    val res = FPCA.run(sc, new IndexedRowMatrix(indexedRowRDD).toBlockMatrix().cache())
+//    val data = res._1.toLocalMatrix().toArray
+//    val at: Tile = ArrayTile(data, rdd.metadata.cols.toInt ,rdd.metadata.rows.toInt)
+//    val image: BufferedImage = new BufferedImage(rdd.metadata.cols.toInt ,rdd.metadata.rows.toInt, BufferedImage.TYPE_INT_RGB)
+//    for (y <- 0 until image.getHeight) {
+//      for (x <- 0 until image.getWidth) {
+//        val v = 255 * (data(y * image.getWidth + x) - data.min) / (data.max - data.min)
+//        image.setRGB(x, y, new Color(v.toInt, v.toInt, v.toInt, v.toInt).getRGB)
+//      }
+//    }
+//    val out = new File("data/out/pca.png")
+//    ImageIO.write(image, "png", out)
+//
+//  }
 
 //  def run(implicit sc: SparkContext): Unit = {
 //    val rowRdd = RddUtils.getRowRdd(sc, "data/NDVISampleTest/Test1998-99.tif")

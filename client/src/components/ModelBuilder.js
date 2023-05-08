@@ -88,7 +88,7 @@ const ModelBuilder = (props) => {
 
     let inputTypes = ['in_raster_band', 'in_raster_layer'];
     let outputTypes = ['out_raster_band', 'out_raster_layer'];
-    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol'];
+    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol', 'op_fpca'];
     const [components, setComponents] = useState({
         inputs: [],
         output: null,
@@ -208,6 +208,10 @@ const ModelBuilder = (props) => {
                                     {
                                         name: "SavGol Filter",
                                         type: "op_savgol"
+                                    },
+                                    {
+                                        name: "FPCA",
+                                        type: "op_fpca"
                                     }
                                 ]
                             },

@@ -1,8 +1,7 @@
 package com.gishorizon.operations
 
 import com.gishorizon.RddUtils.mergeRdds
-import geotrellis.layer.{LayoutDefinition, Metadata, SpatialKey, TileLayerMetadata}
-import geotrellis.raster.{CellType, MultibandTile, TileLayout}
+import geotrellis.layer.{LayoutDefinition, Metadata, SpaceTimeKey, SpatialKey, TileLayerMetadata}
 import geotrellis.spark.{ContextRDD, withTileRDDMergeMethods}
 import geotrellis.vector.ProjectedExtent
 import org.apache.spark.rdd.RDD
@@ -19,18 +18,18 @@ import geotrellis.spark.stitch._
 
 object LocalAvg {
 
-  def runProcess(inputs: Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]], operation: ProcessOperation): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
+  def runProcess(inputs: Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]], operation: ProcessOperation): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
 
-    var inRdds: Array[RDD[(SpatialKey, MultibandTile)]] = Array()
-    var meta: TileLayerMetadata[SpatialKey] = null
+    var inRdds: Array[RDD[(SpaceTimeKey, MultibandTile)]] = Array()
+    var meta: TileLayerMetadata[SpaceTimeKey] = null
     val iCount = operation.inputs.length
 
     for(i <- operation.inputs.indices){
       val op = operation.inputs(i)
       val rdd = inputs(op.id)
       val bid = op.band
-      val r: RDD[(SpatialKey, MultibandTile)] = rdd.map {
-        case (k: SpatialKey, mt: MultibandTile) => {
+      val r: RDD[(SpaceTimeKey, MultibandTile)] = rdd.map {
+        case (k: SpaceTimeKey, mt: MultibandTile) => {
           val _mt: MultibandTile = ArrayMultibandTile(mt.band(bid))
           (k, _mt)
         }
@@ -38,7 +37,7 @@ object LocalAvg {
       meta = rdd.metadata
       inRdds = inRdds :+ r
     }
-    val or: RDD[(SpatialKey, MultibandTile)] = inRdds.reduce{
+    val or: RDD[(SpaceTimeKey, MultibandTile)] = inRdds.reduce{
       (rdd1, rdd2) => {
         rdd1.++(rdd2).reduceByKey(
           (t1: MultibandTile, t2: MultibandTile) => {

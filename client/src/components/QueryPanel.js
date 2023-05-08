@@ -27,8 +27,8 @@ const QueryPanel = (props) => {
     const [sensor, setSensor] = React.useState("LISS3")
     // const [fromDate, setFromDate] = React.useState(new Date("1991-01-01"))
     // const [toDate, setToDate] = React.useState(new Date("1991-01-02"))
-    const [fromDate, setFromDate] = React.useState(new Date("2017-11-19"))
-    const [toDate, setToDate] = React.useState(new Date("2017-11-21"))
+    const [fromDate, setFromDate] = React.useState(new Date("1998-01-01"))
+    const [toDate, setToDate] = React.useState(new Date("1998-12-31"))
     const [aoi, setAoi] = React.useState('aoi_uk_1')
 
     const [redBand, setRedBand] = React.useState(4)
@@ -53,18 +53,20 @@ const QueryPanel = (props) => {
         fetch(`http://localhost:8082/getDatasets`)
             .then(r => r.json())
             .then(r => {
-                setDatasets(r.data.filter(e => e.is_querable).map(d => {
-                    return {
-                        name: d.ds_name,
-                        bands: JSON.parse(d.band_meta),
-                        style: JSON.parse(d.def_color_scheme),
-                        id: d.dataset_id,
-                        description: d.ds_description,
-                        vmin: d.vmin,
-                        vmax: d.vmax,
-                        noOfBands: d.no_of_bands
-                    }
-                }))
+                setDatasets(r.data
+                    // .filter(e => e.is_querable)
+                    .map(d => {
+                        return {
+                            name: d.ds_name,
+                            bands: JSON.parse(d.band_meta),
+                            style: JSON.parse(d.def_color_scheme),
+                            id: d.dataset_id,
+                            description: d.ds_description,
+                            vmin: d.vmin,
+                            vmax: d.vmax,
+                            noOfBands: d.no_of_bands
+                        }
+                    }))
             })
             .catch(er => console.log(er))
     }

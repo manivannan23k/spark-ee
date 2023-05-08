@@ -1,8 +1,9 @@
 name := "geotrellis-spark-job"
 organization := "com.gishorizon"
 version := "0.1.0"
-
+//2.13.8, 2.12.15
 scalaVersion := "2.13.8"
+mainClass := Some("com.gishorizon.Server")
 val akkaV       = "2.7.0"
 val akkaHttpV   = "10.4.0"
 
@@ -26,8 +27,7 @@ libraryDependencies ++= Seq(
   "org.apache.hadoop" % "hadoop-common" % "3.3.2",
   "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.2",
   "com.typesafe.play" %% "play-json" % "2.9.4",
-  "org.postgresql" % "postgresql" % "42.5.4",
-  "com.github.fommil.netlib" % "all" % "1.1.2"
+  "org.postgresql" % "postgresql" % "42.5.4"
 )
 
 console / initialCommands :=

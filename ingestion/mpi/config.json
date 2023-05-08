@@ -1,0 +1,16 @@
+{
+    "start_time": "1990-01-01 00:00:00",
+    "sensors": [],
+    "tile_dir": "/mnt/data/tiles",
+    "grid_dir": "/mnt/data/common/grids",
+    "temp_dir": "/mnt/data/temp_data",
+    "tindex_dir": "/mnt/data/time_index",
+    "sindex_dir": "/mnt/data/spatial_index",
+    "db_host": "127.0.0.1",
+    "db_user": "postgres",
+    "db_password": "manichan",
+    "db_database": "project_master",
+    "tbl_dataset_def": "dataset_def",
+    "tbl_ingest": "ingest_master",
+    "tbl_tiles": "tiles_local"
+}

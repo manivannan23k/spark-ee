@@ -50,52 +50,52 @@ object  Main {
     (inputsOpt, outputOpt, partitionsOpt).tupled
   }
 
-  def main(args: Array[String]): Unit = {
-    command.parse(args, sys.env) match {
-      case Left(help) =>
-        System.err.println(help)
-        sys.exit(1)
-
-      case Right((i, o, p)) =>
-        try {
-          run(i.toList, o, p)(Spark.context)
-        } finally {
-          Spark.session.stop()
-        }
-    }
-  }
-
-  def run(inputs: List[String], output: String, numPartitions: Option[Int])(implicit sc: SparkContext): Unit = {
-
-//    println("----------Creating RDDs----------")
-//    val colRdd = RddUtils.getColRdd(sc, inputs.head)
-//    val rowRdd = RddUtils.getColRdd(sc, inputs.head)
+//  def main(args: Array[String]): Unit = {
+//    command.parse(args, sys.env) match {
+//      case Left(help) =>
+//        System.err.println(help)
+//        sys.exit(1)
 //
-//    val (singleTiffTsRdd, z1): (RDD[(SpaceTimeKey, Tile)] with Metadata[TileLayerMetadata[SpaceTimeKey]], Int) = RddUtils.singleTiffTimeSeriesRdd(sc, inputs.head)
-//    val (multiTiffTsRdd, z2): (RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]], Int) = RddUtils.multiTiffTimeSeriesRdd(sc, "data/NDVISampleTest/*.tif")
-    val (multiTiffCombinedTsRdd, z3): (RDD[(SpaceTimeKey, Tile)] with Metadata[TileLayerMetadata[SpaceTimeKey]], Int) = RddUtils.multiTiffCombinedTimeSeriesRdd(sc, "data/NDVISampleTest/*.tif")
+//      case Right((i, o, p)) =>
+//        try {
+//          run(i.toList, o, p)(Spark.context)
+//        } finally {
+//          Spark.session.stop()
+//        }
+//    }
+//  }
 //
-//    println("----------RDDs are Created----------")
+//  def run(inputs: List[String], output: String, numPartitions: Option[Int])(implicit sc: SparkContext): Unit = {
 //
-//    println("----------Ingesting RDDs----------")
-//    RddUtils.saveMultiBandRdd(
-//      colRdd, 1, "colRdd", "data/output"
-//    )
-//    RddUtils.saveMultiBandRdd(
-//      rowRdd, 1, "rowRdd", "data/output"
-//    )
+////    println("----------Creating RDDs----------")
+////    val colRdd = RddUtils.getColRdd(sc, inputs.head)
+////    val rowRdd = RddUtils.getColRdd(sc, inputs.head)
+////
+////    val (singleTiffTsRdd, z1): (RDD[(SpaceTimeKey, Tile)] with Metadata[TileLayerMetadata[SpaceTimeKey]], Int) = RddUtils.singleTiffTimeSeriesRdd(sc, inputs.head)
+////    val (multiTiffTsRdd, z2): (RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]], Int) = RddUtils.multiTiffTimeSeriesRdd(sc, "data/NDVISampleTest/*.tif")
+//    val (multiTiffCombinedTsRdd, z3): (RDD[(SpaceTimeKey, Tile)] with Metadata[TileLayerMetadata[SpaceTimeKey]], Int) = RddUtils.multiTiffCombinedTimeSeriesRdd(sc, "data/NDVISampleTest/*.tif")
+////
+////    println("----------RDDs are Created----------")
+////
+////    println("----------Ingesting RDDs----------")
+////    RddUtils.saveMultiBandRdd(
+////      colRdd, 1, "colRdd", "data/output"
+////    )
+////    RddUtils.saveMultiBandRdd(
+////      rowRdd, 1, "rowRdd", "data/output"
+////    )
+////    RddUtils.saveSingleBandTimeSeriesRdd(
+////      singleTiffTsRdd, z1, "singleTiffTsRdd", 10, "data/output"
+////    )
+////    RddUtils.saveMultiBandTimeSeriesRdd(
+////      multiTiffTsRdd, z2, "multiTiffTsRdd", 365, "data/output"
+////    )
 //    RddUtils.saveSingleBandTimeSeriesRdd(
-//      singleTiffTsRdd, z1, "singleTiffTsRdd", 10, "data/output"
+//      multiTiffCombinedTsRdd, z3, "multiTiffCombinedTsRdd", 10, "data/output"
 //    )
-//    RddUtils.saveMultiBandTimeSeriesRdd(
-//      multiTiffTsRdd, z2, "multiTiffTsRdd", 365, "data/output"
-//    )
-    RddUtils.saveSingleBandTimeSeriesRdd(
-      multiTiffCombinedTsRdd, z3, "multiTiffCombinedTsRdd", 10, "data/output"
-    )
-//    println("----------Ingestion Completed----------")
-
-
-
-  }
+////    println("----------Ingestion Completed----------")
+//
+//
+//
+//  }
 }

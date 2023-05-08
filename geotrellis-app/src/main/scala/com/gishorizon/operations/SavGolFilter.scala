@@ -3,7 +3,7 @@ package com.gishorizon.operations
 import breeze.linalg.{DenseMatrix, inv}
 import com.gishorizon.RddUtils._
 import com.gishorizon.Spark
-import geotrellis.layer.{Metadata, SpatialKey, TileLayerMetadata}
+import geotrellis.layer.{Metadata, SpaceTimeKey, SpatialKey, TileLayerMetadata}
 import geotrellis.raster.io.geotiff.{GeoTiff, GeoTiffOptions}
 import geotrellis.raster.{ArrayMultibandTile, ArrayTile, MultibandTile, Raster, Tile}
 import geotrellis.spark.ContextRDD
@@ -23,18 +23,18 @@ object SavGolFilter {
 //    }
 //  }
 
-  def runProcess(inputs: Map[String, RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]], operation: ProcessOperation): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
-    var outRdds: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
-    var in1: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = inputs(operation.inputs(0).id)
+  def runProcess(inputs: Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]], operation: ProcessOperation): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
+    var outRdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
+    var in1: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = inputs(operation.inputs(0).id)
     val rdd = in1
     runForRdd(rdd, rdd.metadata)
   }
 
-  def runForRdd(rdd: RDD[(SpatialKey, MultibandTile)], meta: TileLayerMetadata[SpatialKey]): RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = {
+  def runForRdd(rdd: RDD[(SpaceTimeKey, MultibandTile)], meta: TileLayerMetadata[SpaceTimeKey]): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
     val tileSize = 5
 //    val (rdd, meta) = getMultiTiledRDD(sc, "data/NDVISampleTest/Test1998-99.tif", tileSize)
     //TODO: Recalculate SavGol Based on Score
-    val result: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(rdd.map {
+    val result: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(rdd.map {
       case (k, t) => {
         var tv = Array[Array[Int]]()
         t.foreach {

@@ -29,22 +29,6 @@ const QueryResults = (props) => {
                     }
                 </ul>
                 <button onClick={() => {
-                    /***
-                     * {
-                        type: 'DATA_TILE',
-                        id: 'data',
-                        active: true,
-                        tIndex: 913543204,
-                        tIndexes: [913543204],
-                        aoiCode: 'qwertyuiopasdfgh',
-                        dsId: 'Landsat_OLI',
-                        url: `http://localhost:8082/tile/Landsat_OLI/{z}/{x}/{y}.png?tIndex=913543204&bands=4,3,2&vmin=0&vmax=20000&aoi_code=qwertyuiopasdfgh`,
-                        name: 'Data Layer',
-                        sortOrder: 0,
-                        showLegend: false,
-                        showInLayerList: true
-                    }
-                    */
                     let lId = (Math.random() + 1).toString(36).substring(6);
                     let layer = {
                         type: 'DATA_TILE',

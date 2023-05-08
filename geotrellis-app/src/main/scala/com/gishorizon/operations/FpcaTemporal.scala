@@ -1,7 +1,6 @@
 package com.gishorizon.operations
 
-import geotrellis.layer.{Metadata, SpaceTimeKey, SpatialKey, TileLayerMetadata}
-import geotrellis.raster.io.geotiff.GeoTiff
+import geotrellis.layer.{Bounds, Metadata, SpaceTimeKey, SpatialKey, TemporalKey, TileLayerMetadata}
 import geotrellis.raster.{ArrayTile, MultibandTile, Raster, Tile}
 import geotrellis.spark.{ContextRDD, MultibandTileLayerRDD, RasterSourceRDD, RasterSummary, TileLayerRDD, withTilerMethods, _}
 import geotrellis.spark.store.file.FileLayerReader
@@ -14,10 +13,10 @@ import org.apache.spark.SparkContext
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.distributed._
 import org.apache.spark.rdd.RDD
-import geotrellis.layer.{Metadata, SpaceTimeKey, SpatialKey, TileLayerMetadata}
 import geotrellis.raster.io.geotiff._
 import geotrellis.raster.{io => _, _}
 import geotrellis.spark.stitch._
+import org.joda.time.Interval
 
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -26,80 +25,104 @@ import java.time.{ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import javax.imageio.ImageIO
 import scala.Double.NaN
+import org.joda.time._
 
 object FpcaTemporal {
 
-  def main(args: Array[String]): Unit = {
-    implicit val sc: SparkContext = Spark.context
+    def runProcess(inputs: Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]], processOperation: ProcessOperation)
+    : RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]
+    = {
+      val intervalDays = 10
+      val intervalDuration = Duration.standardDays(intervalDays)
 
-    val outputCatalogPath = "data/out/multiTiffTsRdd"
-    val layerName = "multiTiffTsRdd"
-    val attributeStore = FileAttributeStore(outputCatalogPath)
+      var inRdds: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = Array()
+      var meta: TileLayerMetadata[SpaceTimeKey] = null
 
-    val reader = FileLayerReader(attributeStore)
-    val data = reader
-      .query[SpaceTimeKey, MultibandTile, TileLayerMetadata[SpaceTimeKey]](LayerId(layerName, 0))
-      .where(
-        Intersects(
-          new SpatialKey(0, 0).extent(attributeStore.readMetadata[TileLayerMetadata[SpaceTimeKey]](LayerId(layerName, 0)))
-        )
-      )
-      .result
-
-    val meta = data.metadata
-//    val data = ContextRDD(_data.filter {
-//      case (k, v) => {
-//        k.spatialKey == new SpatialKey(1, 1)
-//      }
-//    }, meta)
-
-    println("------------Data Read----------")
-
-//    val (data, z) = RddUtils.multiTiffTimeSeriesRdd(sc, "data/NDVISampleTest/*.tif")
-//    RddUtils.saveMultiBandTimeSeriesRdd(data, z, "multiTiffTsRdd", 1, "data/out/multiTiffTsRdd")
-
-//    val mtRdd = queryResult.map{
-//      case (k, t)=>{
-//        val _k = new SpaceTimeKey(
-//          k.col,
-//          k.row,
-//          ZonedDateTime.parse(f"${k.time.getYear}-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(5, 30))).toInstant.toEpochMilli
-//        )
-//        (_k, t)
-//      }
-//    }
-//      .aggregateByKey(MultibandTile(queryResult.first()._2.map {
-//        case _ =>
-//          0
-//      }))({
-//        (l, t) => {
-//          MultibandTile(
-//            Array.concat(l.bands.toArray[Tile], Array(t))
-//          )
-//        }
-//      }, {
-//        (t1, t2) => {
-//          MultibandTile(Array.concat(t1.bands.toArray[Tile], t2.bands.toArray[Tile]))
-//        }
-//      })
-      val outRdd = data.map{
-        case (k, mt) => {
-          var _d = Array[Array[Double]]()
-          var _d1 = Array[Double]()
-          mt.foreachDouble((v:Array[Double])=>{
-            _d1 = Array.concat(_d1, v)
-          })
-          for (i <- 0 until mt.cols*mt.rows){
-            var _pixel = Array[Double]()
-            for (_time <- mt.bands.indices){
-              _pixel = _pixel :+ _d1((_time) + (i * mt.bands.indices.length)) //mt.cols*mt.rows *
+      for (inp <- processOperation.inputs.indices){
+        val i = processOperation.inputs(inp)
+        val m = inputs(i.id).metadata
+        meta = m
+        val intervalStart = new DateTime(m.bounds.get.minKey.time.toInstant.toEpochMilli) //new DateTime(1989, 11, 1, 0, 0, 0, DateTimeZone.UTC)
+        val intervalEnd = new DateTime(m.bounds.get.maxKey.time.toInstant.toEpochMilli) //new DateTime(1990, 2, 1, 0, 0, 0, DateTimeZone.UTC)
+        println("Interval Start:", intervalStart)
+        println("Interval End:", intervalEnd)
+        val interval = new Interval(intervalStart, intervalEnd)
+        val t: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(inputs(i.id)
+          .groupBy {
+            case (k, r) => {
+              val time = k.time
+              new DateTime(interval.getStartMillis + (time.toInstant.toEpochMilli - interval.getStartMillis) / intervalDuration.getMillis * intervalDuration.getMillis, DateTimeZone.UTC)
             }
-            _d = _d :+ _pixel
           }
-          (k.spatialKey, _d)
+          .flatMap { case (intervalKey, tiles) =>
+            val t = tiles.map {
+              case (k, t) => {
+                println("Interval Key:", intervalKey)
+                (SpaceTimeKey(k.spatialKey, TemporalKey(intervalKey.toInstant.getMillis)), t)
+              }
+            }
+            t
+          }.reduceByKey(
+          (t1: MultibandTile, t2: MultibandTile) => {
+            var tils: Array[Tile] = Array()
+            for (i <- 0 until t1.bandCount) {
+              tils = tils :+ t1.band(i)
+                .combineDouble(t2.band(i)) {
+                  (v1, v2) => {
+                    (v1 + v2) / 2
+                  }
+                }
+            }
+            ArrayMultibandTile(tils)
+          }
+        )
+          .map {
+            case (k, v) => {
+              val t: MultibandTile = ArrayMultibandTile(v.band(0))
+              (k.spatialKey, t)
+            }
+          }
+          .reduceByKey(
+            (t1: MultibandTile, t2: MultibandTile) => {
+              var bds1: Array[Tile] = Array()
+              for(i <- t1.bands){
+                bds1 = bds1 :+ i
+              }
+              for (i <- t2.bands) {
+                bds1 = bds1 :+ i
+              }
+              val t: MultibandTile = ArrayMultibandTile(bds1)
+              t
+            }
+          ), TileLayerMetadata(m.cellType, m.layout, m.extent, m.crs, m.bounds.asInstanceOf[Bounds[SpatialKey]]))
+        inRdds = inRdds :+ t
+      }
+      val outRdd = inRdds.reduce {
+        (rdd1, rdd2) => {
+          val rdd: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(rdd1.++(rdd2), rdd1.metadata)
+          rdd
         }
       }
-      val t = outRdd.aggregateByKey(
+        .map {
+          case (k, mt) => {
+            var _d = Array[Array[Double]]()
+            var _d1 = Array[Double]()
+            mt.foreachDouble((v: Array[Double]) => {
+              _d1 = Array.concat(_d1, v)
+            })
+            for (i <- 0 until mt.cols * mt.rows) {
+              var _pixel = Array[Double]()
+              for (_time <- mt.bands.indices) {
+                _pixel = _pixel :+ _d1((_time) + (i * mt.bands.indices.length))
+              }
+              _d = _d :+ _pixel
+            }
+            (k, _d)
+          }
+        }
+
+
+      val t: RDD[(SpatialKey, Array[Array[IndexedRow]])] = outRdd.aggregateByKey(
         outRdd.first()._2.map {
           _ =>
             val _t: Array[Array[Double]] = Array[Array[Double]]()
@@ -119,7 +142,7 @@ object FpcaTemporal {
           }
         },
         {
-          (l1, l2)=>{
+          (l1, l2) => {
             var _t = Array[Array[Array[Double]]]()
             for (i <- l2.indices) {
               val _t1 = l1(i)
@@ -130,218 +153,271 @@ object FpcaTemporal {
             _t
           }
         }
-      )
-        .map{
-          case (k, v) => {
-            var _d = Array[Array[IndexedRow]]()
-            for (i <- v.indices){
-              var data = Array[IndexedRow]()
-              for (j <- v(i).indices){
-                val ir = IndexedRow(j, Vectors.dense(v(i)(j)))
-                data = data :+ ir
-              }
-              _d = _d :+ data
+      ).map {
+        case (k, v) => {
+          var _d = Array[Array[IndexedRow]]()
+          for (i <- v.indices) {
+            var data = Array[IndexedRow]()
+            for (j <- v(i).indices) {
+              val ir = IndexedRow(j, Vectors.dense(v(i)(j)))
+              data = data :+ ir
             }
-            (k, _d)
+            _d = _d :+ data
           }
+          (k, _d)
         }
-    val _t = t.collect()
-      .map {
-      case (k, v) =>
-        val r = v.map {
-          case (_v) => {
-            sc.parallelize(_v)
-          }
-        }
-        val o: Array[Array[Double]] = r.map{
-          __v=>{
-            val (r, _) = FPCA.run(sc, new IndexedRowMatrix(__v).toBlockMatrix().cache())
-            val _a = r.toLocalMatrix().toArray
-            var min = 99.0
-            var max = -99.0
-
-            _a.foreach{
-              va=>
-                if (min > va) {
-                  min = va
-                }
-                if (va > max) {
-                  max = va
-                }
-            }
-            _a.map {
-              ___v => {
-                if (___v.isNaN) {
-                  ___v
-                } else {
-                  (255 * (___v - min) / (max - min)).toInt
-                }
-              }
-            }
-          }
-        }
-        var _o = Array[Array[Double]]()
-        for (i <- o.indices) {
-          val _t = Array[Double]()
-          for (j <- o(i).indices){
-            if(_o.length<=j){
-              _o = _o :+ _t
-            }
-            _o(j) = _o(j) :+ o(i)(j)
-          }
-        }
-        val t = ZonedDateTime.parse(f"${2021}-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(5, 30))).toInstant.toEpochMilli
-        (k, MultibandTile(
-          _o.map {
-            _v => {
-              //            val r = attributeStore.readMetadata[TileLayerMetadata[SpaceTimeKey]](layerName, 0).rows
-              var min = 99.0
-              var max = -99.0
-              _v.foreach{
-                v=>
-                  if(min>v){
-                    min = v
-                  }
-                  if (v > max) {
-                    max = v
-                  }
-              }
-              val at: Tile = ArrayTile(_v.map {
-                ___v => {
-                  if(___v.isNaN){
-                    ___v
-                  }else{
-                    (255 * (___v - min) / (max - min)).toInt
-                  }
-                }
-              }, 27, 28)
-              at
-            }
-          }
-        ))
       }
 
-    val rdd: MultibandTileLayerRDD[SpatialKey] = ContextRDD(sc.parallelize(_t), meta.asInstanceOf[TileLayerMetadata[SpatialKey]])
-//    val _r = MultibandTileLayerRDD(rdd = rdd, metadata = meta)
 
-    write(rdd, "data/out/fpcafull.tiff")
+      val _t: RDD[(SpaceTimeKey, MultibandTile)] = t
+        .map {
+          case (k, v) =>
+            val o: Array[Array[Double]] = v.map {
+              __v => {
+                val (r, _) = FpcaDev.normalCompute(__v)
+//                val _a = r.toLocalMatrix().toArray
+                if(r == null){
+                  (0 until __v(0).vector.size).map(_ =>0.0).toArray[Double]
+                }else{
+                  val _a = r.toArray
+                  var min = 99.0
+                  var max = -99.0
+                  _a.foreach {
+                    va =>
+                      if (min > va) {
+                        min = va
+                      }
+                      if (va > max) {
+                        max = va
+                      }
+                  }
+                  _a.map {
+                    ___v => {
+                      if (___v.isNaN) {
+                        ___v
+                      } else {
+                        (255 * (___v - min) / (max - min)).toInt
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            var _o = Array[Array[Double]]()
+            for (i <- o.indices) {
+              val _t = Array[Double]()
+              for (j <- o(i).indices) {
+                if (_o.length <= j) {
+                  _o = _o :+ _t
+                }
+                _o(j) = _o(j) :+ o(i)(j)
+              }
+            }
 
-
-//    _t._2.map{
-//      case (v)=>{
-//        v
+            (k, MultibandTile(
+              _o.map {
+                _v => {
+                  var min = 99.0
+                  var max = -99.0
+                  _v.foreach {
+                    v =>
+                      if (min > v) {
+                        min = v
+                      }
+                      if (v > max) {
+                        max = v
+                      }
+                  }
+                  val at: Tile = ArrayTile(_v.map {
+                    ___v => {
+                      if (___v.isNaN) {
+                        ___v
+                      } else {
+                        (255 * (___v - min) / (max - min)).toInt
+                      }
+                    }
+                  }, 256, 256)
+                  at
+                }
+              }
+            ))
+        }
+        .map{
+          case (k, t) => {
+            (SpaceTimeKey(k, meta.bounds.get.maxKey.time), t)
+          }
+        }
+    val rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(_t, meta)
+//      val rdd: MultibandTileLayerRDD[SpatialKey] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(_t, inRdds(0).metadata)
+//      write(rdd, "data/out/fpcafull.tiff")
+//      println("Done")
+      rdd
+    }
+//  def main(args: Array[String]): Unit = {
+//    implicit val sc: SparkContext = Spark.context
+//
+//    val paths = Array(
+//      "data/NDVISampleTest/Test1998-99.tif",
+//      "data/NDVISampleTest/Test1999-00.tif",
+//      "data/NDVISampleTest/Test2000-01.tif",
+//      "data/NDVISampleTest/Test2001-02.tif",
+//    )
+//
+//    val inRdds: Array[RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]] = paths.map(p => {
+//      val (rdd, meta) = RddUtils.getMultiTiledRDD(sc, p, 20)
+//      val _r: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(rdd, meta)
+//      _r
+//    })
+//
+//    val outRdd = inRdds.reduce {
+//      (rdd1, rdd2) => {
+//        val rdd: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(rdd1.++(rdd2), rdd1.metadata)
+//        rdd
 //      }
 //    }
-//: Array[(SpaceTimeKey, Array[Array[Double]])]
-////    val (rdd, _) = singleTiffTimeSeriesRdd(sc, "data/NDVISampleTest/Test1998-99.tif", 0)
-    val _ks = t.keys.collect()
-//    val maxT = _ks.map(m=>m.instant).max
-//    val minT = _ks.map(m=>m.instant).min
-//    val indexedRowRDD = rdd.map {
-//      case (key, tile) =>
-//        (key, Vectors.dense(tile.toArray().map(a => (a.toDouble))))
-//    }.map {
-//      case (key, vectors) =>
-////        IndexedRow(((1356652800000L - key.instant) / 1000L * 60 * 60 * 24 * 10).toInt, vectors)
-//        IndexedRow(((maxT - key.instant) / (1000L * 60 * 60 * 24 * 10)).toInt, vectors)
-//    }
-//    val res = FPCA.run(sc, new IndexedRowMatrix(indexedRowRDD).toBlockMatrix().cache())
-//    val data = res._1.toLocalMatrix().toArray
-//    val at: Tile = ArrayTile(data, rdd.metadata.cols.toInt ,rdd.metadata.rows.toInt)
-//    val image: BufferedImage = new BufferedImage(rdd.metadata.cols.toInt ,rdd.metadata.rows.toInt, BufferedImage.TYPE_INT_RGB)
-//    for (y <- 0 until image.getHeight) {
-//      for (x <- 0 until image.getWidth) {
-//        val v = 255 * (data(y * image.getWidth + x) - data.min) / (data.max - data.min)
-//        image.setRGB(x, y, new Color(v.toInt, v.toInt, v.toInt, v.toInt).getRGB)
+//      .map {
+//      case (k, mt) => {
+//        var _d = Array[Array[Double]]()
+//        var _d1 = Array[Double]()
+//        mt.foreachDouble((v: Array[Double]) => {
+//          _d1 = Array.concat(_d1, v)
+//        })
+//        for (i <- 0 until mt.cols * mt.rows) {
+//          var _pixel = Array[Double]()
+//          for (_time <- mt.bands.indices) {
+//            _pixel = _pixel :+ _d1((_time) + (i * mt.bands.indices.length))
+//          }
+//          _d = _d :+ _pixel
+//        }
+//        (k, _d)
 //      }
 //    }
-//    val out = new File("data/out/pca.png")
-//    ImageIO.write(image, "png", out)
-    println("Done")
-
-  }
+//
+//
+//    val t: RDD[(SpatialKey, Array[Array[IndexedRow]])] = outRdd.aggregateByKey(
+//      outRdd.first()._2.map {
+//        _ =>
+//          val _t: Array[Array[Double]] = Array[Array[Double]]()
+//          _t
+//      }
+//    )(
+//      {
+//        (l, t) => {
+//          var _t_ = Array[Array[Array[Double]]]()
+//          for (i <- l.indices) {
+//            val _t1 = l(i)
+//            val _t2 = t(i)
+//            val _t3: Array[Array[Double]] = _t1 :+ _t2
+//            _t_ = _t_ :+ _t3
+//          }
+//          _t_
+//        }
+//      },
+//      {
+//        (l1, l2) => {
+//          var _t = Array[Array[Array[Double]]]()
+//          for (i <- l2.indices) {
+//            val _t1 = l1(i)
+//            val _t2 = l2(i)
+//            val _t3 = Array.concat(_t1, _t2)
+//            _t = _t :+ _t3
+//          }
+//          _t
+//        }
+//      }
+//    ).map {
+//        case (k, v) => {
+//          var _d = Array[Array[IndexedRow]]()
+//          for (i <- v.indices) {
+//            var data = Array[IndexedRow]()
+//            for (j <- v(i).indices) {
+//              val ir = IndexedRow(j, Vectors.dense(v(i)(j)))
+//              data = data :+ ir
+//            }
+//            _d = _d :+ data
+//          }
+//          (k, _d)
+//        }
+//      }
+//
+//
+//    val _t: RDD[(SpatialKey, MultibandTile)] = t
+//      .map {
+//        case (k, v) =>
+//          val o: Array[Array[Double]] = v.map {
+//            __v => {
+//              FpcaDev.normalCompute(__v)
+//              val (r, _) = FpcaDev.normalCompute(__v)
+//              val _a = r.toArray
+//              var min = 99.0
+//              var max = -99.0
+//              _a.foreach {
+//                va =>
+//                  if (min > va) {
+//                    min = va
+//                  }
+//                  if (va > max) {
+//                    max = va
+//                  }
+//              }
+//              _a.map {
+//                ___v => {
+//                  if (___v.isNaN) {
+//                    ___v
+//                  } else {
+//                    (255 * (___v - min) / (max - min)).toInt
+//                  }
+//                }
+//              }
+//            }
+//          }
+//          var _o = Array[Array[Double]]()
+//          for (i <- o.indices) {
+//            val _t = Array[Double]()
+//            for (j <- o(i).indices) {
+//              if (_o.length <= j) {
+//                _o = _o :+ _t
+//              }
+//              _o(j) = _o(j) :+ o(i)(j)
+//            }
+//          }
+//
+//          (k, MultibandTile(
+//            _o.map {
+//              _v => {
+//                var min = 99.0
+//                var max = -99.0
+//                _v.foreach {
+//                  v =>
+//                    if (min > v) {
+//                      min = v
+//                    }
+//                    if (v > max) {
+//                      max = v
+//                    }
+//                }
+//                val at: Tile = ArrayTile(_v.map {
+//                  ___v => {
+//                    if (___v.isNaN) {
+//                      ___v
+//                    } else {
+//                      (255 * (___v - min) / (max - min)).toInt
+//                    }
+//                  }
+//                }, 20, 20)
+//                at
+//              }
+//            }
+//          ))
+//      }
+//
+//    val rdd: MultibandTileLayerRDD[SpatialKey] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(_t, inRdds(0).metadata)
+//    write(rdd, "data/out/fpcafull.tiff")
+//    println("Done")
+//  }
 
   def write(tiles: MultibandTileLayerRDD[SpatialKey], path: String): Unit = {
     GeoTiff(tiles.stitch().tile, tiles.metadata.extent, tiles.metadata.crs).write(path)
   }
 
-//  def run(implicit sc: SparkContext): Unit = {
-//    val rowRdd = RddUtils.getRowRdd(sc, "data/NDVISampleTest/Test1998-99.tif")
-//    val colRdd = RddUtils.getColRdd(sc, "data/NDVISampleTest/Test1998-99.tif")
-//
-//
-////    val _t1 = rowRdd.map{
-////      case (rk, row) => {
-////        (
-////          rk, colRdd.filter{
-////            case (key, tile) => {
-////              key == rk
-////            }
-////          }
-////          .first()._2
-////        )
-////      }
-////    }
-//
-//
-//
-//    val T = 100
-//    val N = 4
-//    val L = 3
-//    val rand = new scala.util.Random
-//
-//    var data = Array[IndexedRow]()
-//
-//    for (i <- 0 until N){
-//      val v = Vectors.dense(
-//        List.fill(T)(0).map {
-//          i => {
-//            rand.nextFloat().toDouble
-//          }
-//        }.toArray[Double]
-//      )
-//      data = data :+ IndexedRow(i, v)
-//    }
-//
-//    val scData = sc.parallelize(data)
-//    val matrix = new IndexedRowMatrix(scData).toBlockMatrix().cache()
-//
-//    //FPCA function
-//    val _N = matrix.numRows().toInt
-//    val _T = matrix.numCols().toInt
-//    val _t: List[Int] = (0 until _N).map{i=>{i.toInt}}.toList
-//    val scale = new CoordinateMatrix(
-//      sc.parallelize(_t)
-//        .map{
-//          i => {
-//            MatrixEntry(i, i, 1/Math.sqrt(_T))
-//          }
-//        },
-//      _N,
-//      _N
-//    ).toBlockMatrix()
-//    val svd = scale.multiply(matrix).transpose.toIndexedRowMatrix().computeSVD(L)
-//    val s = svd.s
-//    val Va = svd.V
-//    var Vl = Array[IndexedRow]()
-//
-//    for (i <- 0 until N){
-//      Vl = Vl :+ IndexedRow(i, Vectors.dense(
-//        Va.toArray(L * i + 0),
-//        Va.toArray(L * i + 1),
-//        Va.toArray(L * i + 2)
-//      ))
-//    }
-//    val V = new IndexedRowMatrix(sc.parallelize(Vl), N, L)
-//    val S = new DenseMatrix(L, L, org.apache.spark.mllib.linalg.Matrices.diag(s).toArray)
-//    val Si = new DenseMatrix(L, L, org.apache.spark.mllib.linalg.Matrices.diag(
-//      Vectors.dense(s.toArray.map(e=>1/e))
-//    ).toArray)
-//    val scores = V.multiply(S)
-//    val t = V.multiply(Si).toBlockMatrix()
-//    val mt = matrix.transpose
-//    val components= mt.multiply(t)
-//    val FPCA = components.multiply(scores.toBlockMatrix().transpose )
-//    println(FPCA)
-//  }
 }

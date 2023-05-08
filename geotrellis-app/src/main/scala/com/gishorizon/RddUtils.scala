@@ -51,6 +51,23 @@ object RddUtils {
     tiled
   }
 
+  def getMultiTiledTemporalRDDWithMeta(implicit sc: SparkContext, inputFile: String, tileSize: Int, dt: ZonedDateTime): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
+    val layer: RDD[(TemporalProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
+      path = new Path(inputFile),
+      uriToKey = {
+        case (uri, projectedExtent) =>
+          TemporalProjectedExtent(projectedExtent, dt)
+      },
+      options = HadoopGeoTiffRDD.Options.DEFAULT
+    )
+    val (zoom, meta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](layer, FloatingLayoutScheme(tileSize))
+    val tiled: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(
+      layer.tileToLayout(meta.cellType, meta.layout),
+      meta
+    )
+    tiled
+  }
+
   def getTiledRDD(implicit sc: SparkContext, inputFile: String, tileSize: Int): (RDD[(SpatialKey, Tile)], TileLayerMetadata[SpatialKey]) = {
     val layer: RDD[(ProjectedExtent, Tile)] = HadoopGeoTiffRDD[ProjectedExtent, ProjectedExtent, Tile](
       path = new Path(inputFile),
@@ -339,5 +356,42 @@ object RddUtils {
 //    result.tileToLayout(
 //      meta
 //    )
+  }
+
+  def mergeTemporalRdds(outputData: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]]): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
+    var meta = outputData(0).metadata
+    outputData.foreach {
+      o => {
+        meta = meta.merge(o.metadata)
+      }
+    }
+    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin) / (meta.extent.ymax - meta.extent.ymin)) / (((outputData(0).metadata.extent.xmax - outputData(0).metadata.extent.xmin)) / ((outputData(0).metadata.extent.ymax - outputData(0).metadata.extent.ymin))))
+    val xTileSize = 256 * (outputData.length * ratio)
+    val yTileSize = 256 * (outputData.length / ratio)
+    meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1, 1, yTileSize.toInt, xTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
+    println(meta)
+    val outProj: Array[RDD[(TemporalProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = outputData.map(o => {
+      ContextRDD(
+        o.map {
+          case (k, t) => {
+            (TemporalProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs, k.instant), t)
+          }
+        }, o.metadata
+      )
+    })
+    var out: RDD[(TemporalProjectedExtent, MultibandTile)] = outProj(0)
+    outProj.foreach {
+      o => {
+        out = out.merge(o)
+      }
+    }
+    val result = ContextRDD(out, meta)
+
+    val (zoom, newmeta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](result, FloatingLayoutScheme(256))
+    ContextRDD(result.tileToLayout(newmeta.cellType, newmeta.layout), newmeta)
+
+    //    result.tileToLayout(
+    //      meta
+    //    )
   }
 }
