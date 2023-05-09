@@ -69,7 +69,7 @@ object FpcaDev {
     }
     catch {
       case (e) => {
-        println("Error FPCA")
+//        println("Error FPCA")
         (null, null)
       }
     }

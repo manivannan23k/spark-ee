@@ -1,13 +1,14 @@
 package com.gishorizon.reader
 
 import com.gishorizon.operations.{FpcaTemporal, ProcessInput, ProcessOperation}
-import com.gishorizon.{RddUtils, Spark}
+import com.gishorizon.{Logger, RddUtils, Spark}
 import geotrellis.layer.{Metadata, SpaceTimeKey, SpatialKey, TileLayerMetadata}
 import geotrellis.raster.MultibandTile
 import geotrellis.spark.ContextRDD
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import play.api.libs.json._
+import geotrellis.raster.io.geotiff
 
 import scala.collection.mutable.Map
 import java.sql.{Connection, DriverManager}
@@ -68,23 +69,26 @@ object InputReader {
   }
 
   private def getInputRddTemporal(sc: SparkContext, processInput: ProcessInput)
-//  : RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]
+  : RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]
   = {
     val data = HttpUtils.getRequestSync(s"http://localhost:8082/getDataRefsForAoi/?sensorName=${processInput.dsName}&tIndexes=${processInput.tIndexes.mkString("", ",", "")}&level=12&aoiCode=${processInput.aoiCode}")
     val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
     var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
     for (i <- filePaths.value.indices) {
       val filePath = filePaths(i).asInstanceOf[JsString].value
+      Logger.log("Reading " + filePath)
       val tIndex = filePath.split("/").last.split(".tif").head.toInt
       val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
       val dt = ZonedDateTime.ofInstant(
         Instant.ofEpochMilli((sTs + tIndex * 1000L))
         , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
       )
-      var rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, filePath, 20, dt)
+      var rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, filePath, 256, dt)
       rdds = rdds :+ rdd
     }
-    RddUtils.mergeTemporalRdds(rdds)
+    val merged = RddUtils.mergeTemporalRdds(rdds)
+    Logger.log("Merged: " + processInput.id)
+    merged
   }
 
 //  def main(args: Array[String]): Unit = {
@@ -133,7 +137,7 @@ object InputReader {
   def getInputs(sc: SparkContext, inputs: Array[ProcessInput]): mutable.Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = {
     var rddMap = mutable.Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]]()
     for(input <- inputs){
-      val rdd = if (input.isTemporal) getInputRddTemporal(sc, input) else getInputRdd1Temporal(sc, input)
+      val rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = if (input.isTemporal) getInputRddTemporal(sc, input) else getInputRdd1Temporal(sc, input)
       rddMap += (
         input.id -> rdd
       )

@@ -8,7 +8,7 @@ import geotrellis.raster.io.geotiff.GeoTiff
 import geotrellis.store.{Intersects, LayerId}
 import geotrellis.store.file.FileAttributeStore
 import com.gishorizon.RddUtils.singleTiffTimeSeriesRdd
-import com.gishorizon.{RddUtils, Spark}
+import com.gishorizon.{Logger, RddUtils, Spark}
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.distributed._
@@ -57,7 +57,7 @@ object FpcaTemporal {
           .flatMap { case (intervalKey, tiles) =>
             val t = tiles.map {
               case (k, t) => {
-                println("Interval Key:", intervalKey)
+//                println("Interval Key:", intervalKey)
                 (SpaceTimeKey(k.spatialKey, TemporalKey(intervalKey.toInstant.getMillis)), t)
               }
             }
@@ -92,6 +92,7 @@ object FpcaTemporal {
           }
           .reduceByKey(
             (t1: MultibandTile, t2: MultibandTile) => {
+              Logger.log("Merging tiles by key...")
               var bds1: Array[Tile] = Array()
               for(i <- t1.bands){
                 bds1 = bds1 :+ i
@@ -113,18 +114,40 @@ object FpcaTemporal {
       }
         .map {
           case (k, mt) => {
+//            var _d = Array[Array[Double]]()
+//            var _d1 = Array[Double]()
+//            mt.foreachDouble((v: Array[Double]) => {
+//              _d1 = _d1 ++ v //Array.concat(_d1, v)
+//            })
+//            for (i <- 0 until mt.cols * mt.rows) {
+//              val startIdx = i * mt.bandCount
+//              _d = _d :+ _d1.slice(startIdx, startIdx + mt.bandCount)
+////              var _pixel = Array[Double]()
+////              for (_time <- mt.bands.indices) {
+////                _pixel = _pixel :+ _d1((_time) + (i * mt.bands.indices.length))
+////              }
+////              _d = _d :+ _pixel
+//            }
+//            Logger.log("Tile to double...")
+//            (k, _d)
             var _d = Array[Array[Double]]()
-            var _d1 = Array[Double]()
+//            var _d1 = Array[Double]()
+//            var i = 0
             mt.foreachDouble((v: Array[Double]) => {
-              _d1 = Array.concat(_d1, v)
+//              _d1 = _d1 ++ v //Array.concat(_d1, v)
+              _d = _d :+ v
+//              i += 1
             })
-            for (i <- 0 until mt.cols * mt.rows) {
-              var _pixel = Array[Double]()
-              for (_time <- mt.bands.indices) {
-                _pixel = _pixel :+ _d1((_time) + (i * mt.bands.indices.length))
-              }
-              _d = _d :+ _pixel
-            }
+//            for (i <- 0 until mt.cols * mt.rows) {
+//              val startIdx = i * mt.bandCount
+//              _d = _d :+ _d1.slice(startIdx, startIdx + mt.bandCount)
+//              //              var _pixel = Array[Double]()
+//              //              for (_time <- mt.bands.indices) {
+//              //                _pixel = _pixel :+ _d1((_time) + (i * mt.bands.indices.length))
+//              //              }
+//              //              _d = _d :+ _pixel
+//            }
+            Logger.log("Tile to double...")
             (k, _d)
           }
         }
@@ -172,6 +195,7 @@ object FpcaTemporal {
             }
             _d = _d :+ data
           }
+          Logger.log("Tile to IRow...")
           (k, _d)
         }
       }
@@ -180,34 +204,40 @@ object FpcaTemporal {
       val _t: RDD[(SpaceTimeKey, MultibandTile)] = t
         .map {
           case (k, v) =>
+            Logger.log("Running FPCA")
             val o: Array[Array[Double]] = v.map {
               __v => {
-                val (r, _) = FpcaDev.normalCompute(__v)
-//                val _a = r.toLocalMatrix().toArray
-                if(r == null){
-                  (0 until __v(0).vector.size).map(_ =>0.0).toArray[Double]
-                }else{
-                  val _a = r.toArray
-                  var min = 99.0
-                  var max = -99.0
-                  _a.foreach {
-                    va =>
-                      if (min > va) {
-                        min = va
-                      }
-                      if (va > max) {
-                        max = va
-                      }
-                  }
-                  _a.map {
-                    ___v => {
-                      if (___v.isNaN) {
-                        ___v
-                      } else {
-                        (255 * (___v - min) / (max - min)).toInt
+                if(__v.forall(p =>
+                  p.vector.toArray.forall(_p => !_p.isNaN)
+                )){
+                  val (r, _) = FpcaDev.normalCompute(__v)
+                  if (r == null) {
+                    (0 until __v(0).vector.size).map(_ => 0.0).toArray[Double]
+                  } else {
+                    val _a = r.toArray
+                    var min = 99.0
+                    var max = -99.0
+                    _a.foreach {
+                      va =>
+                        if (min > va) {
+                          min = va
+                        }
+                        if (va > max) {
+                          max = va
+                        }
+                    }
+                    _a.map {
+                      ___v => {
+                        if (___v.isNaN) {
+                          ___v
+                        } else {
+                          (255 * (___v - min) / (max - min)).toInt
+                        }
                       }
                     }
                   }
+                }else{
+                  (0 until __v(0).vector.size).map(_ =>0.0).toArray[Double]
                 }
               }
             }
@@ -222,6 +252,7 @@ object FpcaTemporal {
               }
             }
 
+            Logger.log("FPCA tile generation...")
             (k, MultibandTile(
               _o.map {
                 _v => {
@@ -252,6 +283,7 @@ object FpcaTemporal {
         }
         .map{
           case (k, t) => {
+            Logger.log("FPCA Done")
             (SpaceTimeKey(k, meta.bounds.get.maxKey.time), t)
           }
         }

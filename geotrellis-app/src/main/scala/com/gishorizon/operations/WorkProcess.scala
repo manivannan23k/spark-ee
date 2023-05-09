@@ -1,6 +1,6 @@
 package com.gishorizon.operations
 
-import com.gishorizon.Spark
+import com.gishorizon.{Logger, Spark}
 import com.gishorizon.reader.{HttpUtils, InputReader}
 import geotrellis.layer.{Bounds, LayoutDefinition, Metadata, SpaceTimeKey, SpatialKey, TileLayerMetadata}
 import geotrellis.raster.io.geotiff.GeoTiff
@@ -121,7 +121,9 @@ object WorkProcess {
       case (k, v) => (k.spatialKey, v)
     }, TileLayerMetadata(outputData.metadata.cellType, outputData.metadata.layout, outputData.metadata.extent, outputData.metadata.crs, outputData.metadata.bounds.asInstanceOf[Bounds[SpatialKey]]))
     val raster: Raster[MultibandTile] = od.stitch
-//    val fPath = f"E:\\Mani\\ProjectData\\temp_data\\${
+
+    Logger.log("Stitch complete")
+//    val fPath = f"G:\\ProjectData\\temp_data\\${
     val fPath = f"/mnt/data/temp_data/${
       Iterator.continually(Random.nextPrintableChar)
         .filter(_.isLetter)
