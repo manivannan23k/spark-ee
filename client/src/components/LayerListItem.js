@@ -10,6 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Grid from "@material-ui/core/Grid";
 import DataService from "../services.js/Data";
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 
 const mapStateToProps = (state) => {
@@ -31,7 +32,7 @@ const LayerListItem = (props) => {
     }
 
     return (
-        <Paper elevation={0}>
+        <Paper elevation={2} style={{ padding: 8 }}>
             <Grid
                 justifyContent="space-between" // Add it here :)
                 container
@@ -55,7 +56,7 @@ const LayerListItem = (props) => {
                             </div>
                         )
                     } */}
-                    <Button onClick={() => {
+                    <IconButton onClick={() => {
                         //changeMapView
                         DataService.getAoiByCode(props.layer.aoiCode)
                             .then(r => {
@@ -65,14 +66,14 @@ const LayerListItem = (props) => {
                                     [extent.coordinates[0][2][1], extent.coordinates[0][2][0]]
                                 ]))
                             });
-                    }}>
-                        Z
-                    </Button>
-                    <Button onClick={() => {
+                    }} aria-label="zoom to">
+                        <ZoomInIcon />
+                    </IconButton>
+                    <IconButton onClick={() => {
                         dispatch(removeLayer(props.layer.id))
                     }}>
-                        X
-                    </Button>
+                        <DeleteIcon />
+                    </IconButton>
                 </Grid>
             </Grid>
 
@@ -84,7 +85,7 @@ const LayerListItem = (props) => {
                             <Select value={props.layer.style.bands[0]} onChange={(e) => changeVizBand(0, e.target.value)}>
                                 {
                                     Array(props.layer.noOfBands).fill(0).map((v, i) => {
-                                        return <MenuItem key={i} value={i + 1}>{`Band ${i + 1}`}</MenuItem>
+                                        return <MenuItem style={{ color: 'red' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
                                     })
                                 }
                             </Select>
@@ -94,7 +95,7 @@ const LayerListItem = (props) => {
                             <Select value={props.layer.style.bands[1]} onChange={(e) => changeVizBand(1, e.target.value)}>
                                 {
                                     Array(props.layer.noOfBands).fill(0).map((v, i) => {
-                                        return <MenuItem key={i} value={i + 1}>{`Band ${i + 1}`}</MenuItem>
+                                        return <MenuItem style={{ color: 'green' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
                                     })
                                 }
                             </Select>
@@ -104,7 +105,7 @@ const LayerListItem = (props) => {
                             <Select value={props.layer.style.bands[2]} onChange={(e) => changeVizBand(2, e.target.value)}>
                                 {
                                     Array(props.layer.noOfBands).fill(0).map((v, i) => {
-                                        return <MenuItem key={i} value={i + 1}>{`Band ${i + 1}`}</MenuItem>
+                                        return <MenuItem style={{ color: 'blue' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
                                     })
                                 }
                             </Select>

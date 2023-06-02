@@ -366,8 +366,8 @@ object RddUtils {
       }
     }
 //    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin) / (meta.extent.ymax - meta.extent.ymin)) / (((outputData(0).metadata.extent.xmax - outputData(0).metadata.extent.xmin)) / ((outputData(0).metadata.extent.ymax - outputData(0).metadata.extent.ymin))))
-    val xTileSize = (meta.layout.extent.xmax-meta.layout.extent.xmin)/meta.layout.cellwidth //256 * (outputData.length * ratio)
-    val yTileSize = (meta.layout.extent.ymax-meta.layout.extent.ymin)/meta.layout.cellheight //256 * (outputData.length / ratio)
+    val xTileSize = (meta.layout.extent.xmax-meta.layout.extent.xmin)/outputData(0).metadata.layout.cellwidth //256 * (outputData.length * ratio)
+    val yTileSize = (meta.layout.extent.ymax-meta.layout.extent.ymin)/outputData(0).metadata.layout.cellwidth //256 * (outputData.length / ratio)
     meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1, 1, xTileSize.toInt, yTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
     println(meta)
     val outProj: Array[RDD[(TemporalProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = outputData.map(o => {
@@ -393,5 +393,9 @@ object RddUtils {
     //    result.tileToLayout(
     //      meta
     //    )
+  }
+
+  def mosaicSTRddToSingle(): Unit = {
+
   }
 }

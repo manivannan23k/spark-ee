@@ -85,10 +85,50 @@ object WorkProcess {
         val result = FpcaTemporal.runProcess(inputsData.toMap, operation)
         inputsData += (operation.output.id -> result)
       }
+      if (operation.opType == "op_cd") {
+        val result = ChangeDetection.runProcess(inputsData.toMap, operation)
+        inputsData += (operation.output.id -> result)
+      }
+      if (operation.opType == "op_mosaic") {
+        val result = Mosaic.runProcess(inputsData.toMap, operation)
+        inputsData += (operation.output.id -> result)
+      }
 
 
     }
-    val outputData = inputsData(process.output.id)
+    val outputData: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(inputsData(process.output.id).map {
+        case (k, v) => {
+          (k.spatialKey, v)
+        }
+      }, inputsData(process.inputs(0).id).metadata.asInstanceOf[TileLayerMetadata[SpatialKey]])
+//      ContextRDD(inputsData(process.inputs(0).id)
+//      .map {
+//        case (k, v) => {
+//          (k.spatialKey, v)
+//        }
+//      }.reduceByKey(
+//      (t1: MultibandTile, t2: MultibandTile) => {
+//        var tils: Array[Tile] = Array()
+//        for (i <- 0 until t1.bandCount) {
+//          tils = tils :+ t1.band(i)
+//            .combineDouble(t2.band(i)) {
+//              (v1, v2) => {
+//                if (v1 == 0 && v2 == 0) {
+//                  0.0
+//                } else if (v1.isNaN) {
+//                  v2
+//                } else if (v2.isNaN) {
+//                  v1
+//                } else {
+//                  (v1 + v2) / 2
+//                }
+//              }
+//            }
+//        }
+//        val r: MultibandTile = ArrayMultibandTile(tils)
+//        r
+//      }
+//    ), inputsData(process.inputs(0).id).metadata)
 //    var meta = outputData(0).metadata
 //    outputData.foreach{
 //      o => {
@@ -118,13 +158,13 @@ object WorkProcess {
 //    val result = ContextRDD(out, meta)
 //    val rdd = result.tileToLayout(meta)
     val od: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(outputData.map {
-      case (k, v) => (k.spatialKey, v)
+      case (k, v) => (k, v)
     }, TileLayerMetadata(outputData.metadata.cellType, outputData.metadata.layout, outputData.metadata.extent, outputData.metadata.crs, outputData.metadata.bounds.asInstanceOf[Bounds[SpatialKey]]))
     val raster: Raster[MultibandTile] = od.stitch
 
     Logger.log("Stitch complete")
-//    val fPath = f"G:\\ProjectData\\temp_data\\${
-    val fPath = f"/mnt/data/temp_data/${
+//    val fPath = f"/mnt/data/temp_data/${
+    val fPath = f"G:\\ProjectData\\temp_data\\${
       Iterator.continually(Random.nextPrintableChar)
         .filter(_.isLetter)
         .take(16)

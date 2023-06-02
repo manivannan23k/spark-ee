@@ -83,7 +83,7 @@ const MapLayers = (props) => {
 
                     case 'DATA_TILE':
                         return <TileLayer key={layer.id}
-                            url={`${Config.DATA_HOST}/tile/${layer.dsId}/{z}/{x}/{y}.png?tIndex=${layer.tIndex}&bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}&aoi_code=${layer.aoiCode}`}
+                            url={`${Config.DATA_HOST}/tilem/${layer.dsId}/{z}/{x}/{y}.png?tIndexes=${layer.tIndexes.length > 3 ? layer.tIndexes.slice(0, 3).join(",") : layer.tIndexes.join(",")}&bands=${layer.style.bands.join(",")}&vmin=-0.9&vmax=1.35&aoi_code=${layer.aoiCode}`}
                             maxZoom={24}
                         />
                 }

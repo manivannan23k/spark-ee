@@ -89,7 +89,7 @@ const ModelBuilder = (props) => {
 
     let inputTypes = ['in_raster_band', 'in_raster_layer'];
     let outputTypes = ['out_raster_band', 'out_raster_layer'];
-    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol', 'op_fpca'];
+    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol', 'op_fpca', 'op_mosaic', 'op_local_dif'];
     const [components, setComponents] = useState({
         inputs: [],
         output: null,
@@ -207,12 +207,20 @@ const ModelBuilder = (props) => {
                                         type: "op_local_avg"
                                     },
                                     {
+                                        name: "Local Difference",
+                                        type: "op_local_dif"
+                                    },
+                                    {
                                         name: "SavGol Filter",
                                         type: "op_savgol"
                                     },
                                     {
                                         name: "FPCA",
                                         type: "op_fpca"
+                                    },
+                                    {
+                                        name: "Mosaic",
+                                        type: "op_mosaic"
                                     }
                                 ]
                             },
@@ -535,7 +543,7 @@ const ModelBuilder = (props) => {
                     }
 
                     console.log(reqComps)
-                    fetch(`${Config.DATA_HOST}/process`, {
+                    fetch(`${Config.DATA_HOST}/`, {
                         body: JSON.stringify({
                             data: JSON.stringify(reqComps)
                         }),

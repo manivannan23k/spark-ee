@@ -164,7 +164,7 @@ def get_data_ref_for_aoi(sensorName: str, level: int, tIndex: int, aoiCode: str)
     aoi_geom.AssignSpatialReference(target_srs)
 
     tindex = tIndex
-    level = 12
+    level = 8
 
     bbox = aoi_geom.GetEnvelope()
 

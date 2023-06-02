@@ -16,8 +16,70 @@ import java.time.{Instant, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import scala.collection.{immutable, mutable}
 
-object InputReader {
 
+object InputReader {
+  val fps:Array[String] = Array(
+//    "G:/9/9/368/209/822979094.tif",
+//    "G:/9/9/368/211/822979094.tif",
+//    "G:/9/9/368/210/822979094.tif",
+//    "G:/9/9/366/212/822979094.tif",
+//    "G:/9/9/366/211/822979094.tif",
+//    "G:/9/9/366/210/822979094.tif",
+//    "G:/9/9/366/209/822979094.tif",
+//    "G:/9/9/366/209/822979071.tif",
+//    "G:/9/9/366/208/822979071.tif",
+//    "G:/9/9/366/207/822979071.tif",
+//    "G:/9/9/366/206/822979071.tif",
+//    "G:/9/9/367/214/823756344.tif",
+//    "G:/9/9/367/213/823756344.tif",
+//    "G:/9/9/367/212/822979094.tif",
+//    "G:/9/9/367/212/820991548.tif",
+//    "G:/9/9/367/211/822979094.tif",
+//    "G:/9/9/367/209/822979094.tif",
+//    "G:/9/9/367/210/822979094.tif",
+//    "G:/9/9/367/209/822979071.tif",
+//    "G:/9/9/367/208/822979071.tif",
+//    "G:/9/9/367/207/822979071.tif",
+//    "G:/9/9/367/206/822979071.tif",
+//    "G:/9/9/368/209/822979071.tif",
+//    "G:/9/9/368/208/822979071.tif",
+//    "G:/9/9/368/207/828508646.tif",
+//    "G:/9/9/368/213/820991548.tif",
+//    "G:/9/9/368/212/820991548.tif",
+//    "G:/9/9/368/211/820991548.tif",
+//    "G:/9/9/368/211/820991524.tif",
+//    "G:/9/9/368/210/820991524.tif",
+//    "G:/9/9/368/209/822373925.tif",
+//    "G:/9/9/368/207/822979071.tif",
+//    "G:/9/9/368/206/822979071.tif",
+//    "G:/9/9/369/214/820991548.tif",
+//    "G:/9/9/369/213/820991548.tif",
+//    "G:/9/9/369/212/820991548.tif",
+//    "G:/9/9/369/211/820991524.tif",
+//    "G:/9/9/369/210/820991524.tif",
+//    "G:/9/9/369/209/820991524.tif",
+//    "G:/9/9/369/207/828508646.tif",
+//    "G:/9/9/370/214/820991548.tif",
+//    "G:/9/9/370/213/820991548.tif",
+//    "G:/9/9/370/212/820991548.tif",
+//    "G:/9/9/370/211/821768754.tif",
+//    "G:/9/9/370/211/820991524.tif",
+//    "G:/9/9/370/210/821768754.tif",
+//    "G:/9/9/370/210/820991524.tif",
+//    "G:/9/9/370/209/820991524.tif",
+//    "G:/9/9/371/210/825915942.tif",
+//    "G:/9/9/371/211/825915942.tif"
+    "G:/9/9/370/210/821768754.tif",
+    "G:/9/9/370/210/820991524.tif",
+//    "G:/9/9/370/211/821768754.tif",
+//    "G:/9/9/370/211/820991524.tif",
+  )
+  val fps2:Array[String] = Array(
+    "G:/9/9/370/210/971067969.tif",
+    "G:/9/9/370/210/959231487.tif",
+//    "G:/9/9/370/211/971067969.tif",
+//    "G:/9/9/370/211/959231487.tif",
+  )
   private def getConnection: Connection = {
     classOf[org.postgresql.Driver]
     val connStr = "jdbc:postgresql://localhost:5432/project_master?user=postgres&password=manichan"
@@ -67,15 +129,19 @@ object InputReader {
     }
     RddUtils.mergeTemporalRdds(rdds)
   }
-
+var iii = 0
   private def getInputRddTemporal(sc: SparkContext, processInput: ProcessInput)
   : RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]
   = {
-    val data = HttpUtils.getRequestSync(s"http://localhost:8082/getDataRefsForAoi/?sensorName=${processInput.dsName}&tIndexes=${processInput.tIndexes.mkString("", ",", "")}&level=12&aoiCode=${processInput.aoiCode}")
-    val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
+
+//    val data = HttpUtils.getRequestSync(s"http://localhost:8082/getDataRefsForAoi/?sensorName=${processInput.dsName}&tIndexes=${processInput.tIndexes.mkString("", ",", "")}&level=12&aoiCode=${processInput.aoiCode}")
+//    val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
     var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
-    for (i <- filePaths.value.indices) {
-      val filePath = filePaths(i).asInstanceOf[JsString].value
+    val _fps = if(iii%2==0) fps else fps2
+    iii += 1
+    for (i <- _fps.indices) {
+      val filePath = _fps(i)
+//      val filePath = filePaths(i).asInstanceOf[JsString].value
       Logger.log("Reading " + filePath)
       val tIndex = filePath.split("/").last.split(".tif").head.toInt
       val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli

@@ -1,5 +1,5 @@
 const Config = {
-    DATA_HOST: "http://35.222.200.31:8082",
+    DATA_HOST: "http://34.72.58.183:8082",
     PROCESS_HOST: "http://localhost:8081"
 }
 export default Config;

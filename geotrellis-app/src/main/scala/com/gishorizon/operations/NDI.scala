@@ -21,13 +21,18 @@ object NDI {
         (t1: MultibandTile, t2: MultibandTile) => {
           val mt = MultibandTile(
             t1.band(b1).convert(CellType.fromName("float64")).combineDouble(t2.band(b2).convert(CellType.fromName("float64"))) {
-              (v1, v2) => {
-                if (v1 + v2 == 0) {
-                  0.toDouble
+              (v1, v2) =>
+                if (v1.isNaN && v2.isNaN) {
+                  v1
+                } else if (v1.isNaN) {
+                  v1
+                } else if (v2.isNaN) {
+                  v2
+                } else if (v1 + v2 == 0) {
+                  0
                 } else {
-                  (v1 - v2) / (v1 + v2)
+                  (v1 - v2) / ((v1 + v2))
                 }
-              }
             }
           )
           mt

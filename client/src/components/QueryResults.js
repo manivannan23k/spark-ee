@@ -20,7 +20,7 @@ const QueryResults = (props) => {
             dispatch(toggleQueryResultsDialog(flag))
         }}
             content=
-            <div>
+            <div style={{ height: 400, overflowY: 'auto' }}>
                 <ul>
                     {
                         props.map.queryResults.map(r => {
@@ -40,7 +40,7 @@ const QueryResults = (props) => {
                         aoiCode: firstResult['aoiCode'],
                         dsId: firstResult['dsName'],
                         noOfBands: firstResult['dsData']['no_of_bands'],
-                        name: 'Layer: ' + lId,
+                        name: 'Layer: ' + firstResult.dsName + " #2",
                         sortOrder: 0,
                         showLegend: false,
                         showInLayerList: true,

@@ -225,6 +225,7 @@ object Server extends HttpApp with App {
                   opIn
                 }).toArray
                 val opType = opJsArray.value(opJs).asInstanceOf[JsObject].value("type").asInstanceOf[play.api.libs.json.JsString].value
+                val opParams = opJsArray.value(opJs).asInstanceOf[JsObject].value("params").asInstanceOf[play.api.libs.json.JsString].value
                 val opOutput = new ProcessOutput()
                 val opId = opJsArray.value(opJs).asInstanceOf[JsObject].value("output").asInstanceOf[JsObject].value("id").asInstanceOf[play.api.libs.json.JsString].value
                 opOutput.id = opId
@@ -233,6 +234,7 @@ object Server extends HttpApp with App {
                 pIn.opType = opType
                 pIn.inputs = opInputs
                 pIn.output = opOutput
+                pIn.params = opParams
                 operations = operations :+ pIn
               }
 

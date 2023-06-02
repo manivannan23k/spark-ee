@@ -47,7 +47,7 @@ const AddAoiLayer = (props) => {
                     active: true,
                     data: JSON.parse(r.data.geom),
                     aoiCode: aoi,
-                    name: aoi,
+                    name: r.data.aoi_name,
                     sortOrder: 0,
                     showLegend: false,
                     showInLayerList: true

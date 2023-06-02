@@ -52,12 +52,11 @@ object Mosaic {
         }
       }
       .flatMap { case (intervalKey, tiles) =>
-        val t = tiles.map {
+        tiles.map {
           case (k, t) => {
             (SpaceTimeKey(k.spatialKey, TemporalKey(intervalKey.toInstant.getMillis)), t)
           }
         }
-        t
       }.reduceByKey(
       (t1: MultibandTile, t2: MultibandTile) => {
         var tils: Array[Tile] = Array()
@@ -65,7 +64,15 @@ object Mosaic {
           tils = tils :+ t1.band(i).convert(CellType.fromName("float32"))
             .combineDouble(t2.band(i).convert(CellType.fromName("float32"))) {
               (v1, v2) => {
-                (v1 + v2) / 2
+                if (v1.isNaN && v2.isNaN) {
+                  v1
+                } else if (v1.isNaN) {
+                  v2
+                } else if (v2.isNaN) {
+                  v1
+                } else {
+                  (v1 + v2) / 2
+                }
               }
             }
         }
