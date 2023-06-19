@@ -3,7 +3,7 @@ organization := "com.gishorizon"
 version := "0.1.0"
 //2.13.8, 2.12.15
 scalaVersion := "2.13.8"
-mainClass := Some("com.gishorizon.Server")
+mainClass := Some("com.gishorizon.operations.WorkProcess")
 val akkaV       = "2.7.0"
 val akkaHttpV   = "10.4.0"
 

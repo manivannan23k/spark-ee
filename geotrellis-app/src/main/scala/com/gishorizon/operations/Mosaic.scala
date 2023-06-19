@@ -33,10 +33,18 @@ object Mosaic {
   def runProcess(inputs: Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]], processOperation: ProcessOperation)
   : RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]
   = {
+
+
+    val iu = processOperation.params.split("#")(3)
     val startTs = processOperation.params.split("#").head.toLong
     val endTs = processOperation.params.split("#")(1).toLong
-    val intervalDays = processOperation.params.split("#").last.toInt
-    val intervalDuration = Duration.standardDays(intervalDays)
+    val intervalDays = processOperation.params.split("#")(2).toInt
+    var intervalDuration: Duration = null
+    if(iu.equalsIgnoreCase("days")){
+      intervalDuration = Duration.standardDays(intervalDays)
+    }else{
+      intervalDuration = Duration.standardDays(intervalDays * 30)
+    }
     var meta: TileLayerMetadata[SpaceTimeKey] = null
     val i = processOperation.inputs(0)
     val m = inputs(i.id).metadata

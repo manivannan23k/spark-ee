@@ -110,3 +110,9 @@ export const setQueryResults = (data) => {
         payload: data
     }
 };
+export const toggleTasksDialog = (flag) => {
+    return {
+        type: 'TOGGLE_TASKS_DIALOG',
+        payload: flag
+    }
+};

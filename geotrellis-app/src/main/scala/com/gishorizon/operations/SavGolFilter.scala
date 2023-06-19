@@ -15,76 +15,69 @@ import geotrellis.spark._
 
 object SavGolFilter {
 
-//  def main(args: Array[String]): Unit = {
-//    try {
-//      run(Spark.context)
-//    } finally {
-//      Spark.session.stop()
-//    }
-//  }
-
   def runProcess(inputs: Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]], operation: ProcessOperation): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
-    var outRdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
-    var in1: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = inputs(operation.inputs(0).id)
+
+    val w = operation.params.split("#")(1).toInt
+    val p = operation.params.split("#")(0).toInt
+
+    val in1: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = inputs(operation.inputs(0).id)
     val rdd = in1
-    runForRdd(rdd, rdd.metadata)
+    runForRdd(rdd, rdd.metadata, w, p)
   }
 
-  def runForRdd(rdd: RDD[(SpaceTimeKey, MultibandTile)], meta: TileLayerMetadata[SpaceTimeKey]): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
-    val tileSize = 5
-//    val (rdd, meta) = getMultiTiledRDD(sc, "data/NDVISampleTest/Test1998-99.tif", tileSize)
-    //TODO: Recalculate SavGol Based on Score
+  private def runForRdd(rdd: RDD[(SpaceTimeKey, MultibandTile)], meta: TileLayerMetadata[SpaceTimeKey], w: Int, p: Int): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
+    val tileSize = 256
     val result: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(rdd.map {
-      case (k, t) => {
-        var tv = Array[Array[Int]]()
-        t.foreach {
-          (v: Array[Int]) => {
-            tv = tv :+ v
-          }
+      case (k, t) =>
+        var _tv = Array[Array[Int]]()
+        for(b <- 0 until t.bandCount){
+          _tv = _tv :+ t.band(b).toArray()
         }
+        val tv = _tv.head.indices.map(i => _tv.map(_(i))).toArray
         val bandCount = t.bandCount
         var resultTiles = Array[Tile]()
         for (b <- 0 until bandCount) {
           resultTiles = resultTiles :+ ArrayTile(tv.map {
             v => {
-              //TODO: Calculate least sq error and apply optimum params: Least square error from original values: p = 2-4, w = 3-5
-              var wParam = 3
-              var pParam = 2
-              var err = Double.MaxValue //1000.0
-
-              var _a = v
-
-              var outAr = Array[Double]()
-
-              for(w <- 3 to 5){
-                for(p <- 2 to 4){
-                  if(w>p){
-                    val rY = solve(_a.map(e => e.toDouble), w, p)//.map(e=>e.toInt)
-                    val _err = getLeaseSquareError(_a.map(e=>e.toInt), rY)
-                    if(_err<err){
-                      wParam = w
-                      pParam = p
-                      err = _err
-                      outAr = rY
-                    }
-                  }
+              solve(v.map(e => e.toDouble).map(e=>{
+                if(e < 0){
+                  Double.NaN
+                }else{
+                  e
                 }
-              }
-
-
-              outAr
+              }), w, p)
+              //TODO: Calculate least sq error and apply optimum params: Least square error from original values: p = 2-4, w = 3-5
+//              var wParam = 3
+//              var pParam = 2
+//              var err = Double.MaxValue
+//              val _a = v
+//              var outAr = Array[Double]()
+//              for(w <- 3 to 5){
+//                for(p <- 2 to 4){
+//                  if(w>p){
+//                    val rY = solve(_a.map(e => e.toDouble), w, p)
+//                    val _err = getLeaseSquareError(_a.map(e=>e), rY)
+//                    if(_err<err){
+//                      wParam = w
+//                      pParam = p
+//                      err = _err
+//                      outAr = rY
+//                    }
+//                  }
+//                }
+//              }
+//              outAr
             }
           }.map {
             v => {
               v(b)
             }
-          }, tileSize, tileSize).rotate270.flipVertical
+          }, tileSize, tileSize)
         }
         val mTile: MultibandTile = new ArrayMultibandTile(resultTiles)
         (
           k, mTile
         )
-      }
     }, meta)
     result
 //    println("------------Saving----------")
@@ -121,7 +114,13 @@ object SavGolFilter {
     (H * Y).toArray
   }
 
-  def solve(y: Array[Double], w: Int, p: Int): Array[Double] = {
+  def solve(_y: Array[Double], w: Int, p: Int): Array[Double] = {
+    if(_y.forall(_p => _p.isNaN)){
+      return _y
+    }
+    val y = _y.map(e=>{
+      if(e>15000) _y.min else e
+    })
     val hw: Int = w/2
     val xVals = y.indices.map(e => e.toDouble).toArray
     var outY: Array[Double] = y.slice(0, hw)
@@ -136,6 +135,7 @@ object SavGolFilter {
         yCalc = yCalc + coeff(c) * Math.pow(_x, c)
       }
       outY = outY :+ yCalc
+
     }
     outY  = outY ++ y.slice(y.length-hw, y.length)
 //    println(outY.mkString("Array(", ", ", ")"))

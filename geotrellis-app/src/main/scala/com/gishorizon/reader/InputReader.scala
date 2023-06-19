@@ -134,14 +134,14 @@ var iii = 0
   : RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]
   = {
 
-//    val data = HttpUtils.getRequestSync(s"http://localhost:8082/getDataRefsForAoi/?sensorName=${processInput.dsName}&tIndexes=${processInput.tIndexes.mkString("", ",", "")}&level=12&aoiCode=${processInput.aoiCode}")
-//    val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
+    val data = HttpUtils.getRequestSync(s"http://localhost:8082/getDataRefsForAoi/?sensorName=${processInput.dsName}&tIndexes=${processInput.tIndexes.mkString("", ",", "")}&level=8&aoiCode=${processInput.aoiCode}")
+    val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
     var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
     val _fps = if(iii%2==0) fps else fps2
     iii += 1
-    for (i <- _fps.indices) {
-      val filePath = _fps(i)
-//      val filePath = filePaths(i).asInstanceOf[JsString].value
+    for (i <- filePaths.value.indices) {
+//      val filePath = _fps(i)
+      val filePath = "/projects/data/project/tiles/" +  filePaths(i).asInstanceOf[JsString].value
       Logger.log("Reading " + filePath)
       val tIndex = filePath.split("/").last.split(".tif").head.toInt
       val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli

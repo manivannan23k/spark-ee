@@ -7,10 +7,18 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import DatePicker from 'react-datepicker';
 import { Button, Slider, Tab, Tabs, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddAoiDialog, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 import DataService from '../services.js/Data';
 import Config from '../config.js';
+import AppModal from './AppModal';
+
+const mapStateToProps = (state) => {
+    return {
+        map: state.MapReducer,
+        dialog: state.DialogReducer
+    }
+}
 
 const AddAoiLayer = (props) => {
 
@@ -85,7 +93,9 @@ const AddAoiLayer = (props) => {
         )
     }
 
-    return <>
+    return <AppModal btnText={"Add AOI"} height={350} flag={props.dialog.showAddAoiDialog} setFlag={(flag) => {
+        dispatch(toggleAddAoiDialog(flag))
+    }} content=<div>
         <Typography variant="h6" gutterBottom component="div">
             Add AOI
         </Typography>
@@ -102,6 +112,7 @@ const AddAoiLayer = (props) => {
                 role="tabpanel"
                 hidden={selectedTab !== 0}
             >
+                <br />
                 <FormControl fullWidth>
                     <InputLabel id="aoi-select">Existing AOI</InputLabel>
                     <Select
@@ -123,6 +134,7 @@ const AddAoiLayer = (props) => {
                 role="tabpanel"
                 hidden={selectedTab !== 1}
             >
+                <br />
                 <FormControl fullWidth>
                     <TextField
                         label="AOI GeoJSON"
@@ -158,7 +170,7 @@ const AddAoiLayer = (props) => {
             }
         }}>Add</Button>
         <br />
-    </>
+    </div> />
 }
 
-export default AddAoiLayer;
+export default connect(mapStateToProps)(AddAoiLayer);

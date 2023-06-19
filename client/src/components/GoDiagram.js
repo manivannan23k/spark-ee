@@ -4,7 +4,7 @@ import { ReactDiagram } from 'gojs-react';
 import { useEffect, useRef, useState } from 'react';
 import TextEditorSelectBox from './TextEditorSelectBox';
 import { connect } from 'react-redux';
-import TextEditorSelectBoxLayer from './TextEditorSelectBoxLayer';
+import TextEditorDateBox from './TextEditorDateBox';
 
 
 const mapStateToProps = (state) => {
@@ -62,7 +62,11 @@ function initDiagram() {
             // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
             getNodeShape($),
             // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
-            getTitleText($),
+            getTitleText($, "top"),
+            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Band 1: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'b1choices'), new go.Binding('textEdited', 'layerEdited1'), new go.Binding('text', 'b1')),
+            $(go.TextBlock, { position: new go.Point(0, 50), margin: 10, text: "Band 2: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 50), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'b2choices'), new go.Binding('textEdited', 'layerEdited2'), new go.Binding('text', 'b2')),
             // $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
             // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
             makePort("OpNDI", 190, 10, false, true, [5, 0], 0, 1, $),
@@ -95,15 +99,23 @@ function initDiagram() {
         );
     const nodeTemplateOpMosaic =
         $(
-            go.Node, "Position", { width: 200, height: 100 },
+            go.Node, "Position", { width: 200, height: 140 },
             // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
-            getNodeShape($),
+            getNodeShape($, 140),
             // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
-            getTitleText($),
+            getTitleText($, "top"),
+            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Select Unit: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'intervalUnits'), new go.Binding('textEdited', 'iuEdited'), new go.Binding('text', 'intervalUnit')),
+            $(go.TextBlock, { position: new go.Point(0, 50), margin: 10, text: "Select value: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 50), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'intervalValues'), new go.Binding('textEdited', 'ivEdited'), new go.Binding('text', 'intervalValue')),
+            $(go.TextBlock, { position: new go.Point(0, 70), margin: 10, text: "Start Date: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { textEditor: TextEditorDateBox, position: new go.Point(80, 70), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('textEdited', 'sdEdited'), new go.Binding('text', 'startDate')),
+            $(go.TextBlock, { position: new go.Point(0, 90), margin: 10, text: "End Date: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { textEditor: TextEditorDateBox, position: new go.Point(80, 90), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('textEdited', 'edEdited'), new go.Binding('text', 'endDate')),//textEditor: TextEditorDateBox, 
             // $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
             // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
             makePort("OpMosaic", 190, 10, false, true, [5, 0], 0, 1, $),
-            makePort("OpMosaic", 190, 10, true, false, [5, 90], 1, 0, $),
+            makePort("OpMosaic", 190, 10, true, false, [5, 130], 1, 0, $),
         );
     const nodeTemplateOpSavGol =
         $(
@@ -111,7 +123,11 @@ function initDiagram() {
             // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
             getNodeShape($),
             // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
-            getTitleText($),
+            getTitleText($, "top"),
+            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Window size: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'windowchoices'), new go.Binding('textEdited', 'windowEdited'), new go.Binding('text', 'windowSize')),
+            $(go.TextBlock, { position: new go.Point(0, 50), margin: 10, text: "Power: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 50), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'powerchoices'), new go.Binding('textEdited', 'powerEdited'), new go.Binding('text', 'power')),
             // $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
             // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
             makePort("OpSavGol", 190, 10, false, true, [5, 0], 0, 1, $),
@@ -128,6 +144,32 @@ function initDiagram() {
             // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
             makePort("OpFPCA", 190, 10, false, true, [5, 0], 0, 1, $),
             makePort("OpFPCA", 190, 10, true, false, [5, 90], 1, 0, $),
+        );
+    const nodeTemplateOpBandSel =
+        $(
+            go.Node, "Position", { width: 200, height: 100 },
+            // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+            getNodeShape($),
+            // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
+            getTitleText($, "top"),
+            $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, text: "Band 1: ", font: '12px "Roboto", sans-serif', stroke: "black", editable: false, width: 200 }),
+            $(go.TextBlock, { position: new go.Point(80, 30), margin: 10, stroke: "black", font: 'bold 12px "Roboto", sans-serif', editable: true, width: 200 }, new go.Binding('choices', 'b1choices'), new go.Binding('textEdited', 'layerEdited1'), new go.Binding('text', 'b1')),
+            // $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
+            // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
+            makePort("OpBandSel", 190, 10, false, true, [5, 0], 0, 1, $),
+            makePort("OpBandSel", 190, 10, true, false, [5, 90], 1, 0, $),
+        );
+    const nodeTemplateOpTsToBd =
+        $(
+            go.Node, "Position", { width: 200, height: 100 },
+            // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+            getNodeShape($),
+            // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
+            getTitleText($),
+            // $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
+            // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
+            makePort("OpTsToBd", 190, 10, false, true, [5, 0], 0, 1, $),
+            makePort("OpTsToBd", 190, 10, true, false, [5, 90], 1, 0, $),
         );
     const nodeTemplateOutBand =
         $(
@@ -162,6 +204,8 @@ function initDiagram() {
     templateMap.add('opMosaic', nodeTemplateOpMosaic)
     templateMap.add('opSavGol', nodeTemplateOpSavGol)
     templateMap.add('opFPCA', nodeTemplateOpFPCA)
+    templateMap.add('opBandSel', nodeTemplateOpBandSel)
+    templateMap.add('opTsToBd', nodeTemplateOpTsToBd)
 
     const diagram =
         $(go.Diagram,
@@ -219,8 +263,8 @@ function initDiagram() {
     return diagram;
 }
 
-function getNodeShape($) {
-    return $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: '#F1F5EE', strokeWidth: 0 }, new go.Binding('fill', 'color1'))
+function getNodeShape($, height) {
+    return $(go.Shape, 'RoundedRectangle', { width: 200, height: height || 100, position: new go.Point(0, 0), name: 'SHAPE', fill: '#F1F5EE', strokeWidth: 0 }, new go.Binding('fill', 'color1'))
 }
 
 function getTitleText($, loc) {
@@ -320,27 +364,56 @@ const GoDiagram = (props) => {
                             text: component.name,
                             color1: 'rgb(151 255 178)',
                             bchoices: component.id ? Array(component.noOfBands).fill(0).map((e, i) => `Band ${i + 1}`) : [],
-                            lchoices: layers.map(l => l.id),
-                            defaultLayer: component.id,
+                            lchoices: layers.map(l => `${l.name}->${l.id}`),
+                            defaultLayer: layers.map(l => `${l.name}:${l.id}`).filter(e => e.indexOf(component.id)).length > 0 ? layers.map(l => `${l.name}:${l.id}`).filter(e => e.indexOf(component.id))[0] : '',
                             layerEdited: (e) => {
                                 handleModelChange({
-                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Layer', nodeType: "inputs"
+                                    nodeId: component.componentId, value: e.text.split('->')[1], eventType: "nodeUpdate", type: component.type + '#' + 'Layer', nodeType: "inputs"
                                 })
                             },
                             category: 'inLayer'
                         }
-                        console.log("RLayer", component.id)
                         break;
                     // case "out_raster_band":
                     //     node = { key: i, text: component.name, color1: 'white', loc: '0 0', category: 'outRasterband'}
                     //     break;
                     case "op_ndi":
+                        let ndiL1 = [...props.components.inputs, ...props.components.operations.map(ope => {
+                            return {
+                                componentId: ope.output.layer,
+                                noOfBands: ope.noOfBands,
+                                id: ope.componentId
+                            }
+                        })].filter(e => {
+                            if (component.inputs.map(ei => ei.layer).indexOf(e.componentId) > -1) {
+                                return true;
+                            }
+                            return false;
+                        }).map(inLayer => {
+                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i + 1}`)
+                        }).flat()
+
                         node = {
                             key: component.componentId,
                             text: component.name,
+                            b1choices: ndiL1,
+                            b2choices: ndiL1,
+                            b1: component.b1,
+                            b2: component.b2,
                             color1: 'rgb(255 251 133)',
+                            layerEdited1: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Band1', nodeType: "operations"
+                                })
+                            },
+                            layerEdited2: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Band2', nodeType: "operations"
+                                })
+                            },
                             category: 'opNDI'
                         }
+                        break;
                     case "op_local_avg":
                         node = {
                             key: component.componentId,
@@ -354,8 +427,74 @@ const GoDiagram = (props) => {
                             key: component.componentId,
                             text: component.name,
                             color1: 'rgb(255 251 133)',
-                            category: 'opMosaic'
+                            category: 'opMosaic',
+                            intervalUnits: ['days', 'months'],
+                            intervalValue: component.intervalValue,
+                            endDate: component.endDate,
+                            startDate: component.startDate,
+                            intervalValues: component.intervalUnit === 'days' ? [10, 15, 30, 60, 90, 120, 150, 180, 365] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                            intervalUnit: component.intervalUnit,
+                            iuEdited: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'intervalUnit', nodeType: "operations"
+                                })
+                            },
+                            ivEdited: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'intervalValue', nodeType: "operations"
+                                })
+                            },
+                            edEdited: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'endDate', nodeType: "operations"
+                                })
+                            },
+                            sdEdited: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'startDate', nodeType: "operations"
+                                })
+                            }
+
                         }
+                        break;
+                    case "op_bandsel":
+                        let badnSelL1 = [...props.components.inputs, ...props.components.operations.map(ope => {
+                            return {
+                                componentId: ope.output.layer,
+                                noOfBands: ope.noOfBands,
+                                id: ope.componentId
+                            }
+                        })].filter(e => {
+                            if (component.inputs.map(ei => ei.layer).indexOf(e.componentId) > -1) {
+                                return true;
+                            }
+                            return false;
+                        }).map(inLayer => {
+                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i + 1}`)
+                        }).flat()
+                        node = {
+                            key: component.componentId,
+                            text: component.name,
+                            b1choices: badnSelL1,
+                            b1: component.b1,
+                            color1: 'rgb(255 251 133)',
+                            layerEdited1: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Band1', nodeType: "operations"
+                                })
+                            },
+                            color1: 'rgb(255 251 133)',
+                            category: 'opBandSel'
+                        }
+                        break;
+                    case "op_tstomb":
+                        node = {
+                            key: component.componentId,
+                            text: component.name,
+                            color1: 'rgb(255 251 133)',
+                            category: 'opTsToBd'
+                        }
+                        break;
                     case "op_local_dif":
                         node = {
                             key: component.componentId,
@@ -377,7 +516,21 @@ const GoDiagram = (props) => {
                             key: component.componentId,
                             text: component.name,
                             color1: 'rgb(255 251 133)',
-                            category: 'opSavGol'
+                            category: 'opSavGol',
+                            windowSize: component.windowSize,
+                            power: component.power,
+                            powerchoices: [2, 3, 4],
+                            windowchoices: [3, 4, 5],
+                            powerEdited: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Power', nodeType: "operations"
+                                })
+                            },
+                            windowEdited: (e) => {
+                                handleModelChange({
+                                    nodeId: component.componentId, value: e.text, eventType: "nodeUpdate", type: component.type + '#' + 'Window', nodeType: "operations"
+                                })
+                            }
                         }
                         break;
 
@@ -420,7 +573,7 @@ const GoDiagram = (props) => {
     }, [props.components])
 
 
-    return <div style={{ width: '100%', height: '100%', backgroundColor: '#999' }}>
+    return <div style={{ width: '100%', height: '450px', backgroundColor: '#999' }}>
         <ReactDiagram style={{ width: '100%', height: '100%', backgroundColor: '#999' }}
             ref={diagramRef}
             initDiagram={initDiagram}

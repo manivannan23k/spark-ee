@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect, useDispatch } from 'react-redux';
 import Paper from '@mui/material/Paper';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -11,7 +11,9 @@ import IconButton from '@mui/material/IconButton';
 import Grid from "@material-ui/core/Grid";
 import DataService from "../services.js/Data";
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
+import PaletteIcon from '@mui/icons-material/Palette';
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
+import { FormControl, InputLabel, MenuItem, Select, TextField } from "@material-ui/core";
 
 const mapStateToProps = (state) => {
     return {
@@ -21,6 +23,7 @@ const mapStateToProps = (state) => {
 
 const LayerListItem = (props) => {
     const dispatch = useDispatch();
+    const [showStyle, setShowStyle] = useState(false);
     const handleLayerToggle = (e) => {
         dispatch(toggleLayerState(props.layer.id, e.target.checked));
     }
@@ -28,6 +31,35 @@ const LayerListItem = (props) => {
     const changeVizBand = (color, band) => {
         let nLayer = { ...props.layer };
         nLayer.style.bands[color] = band;
+        dispatch(changeLayerStyle(nLayer.id, nLayer.style))
+    }
+
+    const changeVizType = (styleType) => {
+        let nLayer = { ...props.layer };
+        nLayer.style.type = styleType;
+        if (styleType === 'grey') {
+            nLayer.style.bands = [nLayer.style.bands[0]];
+        } else {
+            nLayer.style.bands = [4, 3, 2];
+        }
+        dispatch(changeLayerStyle(nLayer.id, nLayer.style))
+    }
+
+    const changeMinValue = (value) => {
+        let nLayer = { ...props.layer };
+        // if (value === '') {
+        //     value = 0;
+        // }
+        nLayer.style.min = value;
+        dispatch(changeLayerStyle(nLayer.id, nLayer.style))
+    }
+
+    const changeMaxValue = (value) => {
+        let nLayer = { ...props.layer };
+        // if (value === '') {
+        //     value = 0;
+        // }
+        nLayer.style.max = value;
         dispatch(changeLayerStyle(nLayer.id, nLayer.style))
     }
 
@@ -67,8 +99,18 @@ const LayerListItem = (props) => {
                                 ]))
                             });
                     }} aria-label="zoom to">
-                        <ZoomInIcon />
+                        <CenterFocusStrongIcon />
                     </IconButton>
+                    {
+                        props.layer.type === "DATA_TILE" ? (
+                            <IconButton onClick={() => {
+                                setShowStyle(!showStyle)
+                            }}>
+                                <PaletteIcon />
+                            </IconButton>
+                        ) : ''
+                    }
+
                     <IconButton onClick={() => {
                         dispatch(removeLayer(props.layer.id))
                     }}>
@@ -78,37 +120,54 @@ const LayerListItem = (props) => {
             </Grid>
 
             {
-                props.layer.type === "DATA_TILE" ? (
+                props.layer.type === "DATA_TILE" && showStyle ? (
                     <>
-                        <FormControl>
-                            <InputLabel>R</InputLabel>
-                            <Select value={props.layer.style.bands[0]} onChange={(e) => changeVizBand(0, e.target.value)}>
-                                {
-                                    Array(props.layer.noOfBands).fill(0).map((v, i) => {
-                                        return <MenuItem style={{ color: 'red' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
-                                    })
-                                }
+                        <FormControl style={{ margin: 12, width: 250 }}>
+                            <InputLabel>Style type</InputLabel>
+                            <Select
+                                value={props.layer.style.type}
+                                label="Style"
+                                onChange={(e) => { changeVizType(e.target.value) }}
+                            >
+                                <MenuItem key={'grey'} value={'grey'}>Grayscale</MenuItem>
+                                <MenuItem key={'rgb'} value={'rgb'}>RGB</MenuItem>
                             </Select>
                         </FormControl>
-                        <FormControl>
-                            <InputLabel>G</InputLabel>
-                            <Select value={props.layer.style.bands[1]} onChange={(e) => changeVizBand(1, e.target.value)}>
-                                {
-                                    Array(props.layer.noOfBands).fill(0).map((v, i) => {
-                                        return <MenuItem style={{ color: 'green' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
-                                    })
-                                }
-                            </Select>
+                        <br />
+                        {
+                            props.layer.style.type === 'rgb' ? ['Red', 'Green', 'Blue'].map((c, i) => {
+                                return <div style={{ margin: 8, padding: 8, backgroundColor: c === 'Red' ? '#FF4343' : c === 'Green' ? '#0EB22C' : '#2049B0', display: 'inline-block', borderRadius: 4 }}>
+                                    <FormControl>
+                                        <InputLabel style={{ color: 'white' }}>{c}</InputLabel>
+                                        <Select value={props.layer.style.bands[i]} onChange={(e) => changeVizBand(i, e.target.value)}>
+                                            {
+                                                Array(props.layer.noOfBands).fill(0).map((v, i) => {
+                                                    return <MenuItem style={{ color: c === 'Red' ? '#FF4343' : c === 'Green' ? '#0EB22C' : '#2049B0' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
+                                                })
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                            }) : <div style={{ margin: 8, padding: 8, backgroundColor: '#333', display: 'inline-block', borderRadius: 4 }}>
+                                <FormControl>
+                                    <InputLabel style={{ color: 'white' }}>Grey</InputLabel>
+                                    <Select style={{ color: 'white' }} value={props.layer.style.bands[0]} onChange={(e) => changeVizBand(0, e.target.value)}>
+                                        {
+                                            Array(props.layer.noOfBands).fill(0).map((v, i) => {
+                                                return <MenuItem style={{ color: '#333' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
+                                            })
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </div>
+                        }
+                        <br />
+                        <FormControl style={{ margin: 12, width: 100 }}>
+                            <TextField type={"number"} value={props.layer.style.min} label="Min. value" variant="standard" onChange={(e) => { changeMinValue(e.target.value) }} />
                         </FormControl>
-                        <FormControl>
-                            <InputLabel>B</InputLabel>
-                            <Select value={props.layer.style.bands[2]} onChange={(e) => changeVizBand(2, e.target.value)}>
-                                {
-                                    Array(props.layer.noOfBands).fill(0).map((v, i) => {
-                                        return <MenuItem style={{ color: 'blue' }} key={i} value={i + 1}>{`B${i + 1}`}</MenuItem>
-                                    })
-                                }
-                            </Select>
+                        &nbsp;&nbsp;
+                        <FormControl style={{ margin: 12, width: 100 }}>
+                            <TextField type={"number"} value={props.layer.style.max} label="Max. value" variant="standard" onChange={(e) => { changeMaxValue(e.target.value) }} />
                         </FormControl>
                     </>
                 ) : ''

@@ -10,6 +10,7 @@ import { Button, Slider, Typography } from '@mui/material';
 import { connect, useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 import Config from '../config.js';
+import AppModal from './AppModal';
 
 const mapStateToProps = (state) => {
     return {
@@ -94,8 +95,9 @@ const QueryPanel = (props) => {
     }
 
     const aoiLayers = Object.keys(props.map.layers).filter(lk => props.map.layers[lk].group === "AOI").map(lk => props.map.layers[lk])
-
-    return <>
+    return <AppModal btnText={"Add Layer"} flag={props.dialog.showAddLayerDialog} setFlag={(flag) => {
+        dispatch(toggleAddLayerDialog(flag))
+    }} content=<div>
         <Typography variant="h6" gutterBottom component="div">
             Query Datasets
         </Typography>
@@ -123,13 +125,6 @@ const QueryPanel = (props) => {
                 label="AOI"
                 onChange={(e) => { setAoi(e.target.value) }}
             >
-                {/* <MenuItem value={'aoi_RJ_Park_small'}>AOI Rajaji Park (Small)</MenuItem>
-                <MenuItem value={'aoi_RJP_Field'}>AOI Rajaji Park (Field)</MenuItem>
-                <MenuItem value={'aoi_shilma'}>AOI Shimla</MenuItem>
-                <MenuItem value={'aoi_haldwani_tw'}>AOI Haldwani Town</MenuItem>
-                <MenuItem value={'aoi_haldwani_outer'}>AOI Haldwani Outer</MenuItem>
-                <MenuItem value={'aoi_RJ_Park'}>AOI Rajaji Park</MenuItem>
-                <MenuItem value={'aoi_uk_1'}>AOI UK</MenuItem> */}
                 {
                     aoiLayers.map(aoiLayer => {
                         return <MenuItem value={aoiLayer.aoiCode}>{aoiLayer.name}</MenuItem>
@@ -161,69 +156,8 @@ const QueryPanel = (props) => {
         <br />
         <Button variant="contained" onClick={queryDataset}>Submit</Button>
         <br />
-
-        {/* <Typography variant="h6" gutterBottom component="div">
-            Visualization
-        </Typography>
-        <FormControl fullWidth>
-            <InputLabel id="red-band-select">Red band</InputLabel>
-            <Select
-                labelId="red-band-select"
-                value={redBand}
-                label="Red band"
-                onChange={(e) => { setRedBand(e.target.value) }}
-            >
-                {
-                    Array(7).fill(0).map((e, i) => i).map(e => {
-                        return <MenuItem key={e} value={e + 1}>Band {e + 1}</MenuItem>
-                    })
-                }
-            </Select>
-        </FormControl>
-        <br />
-        <br />
-        <FormControl fullWidth>
-            <InputLabel id="green-band-select">Green band</InputLabel>
-            <Select
-                labelId="green-band-select"
-                value={greenBand}
-                label="Green band"
-                onChange={(e) => { setGreenBand(e.target.value) }}
-            >
-                {
-                    Array(7).fill(0).map((e, i) => i).map(e => {
-                        return <MenuItem key={e} value={e + 1}>Band {e + 1}</MenuItem>
-                    })
-                }
-            </Select>
-        </FormControl> */}
-        {/* <br />
-        <br />
-        <FormControl fullWidth>
-            <InputLabel id="blue-band-select">Blue band</InputLabel>
-            <Select
-                labelId="blue-band-select"
-                value={blueBand}
-                label="Blue band"
-                onChange={(e) => { setBlueBand(e.target.value) }}
-            >
-                {
-                    Array(7).fill(0).map((e, i) => i).map(e => {
-                        return <MenuItem key={e} value={e + 1}>Band {e + 1}</MenuItem>
-                    })
-                }
-            </Select>
-        </FormControl>
-        <br />
-        <br />
-        <FormControl fullWidth>
-            <TextField type={"number"} value={vizMaxValue} label="Max. value" variant="outlined" onChange={(e) => setVizMaxValue(e.target.value)} />
-        </FormControl>
-        <br />
-        <br />
-        <Button variant="contained" onClick={updateViz}>Update</Button> */}
-
-    </>
+    </div>
+    />
 }
 
 export default connect(mapStateToProps)(QueryPanel);

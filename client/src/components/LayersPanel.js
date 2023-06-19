@@ -5,9 +5,10 @@ import Typography from "@mui/material/Typography";
 import QueryPanel from "./QueryPanel";
 import AppModal from "./AppModal";
 import { connect, useDispatch } from "react-redux";
-import { toggleAddAoiDialog, toggleAddLayerDialog } from "../actions";
+import { toggleAddAoiDialog, toggleAddLayerDialog, toggleTasksDialog } from "../actions";
 import ModelBuilder from "./ModelBuilder";
 import QueryResults from "./QueryResults";
+import TasksList from './TasksList';
 import go from 'gojs'
 
 import DataTable from 'react-data-table-component';
@@ -24,18 +25,13 @@ const LayersPanel = (props) => {
 
     const dispatch = useDispatch();
 
-    return <Paper elevation={2} style={{ padding: 15, maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+    return <Paper elevation={2} style={{ padding: 15, maxHeight: 'calc(100vh - 120px)', overflowY: 'auto', zIndex: 1000, position: 'absolute', top: 100, right: 40 }}>
         {/* <Typography variant="h6" gutterBottom component="div">
             Layers
         </Typography> */}
         <LayerList />
-        <AppModal btnText={"Add Layer"} flag={props.dialog.showAddLayerDialog} setFlag={(flag) => {
-            dispatch(toggleAddLayerDialog(flag))
-        }} content=<QueryPanel /> />
-
-        <AppModal btnText={"Add AOI"} flag={props.dialog.showAddAoiDialog} setFlag={(flag) => {
-            dispatch(toggleAddAoiDialog(flag))
-        }} content=<AddAoiLayer /> />
+        <QueryPanel />
+        <AddAoiLayer />
 
 
         <ModelBuilder />
