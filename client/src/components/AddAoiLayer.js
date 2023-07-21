@@ -47,7 +47,7 @@ const AddAoiLayer = (props) => {
                     active: true,
                     data: JSON.parse(r.data.geom),
                     aoiCode: aoi,
-                    name: aoi,
+                    name: r.data.aoi_name,
                     sortOrder: 0,
                     showLegend: false,
                     showInLayerList: true
@@ -102,6 +102,7 @@ const AddAoiLayer = (props) => {
                 role="tabpanel"
                 hidden={selectedTab !== 0}
             >
+                <br />
                 <FormControl fullWidth>
                     <InputLabel id="aoi-select">Existing AOI</InputLabel>
                     <Select
@@ -123,6 +124,7 @@ const AddAoiLayer = (props) => {
                 role="tabpanel"
                 hidden={selectedTab !== 1}
             >
+                <br />
                 <FormControl fullWidth>
                     <TextField
                         label="AOI GeoJSON"

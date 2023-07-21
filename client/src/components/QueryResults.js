@@ -1,6 +1,8 @@
 import { connect, useDispatch } from "react-redux";
 import AppModal from "./AppModal";
 import { addLayer, toggleQueryResultsDialog } from "../actions";
+import { useEffect, useState } from "react";
+import { Button, Checkbox, Typography } from "@material-ui/core";
 
 const mapStateToProps = (state) => {
     return {
@@ -11,32 +13,55 @@ const mapStateToProps = (state) => {
 
 const QueryResults = (props) => {
     const dispatch = useDispatch();
+    let [timeIndexes, setTimeIndexes] = useState([]);
+    useEffect(() => {
+        setTimeIndexes([])
+    }, [props.map.queryResults])
     if (props.map.queryResults.length <= 0) {
         return <></>;
     }
     let firstResult = props.map.queryResults[0];
+
     return <>
         <AppModal btnText={""} flag={props.dialog.showQueryResultsDialog} setFlag={(flag) => {
             dispatch(toggleQueryResultsDialog(flag))
         }}
             content=
-            <div>
-                <ul>
+            <div >
+                <Typography variant="h6" gutterBottom component="div">
+                    Add Layer - Query Results
+                </Typography>
+                <ul style={{ listStyle: 'none', height: 300, overflowY: 'auto' }}>
                     {
                         props.map.queryResults.map(r => {
-                            return <li>{r.dsName} - {new Date(r.ts).toLocaleString('in')}</li>
+                            return <li><Checkbox checked={timeIndexes.indexOf(r.tIndex) > -1} onClick={(e) => {
+                                if (!e.target.checked) {
+                                    let idx = timeIndexes.indexOf(r.tIndex);
+                                    if (idx > -1) {
+                                        let ntIndexes = [...timeIndexes];
+                                        ntIndexes.splice(idx, 1)
+                                        setTimeIndexes(ntIndexes)
+                                    }
+                                } else {
+                                    setTimeIndexes([
+                                        ...timeIndexes,
+                                        r.tIndex
+                                    ])
+                                }
+                            }} />{r.dsName} - {new Date(r.ts).toLocaleString('in')}</li>
                         })
                     }
                 </ul>
-                <button onClick={() => {
+                <Button variant="contained" style={{ backgroundColor: "#6ccd6c", float: 'right' }} onClick={() => {
                     let lId = (Math.random() + 1).toString(36).substring(6);
+                    // console.log(timeIndexes)
                     let layer = {
                         type: 'DATA_TILE',
                         group: 'RASTER_DATA',
                         id: lId,
                         active: true,
                         tIndex: firstResult.tIndex,
-                        tIndexes: props.map.queryResults.map(qr => qr.tIndex),
+                        tIndexes: timeIndexes,//props.map.queryResults.map(qr => qr.tIndex),
                         aoiCode: firstResult['aoiCode'],
                         dsId: firstResult['dsName'],
                         noOfBands: firstResult['dsData']['no_of_bands'],
@@ -53,7 +78,7 @@ const QueryResults = (props) => {
                     }
                     dispatch(addLayer(layer));
                     dispatch(toggleQueryResultsDialog(false))
-                }}>Add</button>
+                }}>Add</Button>
             </div>
         />
 

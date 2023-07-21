@@ -5,6 +5,7 @@ import { connect, useDispatch } from "react-redux";
 import { toggleModelBuilderDialog } from "../actions";
 import GoDiagram from "./GoDiagram";
 import Config from '../config.js';
+import { Button } from "@material-ui/core";
 
 const mapStateToProps = (state) => {
     return {
@@ -89,7 +90,7 @@ const ModelBuilder = (props) => {
 
     let inputTypes = ['in_raster_band', 'in_raster_layer'];
     let outputTypes = ['out_raster_band', 'out_raster_layer'];
-    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol', 'op_fpca'];
+    let operationTypes = ['op_ndi', 'op_local_avg', 'op_local_dif', 'op_savgol', 'op_fpca'];
     const [components, setComponents] = useState({
         inputs: [],
         output: null,
@@ -205,6 +206,10 @@ const ModelBuilder = (props) => {
                                     {
                                         name: "Local Average",
                                         type: "op_local_avg"
+                                    },
+                                    {
+                                        name: "Local Difference",
+                                        type: "op_local_dif"
                                     },
                                     {
                                         name: "SavGol Filter",
@@ -480,15 +485,15 @@ const ModelBuilder = (props) => {
                         console.log(e);
                     }
                 }} />
-                <button onClick={() => {
+                <Button variant="contained" color="error" style={{ backgroundColor: "#ff8181", margin: 10 }} onClick={() => {
                     setComponents({
                         inputs: [],
                         output: null,
                         operations: []
                     })
                     setModelLinks([])
-                }}>Clear</button>
-                <button onClick={() => {
+                }}>Clear</Button>
+                <Button variant="contained" color="success" style={{ backgroundColor: "#6ccd6c", margin: 10 }} onClick={() => {
                     // console.log(components);
                     let reqComps = {
                         inputs: [], operations: [], output: {}
@@ -550,7 +555,7 @@ const ModelBuilder = (props) => {
                         .catch(e => console.log(e))
 
 
-                }}>Run</button>
+                }}>Run</Button>
                 <div>{processResult}</div>
             </div>
         </div>

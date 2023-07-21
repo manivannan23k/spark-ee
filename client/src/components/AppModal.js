@@ -21,23 +21,23 @@ const AppModal = (props) => {
     const handleOpen = () => props.setFlag(true);
     const handleClose = () => props.setFlag(false);
 
-    if(!props.content){
+    if (!props.content) {
         return <></>
     }
 
     return (
         <div>
-        <Button onClick={handleOpen}>{props.btnText}</Button>
-        <Modal
-            open={props.flag}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-        >
-            <Box sx={style}>
-                {props.content}
-            </Box>
-        </Modal>
+            <Button onClick={handleOpen}>{props.btnText}</Button>
+            <Modal
+                open={props.flag}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    {props.content}
+                </Box>
+            </Modal>
         </div>
     );
 }

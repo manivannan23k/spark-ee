@@ -81,8 +81,15 @@ const QueryPanel = (props) => {
             .then(r => r.json())
             .then(r => {
                 if (r.data.length > 0) {
+                    let exTs = [], newObjs = [];
+                    r.data.forEach(e => {
+                        if (exTs.indexOf(e.tIndex) === -1) {
+                            exTs.push(e.tIndex)
+                            newObjs.push(e)
+                        }
+                    })
                     dispatch(toggleAddLayerDialog(false))
-                    dispatch(setQueryResults(r.data))
+                    dispatch(setQueryResults(newObjs))
                     dispatch(toggleQueryResultsDialog(true))
                 } else {
                     alert("No result")

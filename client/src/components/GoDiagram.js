@@ -80,6 +80,18 @@ function initDiagram() {
             makePort("OpLocalAvg", 190, 10, false, true, [5, 0], 0, 1, $),
             makePort("OpLocalAvg", 190, 10, true, false, [5, 90], 1, 0, $),
         );
+    const nodeTemplateOpLocalDif =
+        $(
+            go.Node, "Position", { width: 200, height: 100 },
+            // new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+            getNodeShape($),
+            // $(go.Shape, 'RoundedRectangle', { width: 200, height: 100, position: new go.Point(0, 0), name: 'SHAPE', fill: 'white', strokeWidth: 0 }, new go.Binding('fill', 'color1')),
+            getTitleText($),
+            // $(go.TextBlock, { position: new go.Point(0, 30), margin: 10, font: 'bold 14pt serif', textAlign: 'center', width: 200 }, new go.Binding('text').makeTwoWay()),
+            // $(go.TextBlock, {position: new go.Point(0, 50), margin: 10, stroke: "red", editable: false, width: 200 }, new go.Binding("text")),
+            makePort("OpLocalDif", 190, 10, false, true, [5, 0], 0, 1, $),
+            makePort("OpLocalDif", 190, 10, true, false, [5, 90], 1, 0, $),
+        );
     const nodeTemplateOpSavGol =
         $(
             go.Node, "Position", { width: 200, height: 100 },
@@ -132,6 +144,7 @@ function initDiagram() {
     templateMap.add('inLayer', nodeTemplateInputLayer);
     templateMap.add('outRasterband', nodeTemplateOutBand)
     templateMap.add('opLocalAvg', nodeTemplateOpLocalAvg)
+    templateMap.add('opLocalDif', nodeTemplateOpLocalDif)
     templateMap.add('outRasterlayer', nodeTemplateOutLayer)
     templateMap.add('opSavGol', nodeTemplateOpSavGol)
     templateMap.add('opFPCA', nodeTemplateOpFPCA)
@@ -328,6 +341,14 @@ const GoDiagram = (props) => {
                             text: component.name,
                             color1: 'rgb(255 251 133)',
                             category: 'opLocalAvg'
+                        }
+                        break;
+                    case "op_local_dif":
+                        node = {
+                            key: component.componentId,
+                            text: component.name,
+                            color1: 'rgb(255 251 133)',
+                            category: 'opLocalDif'
                         }
                         break;
                     case "op_savgol":
