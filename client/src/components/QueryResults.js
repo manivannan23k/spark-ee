@@ -21,6 +21,17 @@ const QueryResults = (props) => {
         return <></>;
     }
     let firstResult = props.map.queryResults[0];
+
+    // const t = async () => {
+    //     console.time("STA")
+    //     for (let i = 0; i < 50; i++) {
+    //         console.log("Fetch ", i)
+    //         await fetch('https://test2.gishorizon.com/tilem/LISS3/8/183/105.png?tIndexes=870410314,871705583,871705563,880003475,879571713,859267663,858404194,857972449,880003455,870842077,859267683,870410334&bands=4,3,2&vmin=0&vmax=1&aoi_code=AVSQFSNWOYLMNOQG')
+    //     }
+    //     console.timeEnd("STA")
+    // }
+    // t();
+
     return <>
         <AppModal btnText={""} flag={props.dialog.showQueryResultsDialog} setFlag={(flag) => {
             dispatch(toggleQueryResultsDialog(flag))

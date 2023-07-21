@@ -312,7 +312,8 @@ object WorkProcess {
 
     val result = WorkProcess.run(processConfig)
     print(result.mkString(","))
-    Files.write(Paths.get("/projects/data/project/geoprocess/" + processId + ".out"), result.mkString(", ").getBytes(StandardCharsets.UTF_8))
+    Files.write(Paths.get("G:/ProjectData/geoprocess/" + processId + ".out"), result.mkString(", ").getBytes(StandardCharsets.UTF_8))
+//    Files.write(Paths.get("/projects/data/project/geoprocess/" + processId + ".out"), result.mkString(", ").getBytes(StandardCharsets.UTF_8))
     print("Process completed")
   }
 

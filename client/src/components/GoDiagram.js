@@ -573,7 +573,7 @@ const GoDiagram = (props) => {
     }, [props.components])
 
 
-    return <div style={{ width: '100%', height: '450px', backgroundColor: '#999' }}>
+    return <div style={{ width: '100%', height: '100%', backgroundColor: '#999' }}>
         <ReactDiagram style={{ width: '100%', height: '100%', backgroundColor: '#999' }}
             ref={diagramRef}
             initDiagram={initDiagram}

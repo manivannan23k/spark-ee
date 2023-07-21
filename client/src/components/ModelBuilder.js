@@ -301,7 +301,7 @@ const ModelBuilder = (props) => {
                     return <DraggableComponent key={_i} {...c} />
                 })
             } */}
-                <div style={{ width: '80%', display: 'inline-block', height: 'calc(100vh - 400px)', maxHeight: 600, overflowY: 'auto' }}>
+                <div style={{ width: '100%', display: 'inline-block', height: 'calc(100vh)', maxHeight: 600, overflowY: 'auto' }}>
                     <GoDiagram components={components} modelLinks={modelLinks} modelChange={(changes) => {
                         // console.log("Model updated", changes)
                         // if(changes.insertedLinkKeys){
@@ -707,94 +707,97 @@ const ModelBuilder = (props) => {
                             console.log(e);
                         }
                     }} />
-                    <div>
-                        <TextField
-                            label="Process name"
-                            value={processName}
-                            onChange={(e) => {
-                                setProcessName(e.target.value)
-                            }}
-                        />
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                        <Button onClick={() => {
-                            setComponents({
-                                inputs: [],
-                                output: null,
-                                operations: []
-                            })
-                            setModelLinks([])
-                            setProcessName("")
-                            setProcessResult("")
-                        }}>Clear</Button>
-                        <Button onClick={() => {
-                            // console.log(components);
-                            let reqComps = {
-                                inputs: [], operations: [], output: {}
-                            };
-                            for (let i = 0; i < components.inputs.length; i++) {
-                                let input = components.inputs[i];
-                                input = {
-                                    "id": input.componentId,
-                                    "tIndexes": input.tIndexes,
-                                    "isTemporal": input.isTemporal,
-                                    "aoiCode": input.aoiCode,
-                                    "dsName": input.dsName
-                                }
-                                reqComps.inputs.push(input)
-                            }
 
-                            for (let i = 0; i < components.operations.length; i++) {
-                                let operation = components.operations[i];
-                                operation = {
-                                    "id": operation.componentId,
-                                    "type": operation.type,
-                                    "inputs": operation.inputs.map(inp => {
-                                        let il = components.inputs.filter(e => { return e.componentId === inp.layer })[0]
-                                        if (!il) {
-                                            //from operation
-                                            return {
-                                                id: inp.layer,
-                                                band: 0
-                                            }
-                                        }
+                </div>
+            </div>
+            <div style={{ padding: 8, border: '0px solid grey' }}>
+                <div>
+                    <TextField
+                        label="Process name"
+                        value={processName}
+                        onChange={(e) => {
+                            setProcessName(e.target.value)
+                        }}
+                    />
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                    <Button onClick={() => {
+                        setComponents({
+                            inputs: [],
+                            output: null,
+                            operations: []
+                        })
+                        setModelLinks([])
+                        setProcessName("")
+                        setProcessResult("")
+                    }}>Clear</Button>
+                    <Button onClick={() => {
+                        // console.log(components);
+                        let reqComps = {
+                            inputs: [], operations: [], output: {}
+                        };
+                        for (let i = 0; i < components.inputs.length; i++) {
+                            let input = components.inputs[i];
+                            input = {
+                                "id": input.componentId,
+                                "tIndexes": input.tIndexes,
+                                "isTemporal": input.isTemporal,
+                                "aoiCode": input.aoiCode,
+                                "dsName": input.dsName
+                            }
+                            reqComps.inputs.push(input)
+                        }
+
+                        for (let i = 0; i < components.operations.length; i++) {
+                            let operation = components.operations[i];
+                            operation = {
+                                "id": operation.componentId,
+                                "type": operation.type,
+                                "inputs": operation.inputs.map(inp => {
+                                    let il = components.inputs.filter(e => { return e.componentId === inp.layer })[0]
+                                    if (!il) {
+                                        //from operation
                                         return {
                                             id: inp.layer,
-                                            band: il.band ? parseInt(il.band) : 0
+                                            band: 0
                                         }
-                                    }),
-                                    "output": {
-                                        "id": operation.output.layer
-                                    },
-                                    "params": operation.params
-                                }
-                                reqComps.operations.push(operation)
-                            }
-                            reqComps.output = {
-                                id: components.output.componentId
-                            }
-
-                            console.log(reqComps)
-                            fetch(`${Config.PROCESS_HOST}/process/submit`, {
-                                body: JSON.stringify({
-                                    data: JSON.stringify(reqComps),
-                                    name: processName || "Sample Process"
+                                    }
+                                    return {
+                                        id: inp.layer,
+                                        band: il.band ? parseInt(il.band) : 0
+                                    }
                                 }),
-                                method: 'POST',
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'Content-Type': 'application/json'
-                                }
-                            })
-                                .then(r => r.json())
-                                .then(r => { console.log(r); setProcessResult(r.data) })
-                                .catch(e => console.log(e))
+                                "output": {
+                                    "id": operation.output.layer
+                                },
+                                "params": operation.params
+                            }
+                            reqComps.operations.push(operation)
+                        }
+                        reqComps.output = {
+                            id: components.output.componentId
+                        }
+
+                        console.log(reqComps)
+                        fetch(`${Config.PROCESS_HOST}/process/submit`, {
+                            body: JSON.stringify({
+                                data: JSON.stringify(reqComps),
+                                name: processName || "Sample Process"
+                            }),
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(r => r.json())
+                            .then(r => { console.log(r); setProcessResult(r.data) })
+                            .catch(e => console.log(e))
 
 
-                        }}>Run</Button>
-                    </div>
-                    <div>{processResult}</div>
+                    }}>Run</Button>
                 </div>
+                <div>{processResult}</div>
             </div>
         </div>
 
