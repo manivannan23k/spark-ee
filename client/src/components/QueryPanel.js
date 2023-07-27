@@ -11,6 +11,7 @@ import { connect, useDispatch } from 'react-redux';
 import { addLayer, setQueryResults, setTimeIndexes, toggleAddLayerDialog, toggleQueryResultsDialog, updateRGBBands } from '../actions';
 import Config from '../config.js';
 import AppModal from './AppModal';
+import DataService from '../services.js/Data';
 
 const mapStateToProps = (state) => {
     return {
@@ -77,8 +78,41 @@ const QueryPanel = (props) => {
         getDatasets()
     }, [])
 
-    const queryDataset = () => {
-        fetch(`${Config.DATA_HOST}/getTimeIndexes?sensorName=${sensor}&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoi}`)
+    const queryDataset = async () => {
+        let aoiCode = aoi;
+        if (aoi === 'current_extent') {
+            console.log(props.map.mapView.extent);
+            let gj = {
+                "coordinates": [
+                    [
+                        [
+                            props.map.mapView.extent.getEast(),
+                            props.map.mapView.extent.getSouth()
+                        ],
+                        [
+                            props.map.mapView.extent.getEast(),
+                            props.map.mapView.extent.getNorth()
+                        ],
+                        [
+                            props.map.mapView.extent.getWest(),
+                            props.map.mapView.extent.getNorth()
+                        ],
+                        [
+                            props.map.mapView.extent.getWest(),
+                            props.map.mapView.extent.getSouth()
+                        ],
+                        [
+                            props.map.mapView.extent.getEast(),
+                            props.map.mapView.extent.getSouth()
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+            let aoiData = await DataService.addAoi(JSON.stringify(gj), "Temp")
+            aoiCode = aoiData.data;
+        }
+        fetch(`${Config.DATA_HOST}/getTimeIndexes?sensorName=${sensor}&fromTs=${fromDate.getTime()}&toTs=${toDate.getTime()}&aoi_code=${aoiCode}`)
             .then(r => r.json())
             .then(r => {
                 if (r.data.length > 0) {
@@ -130,6 +164,7 @@ const QueryPanel = (props) => {
                         return <MenuItem value={aoiLayer.aoiCode}>{aoiLayer.name}</MenuItem>
                     })
                 }
+                <MenuItem value={"current_extent"}>Current extent</MenuItem>
 
             </Select>
         </FormControl>

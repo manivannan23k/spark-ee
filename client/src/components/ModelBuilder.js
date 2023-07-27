@@ -28,9 +28,9 @@ const ModelBuilder = (props) => {
      * 3) Output - 
      */
 
-    const datasets = [
-        {
-            id: 'landsat_8',
+    const datasets = {
+        Landsat_OLI: {
+            id: 'Landsat_OLI',
             dataType: 'int16',
             noOfBands: 7,
             name: "Landsat 8",
@@ -86,8 +86,48 @@ const ModelBuilder = (props) => {
                     max: 4200
                 }
             ]
+        },
+        LISS3: {
+            id: 'LISS3',
+            dataType: 'int16',
+            noOfBands: 4,
+            name: "LISS 3",
+            description: "LISS 3",
+            defaultColorScheme: {
+                type: "stretched",
+                colorRamp: [
+                    "#000000",
+                    "#ffffff"
+                ]
+            },
+            bandMeta: [
+                {
+                    name: "Band 1",
+                    description: "Coastal Aerosol",
+                    min: 2,
+                    max: 1000
+                },
+                {
+                    name: "Band 2",
+                    description: "Blue",
+                    min: 100,
+                    max: 1200
+                },
+                {
+                    name: "Band 3",
+                    description: "Green",
+                    min: 300,
+                    max: 1600
+                },
+                {
+                    name: "Band 4",
+                    description: "Red",
+                    min: 0,
+                    max: 2600
+                }
+            ]
         }
-    ]
+    };
 
     let inputTypes = ['in_raster_band', 'in_raster_layer'];
     let outputTypes = ['out_raster_band', 'out_raster_layer'];
@@ -346,6 +386,8 @@ const ModelBuilder = (props) => {
                                             component.isTemporal = layer.tIndexes.length > 1;
                                             component.dsName = layer.dsId;
                                             component.id = changes.value
+                                            component.noOfBands = layer.noOfBands;
+                                            console.log(layer)
                                             component.loc = '100 100'
                                             break;
                                     }

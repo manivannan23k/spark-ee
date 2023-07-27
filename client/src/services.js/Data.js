@@ -14,7 +14,7 @@ const DataService = {
                 })
         })
     },
-    addAoi: (aoiGj, aoiName) => {
+    addAoi: (aoiGj, aoiName, isTemp) => {
         return new Promise((resolve, reject) => {
             fetch(`${Config.DATA_HOST}/addAoi`, {
                 method: "POST",
@@ -24,7 +24,8 @@ const DataService = {
                 },
                 body: JSON.stringify({
                     aoiGj: aoiGj,
-                    aoiName: aoiName
+                    aoiName: aoiName,
+                    isTemp: isTemp ? true : false
                 })
             })
                 .then(r => r.json())

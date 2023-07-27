@@ -32,7 +32,7 @@ const AppModal = (props) => {
                         border: '2px solid #000',
                         boxShadow: 24,
                         p: 4,
-                        maxHeight: 700
+                        maxHeight: 850
                         // height: props.height || 600,//'calc(100vh - 200px)'
                     }
                 }>

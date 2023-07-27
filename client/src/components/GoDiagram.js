@@ -342,7 +342,7 @@ const GoDiagram = (props) => {
                             color1: 'rgb(151 255 178)',
                             // loc: component.loc,
                             defaultBand: component.band ? `Band ${component.band}` : "-",
-                            bchoices: component.id ? Array(component.noOfBands).fill(0).map((e, i) => `Band ${i + 1}`) : [],
+                            bchoices: component.id ? Array(component.noOfBands).fill(0).map((e, i) => `Band ${i}`) : [],
                             lchoices: layers.map(l => l.id),
                             defaultLayer: component.id ? `Layer: ${component.id}` : "-",
                             bandEdited: (e) => {
@@ -361,11 +361,11 @@ const GoDiagram = (props) => {
                     case "in_raster_layer":
                         node = {
                             key: component.componentId,
-                            text: component.name,
+                            text: component.name === "" ? "Double Click here" : component.name,
                             color1: 'rgb(151 255 178)',
-                            bchoices: component.id ? Array(component.noOfBands).fill(0).map((e, i) => `Band ${i + 1}`) : [],
+                            bchoices: component.id ? Array(component.noOfBands).fill(0).map((e, i) => `Band ${i}`) : [],
                             lchoices: layers.map(l => `${l.name}->${l.id}`),
-                            defaultLayer: layers.map(l => `${l.name}:${l.id}`).filter(e => e.indexOf(component.id)).length > 0 ? layers.map(l => `${l.name}:${l.id}`).filter(e => e.indexOf(component.id))[0] : '',
+                            defaultLayer: layers.map(l => `${l.name}:${l.id}`).filter(e => e.indexOf(component.id)).length > 0 ? layers.map(l => `${l.name}:${l.id}`).filter(e => e.indexOf(component.id))[0] : 'Double Click here',
                             layerEdited: (e) => {
                                 handleModelChange({
                                     nodeId: component.componentId, value: e.text.split('->')[1], eventType: "nodeUpdate", type: component.type + '#' + 'Layer', nodeType: "inputs"
@@ -390,7 +390,7 @@ const GoDiagram = (props) => {
                             }
                             return false;
                         }).map(inLayer => {
-                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i + 1}`)
+                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i}`)
                         }).flat()
 
                         node = {
@@ -398,8 +398,8 @@ const GoDiagram = (props) => {
                             text: component.name,
                             b1choices: ndiL1,
                             b2choices: ndiL1,
-                            b1: component.b1,
-                            b2: component.b2,
+                            b1: !Boolean(component.b1) ? "Double Click here" : component.b1,
+                            b2: !Boolean(component.b2) ? "Double Click here" : component.b2,
                             color1: 'rgb(255 251 133)',
                             layerEdited1: (e) => {
                                 handleModelChange({
@@ -470,7 +470,7 @@ const GoDiagram = (props) => {
                             }
                             return false;
                         }).map(inLayer => {
-                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i + 1}`)
+                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i}`)
                         }).flat()
                         node = {
                             key: component.componentId,

@@ -86,6 +86,12 @@ const MapLayers = (props) => {
                             url={`${Config.DATA_HOST}/tilem/${layer.dsId}/{z}/{x}/{y}.png?tIndexes=${layer.tIndexes.join(",")}&bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}&aoi_code=${layer.aoiCode}`}
                             maxZoom={24}
                         />
+
+                    case 'OUTPUT_DATA_TILE':
+                        return <TileLayer key={layer.id}
+                            url={`${Config.DATA_HOST}/tilemo/${layer.dsId}/{z}/{x}/{y}.png?bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}`}
+                            maxZoom={24}
+                        />
                 }
                 return '';
             })

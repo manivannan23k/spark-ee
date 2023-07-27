@@ -55,6 +55,33 @@ const TasksList = (props) => {
                         <div style={{ display: 'inline' }}>{tindx + 1}.{task.name} ({task.id})</div>
                         {task.status === 'COMPLETED' ? <div style={{ display: 'inline', float: 'right' }}>
                             <Button onClick={() => {
+                                console.log(task);
+                                let lId = (Math.random() + 1).toString(36).substring(6);
+                                let layer = {
+                                    type: 'OUTPUT_DATA_TILE',
+                                    group: 'RASTER_DATA',
+                                    id: lId,
+                                    active: true,
+                                    // tIndex: firstResult.tIndex,
+                                    // tIndexes: props.map.queryResults.map(qr => qr.tIndex),
+                                    // aoiCode: firstResult['aoiCode'],
+                                    dsId: "output_" + task['id'],
+                                    // noOfBands: firstResult['dsData']['no_of_bands'],
+                                    name: "Output " + task['id'], // + ": " + firstResult.dsName,//'Layer: ' + firstResult.dsName + " #" + lId,
+                                    sortOrder: 0,
+                                    showLegend: false,
+                                    showInLayerList: true,
+                                    style: {
+                                        min: 0,
+                                        max: 1,
+                                        bands: [4, 3, 2],
+                                        type: "rgb"
+                                    }
+                                }
+                                dispatch(addLayer(layer));
+                                //https://test2.gishorizon.com/tilemo/output_UZFMUJOCKEJMTGML/12/2936/1686.png
+                            }} >View</Button>
+                            <Button onClick={() => {
                                 var url = `${Config.DATA_HOST}/process/download?pid=${task.id}`;
                                 window.open(url, '_blank');
                             }} >Download</Button>
