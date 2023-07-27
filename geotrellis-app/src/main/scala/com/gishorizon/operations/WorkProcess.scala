@@ -152,7 +152,7 @@ object WorkProcess {
         val od: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(Spark.context.parallelize(d.toSeq), TileLayerMetadata(outMeta.cellType, outMeta.layout, outMeta.extent, outMeta.crs, outMeta.bounds.asInstanceOf[Bounds[SpatialKey]]))
         val raster: Raster[MultibandTile] = od.stitch
         Logger.log("Stitch complete")
-        val fPath = f"/projects/data/project/temp_data/${
+        val fPath = f"/home/datacube/project/data_dir/temp_data/${
           Iterator.continually(Random.nextPrintableChar)
             .filter(_.isLetter)
             .take(16)
@@ -312,7 +312,7 @@ object WorkProcess {
 
     val result = WorkProcess.run(processConfig)
     print(result.mkString(","))
-    Files.write(Paths.get("G:/ProjectData/geoprocess/" + processId + ".out"), result.mkString(", ").getBytes(StandardCharsets.UTF_8))
+    Files.write(Paths.get("/home/datacube/project/data_dir/geoprocess/" + processId + ".out"), result.mkString(", ").getBytes(StandardCharsets.UTF_8))
 //    Files.write(Paths.get("/projects/data/project/geoprocess/" + processId + ".out"), result.mkString(", ").getBytes(StandardCharsets.UTF_8))
     print("Process completed")
   }

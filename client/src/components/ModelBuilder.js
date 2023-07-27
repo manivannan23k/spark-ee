@@ -32,7 +32,7 @@ const ModelBuilder = (props) => {
         {
             id: 'landsat_8',
             dataType: 'int16',
-            noOfBands: 7,
+            noOfBands: 4,
             name: "Landsat 8",
             description: "OLI Landsat 8",
             defaultColorScheme: {
@@ -113,7 +113,7 @@ const ModelBuilder = (props) => {
                 "layerName": "",
                 "type": c.type,
                 "name": c.name,
-                "noOfBands": 7,
+                "noOfBands": 4,
                 "band": "",
                 "loc": "0 0",
                 "prevLoc": null

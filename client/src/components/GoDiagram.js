@@ -390,7 +390,7 @@ const GoDiagram = (props) => {
                             }
                             return false;
                         }).map(inLayer => {
-                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i + 1}`)
+                            return Array(inLayer.noOfBands).fill(0).map((e, i) => `Layer ${inLayer.id}: B_${i}`)
                         }).flat()
 
                         node = {
