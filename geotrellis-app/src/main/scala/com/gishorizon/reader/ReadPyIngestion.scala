@@ -23,7 +23,7 @@ import java.io.File
 object ReadPyIngestion {
 
   private val appBasePath = "C:/Users/ManiChan/Desktop/Project/spark-ee/geotrellis-app/"
-  def run(implicit sc: SparkContext): Unit = {
+  def run(sc: SparkContext): Unit = {
 
     val tIndex = 978413100L * 1000
     val indexStartTime = ZonedDateTime.parse("1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)))
@@ -60,7 +60,7 @@ object ReadPyIngestion {
             rasterSource.extent,
             TileLayout(rasterSource.tile.cols, rasterSource.tile.rows, rasterSource.tile.cols, rasterSource.tile.rows)
           )
-        )
+        )(sc)
 
         println(rowRdd)
 

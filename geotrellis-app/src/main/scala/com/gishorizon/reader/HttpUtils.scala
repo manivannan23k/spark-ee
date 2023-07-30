@@ -18,11 +18,6 @@ object HttpUtils {
       inputStream.close()
       val json: JsValue = Json.parse(responseBody)
       callback(true, json)
-//      if (json.asInstanceOf[JsObject].value("error").toString() == "false") {
-//
-//      } else {
-//
-//      }
     } else {
       callback(false, null)
     }
@@ -40,11 +35,6 @@ object HttpUtils {
       val responseBody = Source.fromInputStream(inputStream).mkString
       inputStream.close()
       json = Json.parse(responseBody)
-      //      if (json.asInstanceOf[JsObject].value("error").toString() == "false") {
-      //
-      //      } else {
-      //
-      //      }
     }
     connection.disconnect()
     json

@@ -6,6 +6,7 @@ scalaVersion := "2.13.8"
 mainClass := Some("com.gishorizon.operations.WorkProcess")
 val akkaV       = "2.7.0"
 val akkaHttpV   = "10.4.0"
+retrieveManaged := true
 
 libraryDependencies ++= Seq(
   "com.monovore" %% "decline" % "1.2.0",

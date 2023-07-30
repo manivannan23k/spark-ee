@@ -16,7 +16,7 @@ object FPCA {
 //    run(sc)
 //  }
 
-  def run(implicit sc: SparkContext, matrix: BlockMatrix): (BlockMatrix, BlockMatrix) = { //v: Array[Vector]
+  def run(sc: SparkContext, matrix: BlockMatrix): (BlockMatrix, BlockMatrix) = { //v: Array[Vector]
     val N = matrix.numRows().toInt
     val L = 1
     val _N = matrix.numRows().toInt
@@ -54,7 +54,7 @@ object FPCA {
     (components, FPCA)
   }
 
-  def test(implicit sc: SparkContext, arr: Array[IndexedRow]): (BlockMatrix, BlockMatrix) = {
+  def test(sc: SparkContext, arr: Array[IndexedRow]): (BlockMatrix, BlockMatrix) = {
     val matrix = new IndexedRowMatrix(sc.parallelize(arr)).toBlockMatrix().cache()
     val N = matrix.numRows().toInt
     val L = 1

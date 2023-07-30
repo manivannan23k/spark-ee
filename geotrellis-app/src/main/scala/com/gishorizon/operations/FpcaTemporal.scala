@@ -72,7 +72,7 @@ object FpcaTemporal {
             mt.foreachDouble((v: Array[Double]) => {
               _d = _d :+ v
             })
-            Logger.log("Tile to double...")
+            println("[APP_LOG] " + DateTime.now() + "Tile to double...")
             (k, _d)
           }
         }
@@ -118,7 +118,7 @@ object FpcaTemporal {
             }
             _d = _d :+ data
           }
-          Logger.log("Tile to IRow...")
+          println("[APP_LOG] " + DateTime.now() + "Tile to IRow...")
           (k, _d)
         }
       }
@@ -127,7 +127,7 @@ object FpcaTemporal {
       val _t: RDD[(SpaceTimeKey, MultibandTile)] = t
         .map {
           case (k, v) =>
-            Logger.log("Running FPCA")
+            println("[APP_LOG] " + DateTime.now() + "Running FPCA")
             val o: Array[Array[Double]] = v.map {
               __v => {
                 if(__v.forall(p =>
@@ -176,7 +176,7 @@ object FpcaTemporal {
               }
             }
 
-            Logger.log("FPCA tile generation...")
+            println("[APP_LOG] " + DateTime.now() + "FPCA tile generation...")
             (k, MultibandTile(
               _o.map {
                 _v => {
@@ -208,7 +208,7 @@ object FpcaTemporal {
         }
         .map{
           case (k, t) => {
-            Logger.log("FPCA Done")
+            println("[APP_LOG] " + DateTime.now() + "FPCA Done")
             (SpaceTimeKey(k, meta.bounds.get.maxKey.time), t)
           }
         }

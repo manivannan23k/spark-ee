@@ -13,12 +13,12 @@ import java.time.format.DateTimeFormatter
 object TileServerUtils {
 
   def getCatalogDetails(
-                         implicit sc: SparkContext,
+                         sc: SparkContext,
                          path: String,
                          layerName: String
                        ): (FileLayerReader, Int) = {
     val outputCatalogPath = path
-    val reader = FileLayerReader(outputCatalogPath)
+    val reader = FileLayerReader(outputCatalogPath)(sc)
     val layerIds = reader.attributeStore.layerIds.filter { id => id.name == layerName }
     val zooms = layerIds.map {
       _.zoom

@@ -1,6 +1,6 @@
 const Config = {
-    DATA_HOST: "https://test2.gishorizon.com",
-    PROCESS_HOST: "https://test2.gishorizon.com"
+    DATA_HOST: "http://130.211.234.246:8080",
+    PROCESS_HOST: "http://130.211.234.246:8080"
 }
 export default Config;
 

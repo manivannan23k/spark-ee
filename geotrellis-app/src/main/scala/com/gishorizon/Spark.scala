@@ -5,7 +5,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object Spark {
   def conf: SparkConf = new SparkConf()
-    .setIfMissing("spark.master", "local[*]")
+    .setIfMissing("spark.master", DataConfigs.SPARK_MASTER)
 //    .setIfMissing("spark.master", "yarn")
     .set("spark.submit.deployMode", "cluster")
 //    .setIfMissing("spark.master", "spark://localhost:7077")
@@ -23,8 +23,8 @@ object Spark {
     .set("spark.kryo.registrator", "geotrellis.spark.store.kryo.KryoRegistrator")
     .set("spark.executor.userClassPathFirst", "true")
 //    .set("spark.sql.warehouse.dir", "file:///c:/tmp/spark-warehouse")
-    .set("spark.driver.memory", "4g")
-    .set("spark.executor.memory", "4g")
+    .set("spark.driver.memory", DataConfigs.DRI_MEM)
+    .set("spark.executor.memory", DataConfigs.EXE_MEM)
 //    .setExecutorEnv("GEOTRELLIS_HOME", Properties.envOrElse("GEOTRELLIS_HOME", "/usr/local/geotrellis"))
 //    .setJars(Array[String](
 //      "/usr/local/geotrellis/geotrellis-spark_2.12-3.6.0-SNAPSHOT.jar",
@@ -47,7 +47,7 @@ object Spark {
 //  session.sparkContext.addJar("G:\\geotrellis-spark_2.13-3.6.3.jar")
 //  session.sparkContext.addJar("G:\\geotrellis-gdal_2.13-3.6.3.jar")
 //  session.sparkContext.addJar("G:\\geotrellis-raster_2.13-3.6.3.jar")
-//  session.sparkContext.addJar("/mnt/data/common/geotrellis-spark-job-assembly-0.1.0.jar")
+////  session.sparkContext.addJar("/mnt/data/common/geotrellis-spark-job-assembly-0.1.0.jar")
 //  session.sparkContext.addJar("G:\\geotrellis-vector_2.13-3.6.3.jar")
 //  session.sparkContext.addJar("G:\\geotrellis-util_2.13-3.6.3.jar")
 //  session.sparkContext.addJar("G:\\geotrellis-s3_2.13-3.6.3.jar")

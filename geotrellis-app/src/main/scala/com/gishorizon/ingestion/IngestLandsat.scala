@@ -7,6 +7,7 @@ import geotrellis.raster.MultibandTile
 import geotrellis.raster.resample.{Bilinear, NearestNeighbor}
 import geotrellis.spark.pyramid.Pyramid
 import geotrellis.spark.reproject.TileRDDReprojectMethods
+import geotrellis.spark.store.RasterReader
 import geotrellis.spark.store.file.FileLayerWriter
 import geotrellis.spark.{CollectTileLayerMetadata, ContextRDD, withTilerMethods}
 import geotrellis.spark.store.hadoop.{HadoopGeoTiffRDD, HadoopLayerWriter}
@@ -28,7 +29,7 @@ object IngestLandsat {
   private val appConf = ConfigFactory.load()
   val layerName = "Landsat8"
 
-  def run(implicit sc: SparkContext, srcPath: String, dataTime: String, catalogType: String): Unit = {
+  def run(sc: SparkContext, srcPath: String, dataTime: String, catalogType: String): Unit = {
 
     val sRdd = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
       path = new Path(srcPath),
@@ -38,7 +39,7 @@ object IngestLandsat {
         }
       },
       options = HadoopGeoTiffRDD.Options.DEFAULT
-    )
+    )(sc, RasterReader.multibandGeoTiffReader)
     val (zoom, meta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](sRdd, FloatingLayoutScheme(256))
 
     val tiled: RDD[(SpaceTimeKey, MultibandTile)] = sRdd.tileToLayout(
