@@ -45,6 +45,24 @@ object  Main {
   }
   def main(args: Array[String]): Unit = {
     val sc: SparkContext = Spark.context
+    val p = "hdfs://localhost:9000/o.tif"
+    val layer: RDD[(ProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, ProjectedExtent, MultibandTile](
+      path = new Path(p),
+      uriToKey = {
+        case (uri, projectedExtent) =>
+          val ts = uri.toString.split("/").last.replace(".tif", "").toLong
+          projectedExtent
+      },
+      options = HadoopGeoTiffRDD.Options.DEFAULT
+    )(sc, RasterReader.multibandGeoTiffReader)
+    val (zoom, meta) = CollectTileLayerMetadata.fromRDD[ProjectedExtent, MultibandTile, SpatialKey](layer, FloatingLayoutScheme(256))
+    var tiled: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(
+      layer.tileToLayout(meta.cellType, meta.layout),
+      meta
+    )
+    tiled.collect()
+    print(tiled)
+
 //    val d1: Array[Double] = Array(3, 2, 5, 1, 4, 5, 2, 3, 5, 4, 3, 2)
 //    val d2: Array[Double] = Array(3, 2, 5, 1, 4, 5, 2, 3, 5, 4, 3, 2)
 //    val d3: Array[Double] = Array(5, 2, 3, 1, 4, 5, 2, 3, 5, 4, 3, 2)
@@ -61,53 +79,53 @@ object  Main {
 //    }
 //    println(DateTime.now().toString() + "----------------END-----------------")
 
-    var dir = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1734/"
-    val f1 = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1734/1690659094429.tif"
-    val f2 = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1734/1690659094449.tif"
-    val f3 = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1735/1690659094489.tif"
-    val ps = Array(f1, f2, f3)
-    var rdd: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
-    for (p <- ps) {
-      val layer: RDD[(TemporalProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
-        path = new Path(p),
-        uriToKey = {
-          case (uri, projectedExtent) =>
-            val ts = uri.toString.split("/").last.replace(".tif", "").toLong
-            TemporalProjectedExtent(projectedExtent, ZonedDateTime.ofInstant(
-              Instant.ofEpochMilli((ts))
-              , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
-            ))
-        },
-        options = HadoopGeoTiffRDD.Options.DEFAULT
-      )(sc, RasterReader.multibandGeoTiffReader)
-      val (zoom, meta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](layer, FloatingLayoutScheme(256))
-      var tiled: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(
-        layer.tileToLayout(meta.cellType, meta.layout),
-        meta
-      )
-      rdd = rdd :+ tiled
-    }
-    val o = RddUtils.mergeTemporalRdds(rdd)
-    val tPath = DataConfigs.TEMP_PATH
-    val outMeta = o.metadata
-    val fPaths = o
-      .map { case (key, tile) => (key.instant, (key.spatialKey, tile)) }
-      .groupByKey()
-      .map {
-        case (t, d) => {
-          val od: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(Spark.context.parallelize(d.toSeq), TileLayerMetadata(outMeta.cellType, outMeta.layout, outMeta.extent, outMeta.crs, outMeta.bounds.asInstanceOf[Bounds[SpatialKey]]))
-          val raster: Raster[MultibandTile] = od.stitch
-          println("Stitch complete")
-          val fPath = f"$tPath${
-            Iterator.continually(Random.nextPrintableChar)
-              .filter(_.isLetter)
-              .take(16)
-              .mkString
-          }.tif"
-          GeoTiff(raster, o.metadata.crs).write(fPath)
-          fPath
-        }
-      }.collect()
+//    var dir = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1734/"
+//    val f1 = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1734/1690659094429.tif"
+//    val f2 = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1734/1690659094449.tif"
+//    val f3 = "G:/ProjectData/tiles/Landsat_OLI/12/3060/1735/1690659094489.tif"
+//    val ps = Array(f1, f2, f3)
+//    var rdd: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
+//    for (p <- ps) {
+//      val layer: RDD[(TemporalProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
+//        path = new Path(p),
+//        uriToKey = {
+//          case (uri, projectedExtent) =>
+//            val ts = uri.toString.split("/").last.replace(".tif", "").toLong
+//            TemporalProjectedExtent(projectedExtent, ZonedDateTime.ofInstant(
+//              Instant.ofEpochMilli((ts))
+//              , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
+//            ))
+//        },
+//        options = HadoopGeoTiffRDD.Options.DEFAULT
+//      )(sc, RasterReader.multibandGeoTiffReader)
+//      val (zoom, meta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](layer, FloatingLayoutScheme(256))
+//      var tiled: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(
+//        layer.tileToLayout(meta.cellType, meta.layout),
+//        meta
+//      )
+//      rdd = rdd :+ tiled
+//    }
+//    val o = RddUtils.mergeTemporalRdds(rdd)
+//    val tPath = DataConfigs.TEMP_PATH
+//    val outMeta = o.metadata
+//    val fPaths = o
+//      .map { case (key, tile) => (key.instant, (key.spatialKey, tile)) }
+//      .groupByKey()
+//      .map {
+//        case (t, d) => {
+//          val od: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(Spark.context.parallelize(d.toSeq), TileLayerMetadata(outMeta.cellType, outMeta.layout, outMeta.extent, outMeta.crs, outMeta.bounds.asInstanceOf[Bounds[SpatialKey]]))
+//          val raster: Raster[MultibandTile] = od.stitch
+//          println("Stitch complete")
+//          val fPath = f"$tPath${
+//            Iterator.continually(Random.nextPrintableChar)
+//              .filter(_.isLetter)
+//              .take(16)
+//              .mkString
+//          }.tif"
+//          GeoTiff(raster, o.metadata.crs).write(fPath)
+//          fPath
+//        }
+//      }.collect()
 
 //    var bm = "fpca"
 //    if(args.length > 0){
