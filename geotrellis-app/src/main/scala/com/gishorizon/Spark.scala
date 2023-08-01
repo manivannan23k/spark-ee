@@ -56,4 +56,5 @@ object Spark {
 //  session.sparkContext.addJar("G:\\geotrellis-store_2.13-3.6.3.jar")
 //  session.sparkContext.addJar("G:\\geotrellis-proj4_2.13-3.6.3.jar")
   implicit def context: SparkContext = session.sparkContext
+  context.setCheckpointDir('/mnt/data/chkpts')
 }
