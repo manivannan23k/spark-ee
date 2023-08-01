@@ -211,6 +211,7 @@ object RddUtils {
       }
     }, meta)
     println(meta)
+    tmp.checkpoint()
     tmp
 //    val outProj: Array[RDD[(TemporalProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = outputData.map(o => {
 //      ContextRDD(

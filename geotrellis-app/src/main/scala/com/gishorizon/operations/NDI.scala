@@ -41,6 +41,7 @@ object NDI {
           mt
         }), m)
 
+    rdd.checkpoint()
     rdd.cache()
   }
 

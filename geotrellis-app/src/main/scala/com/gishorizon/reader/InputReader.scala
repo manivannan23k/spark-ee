@@ -85,6 +85,7 @@ object InputReader {
         , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
       )
       val rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, filePath, 256, dt)
+      rdd.checkpoint()
       rdds = rdds :+ rdd
     }
     val merged = RddUtils.mergeTemporalRdds(rdds)
@@ -97,6 +98,7 @@ object InputReader {
     for(input <- inputs){
       var rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = if (input.isTemporal) getInputRddTemporal(sc, input) else getInputRdd1Temporal(sc, input)
       rdd = rdd.cache()
+      rdd.checkpoint()
       rddMap += (
         input.id -> rdd
       )

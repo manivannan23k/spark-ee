@@ -52,7 +52,7 @@ object Mosaic {
     val intervalStart = new DateTime(startTs) //new DateTime(1989, 11, 1, 0, 0, 0, DateTimeZone.UTC)
     val intervalEnd = new DateTime(endTs) //new DateTime(1990, 2, 1, 0, 0, 0, DateTimeZone.UTC)
     val interval = new Interval(intervalStart, intervalEnd)
-    val inRdds: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(inputs(i.id)
+    val r1 = inputs(i.id)
       .groupBy {
         case (k, r) => {
           val time = k.time
@@ -65,7 +65,9 @@ object Mosaic {
             (SpaceTimeKey(k.spatialKey, TemporalKey(intervalKey.toInstant.getMillis)), t)
           }
         }
-      }.reduceByKey(
+      }
+    r1.checkpoint()
+    val inRdds: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(r1.reduceByKey(
       (t1: MultibandTile, t2: MultibandTile) => {
         var tils: Array[Tile] = Array()
         for (i <- 0 until t1.bandCount) {
@@ -88,6 +90,7 @@ object Mosaic {
       }
     ), m)
 
+    inRdds.checkpoint()
     inRdds.cache()
 
   }
