@@ -28,9 +28,3 @@ class ProcessOperation {
   var output: ProcessOutput = new ProcessOutput()
   var params: String = ""
 }
-
-
-//case class ProcessInput(id: String, tIndexes: Array[BigInt], isTemporal: Boolean, aoiCode: String, dsName: String, band: Int)
-//case class ProcessOutput(id: String, dsName: String)
-//case class ProcessOperation(id: String, opType: String, inputs: Array[ProcessInput], output: ProcessOutput)
-//case class ProcessConfig(inputs: Array[ProcessInput], operations: Array[ProcessOperation], output: Array[ProcessOutput])

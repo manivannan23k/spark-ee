@@ -181,34 +181,60 @@ object RddUtils {
         meta = meta.merge(o.metadata)
       }
     }
-//    val ratio = Math.round(((meta.extent.xmax - meta.extent.xmin) / (meta.extent.ymax - meta.extent.ymin)) / (((outputData(0).metadata.extent.xmax - outputData(0).metadata.extent.xmin)) / ((outputData(0).metadata.extent.ymax - outputData(0).metadata.extent.ymin))))
     val xTileSize = (meta.layout.extent.xmax-meta.layout.extent.xmin)/outputData(0).metadata.layout.cellwidth //256 * (outputData.length * ratio)
     val yTileSize = (meta.layout.extent.ymax-meta.layout.extent.ymin)/outputData(0).metadata.layout.cellwidth //256 * (outputData.length / ratio)
-    meta = TileLayerMetadata(meta.cellType, new LayoutDefinition(meta.layout.extent, new TileLayout(1, 1, xTileSize.toInt, yTileSize.toInt)), meta.extent, meta.crs, meta.bounds)
-    println(meta)
-    val outProj: Array[RDD[(TemporalProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = outputData.map(o => {
-      ContextRDD(
-        o.map {
-          case (k, t) => {
-            (TemporalProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs, k.instant), t)
+    meta = TileLayerMetadata(
+      meta.cellType,
+      new LayoutDefinition(
+        meta.layout.extent,
+        new TileLayout(
+          Math.ceil((xTileSize)/256).toInt,
+          Math.ceil((yTileSize)/256).toInt,
+          256,
+          256)), meta.extent, meta.crs, meta.bounds)
+
+    val tmp = ContextRDD(outputData.map {
+      rd => {
+        rd.map {
+          case (k, v) => {
+            val e = k.spatialKey.extent(rd.metadata.layout)
+            val fe = meta.layout.extent
+            val c: Int = Math.ceil((fe.ymax - e.ymax) / meta.layout.cellSize.height / 256).toInt
+            val r: Int = Math.ceil((e.xmin-fe.xmin) / meta.layout.cellSize.width / 256).toInt
+            (SpaceTimeKey(SpatialKey(r, c), k.temporalKey), v)
           }
-        }, o.metadata
-      )
-    })
-    var out: RDD[(TemporalProjectedExtent, MultibandTile)] = outProj(0)
-    outProj.foreach {
-      o => {
-        out = out.merge(o)
+        }
       }
-    }
-    val result = ContextRDD(out, meta)
-
-    val (zoom, newmeta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](result, FloatingLayoutScheme(256))
-    ContextRDD(result.tileToLayout(newmeta.cellType, newmeta.layout), newmeta)
-
-    //    result.tileToLayout(
-    //      meta
-    //    )
+    }.reduce {
+      (a, b) => {
+        a.merge(b)
+      }
+    }, meta)
+    println(meta)
+    tmp
+//    val outProj: Array[RDD[(TemporalProjectedExtent, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = outputData.map(o => {
+//      ContextRDD(
+//        o.map {
+//          case (k, t) => {
+//            (TemporalProjectedExtent(o.metadata.mapTransform(k), o.metadata.crs, k.instant), t)
+//          }
+//        }, o.metadata
+//      )
+//    })
+//    var out: RDD[(TemporalProjectedExtent, MultibandTile)] = outProj(0)
+//    outProj.foreach {
+//      o => {
+//        out = out.merge(o)
+//      }
+//    }
+//    val result = ContextRDD(out, meta)
+//
+//    val (zoom, newmeta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](result, FloatingLayoutScheme(256))
+//    ContextRDD(result.tileToLayout(newmeta.cellType, newmeta.layout), newmeta)
+//
+//    //    result.tileToLayout(
+//    //      meta
+//    //    )
   }
 
   def mosaicSTRddToSingle(): Unit = {

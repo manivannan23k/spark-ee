@@ -1,6 +1,6 @@
 const Config = {
-    DATA_HOST: "http://130.211.234.246:8080",
-    PROCESS_HOST: "http://130.211.234.246:8080"
+    DATA_HOST: "http://34.16.15.77:8080",
+    PROCESS_HOST: "http://34.16.15.77:8080"
 }
 export default Config;
 
