@@ -41,7 +41,7 @@ object NDI {
           mt
         }), m)
 
-    rdd
+    rdd.cache()
   }
 
 

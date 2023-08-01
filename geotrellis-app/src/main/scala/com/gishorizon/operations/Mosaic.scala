@@ -88,7 +88,7 @@ object Mosaic {
       }
     ), m)
 
-    inRdds
+    inRdds.cache()
 
   }
 

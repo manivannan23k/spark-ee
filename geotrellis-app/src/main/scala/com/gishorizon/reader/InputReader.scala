@@ -95,7 +95,8 @@ object InputReader {
   def getInputs(sc: SparkContext, inputs: Array[ProcessInput]): mutable.Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = {
     var rddMap = mutable.Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]]()
     for(input <- inputs){
-      val rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = if (input.isTemporal) getInputRddTemporal(sc, input) else getInputRdd1Temporal(sc, input)
+      var rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = if (input.isTemporal) getInputRddTemporal(sc, input) else getInputRdd1Temporal(sc, input)
+      rdd = rdd.cache()
       rddMap += (
         input.id -> rdd
       )
