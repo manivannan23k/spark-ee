@@ -50,7 +50,6 @@ object  Main {
       path = new Path(p),
       uriToKey = {
         case (uri, projectedExtent) =>
-          val ts = uri.toString.split("/").last.replace(".tif", "").toLong
           projectedExtent
       },
       options = HadoopGeoTiffRDD.Options.DEFAULT
