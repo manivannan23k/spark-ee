@@ -48,8 +48,8 @@ object RddUtils {
     var extent: Extent = null
     var crs: CRS = null
     var cellType: CellType = null
-    var cellHeight: Double = null
-    var cellWidth: Double = null
+    var cellHeight: Double = 0.0
+    var cellWidth: Double = 0.0
     var maxTime: Instant = null
     var minTime: Instant = null
     val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
