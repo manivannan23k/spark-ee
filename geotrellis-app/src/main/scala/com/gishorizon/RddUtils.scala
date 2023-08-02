@@ -1,8 +1,8 @@
 package com.gishorizon
 
-import geotrellis.layer.{FloatingLayoutScheme, LayoutDefinition, Metadata, SpaceTimeKey, SpatialKey, TemporalProjectedExtent, TileLayerMetadata}
+import geotrellis.layer.{Bounds, FloatingLayoutScheme, LayoutDefinition, Metadata, SpaceTimeKey, SpatialKey, TemporalKey, TemporalProjectedExtent, TileLayerMetadata}
 import geotrellis.proj4.CRS
-import geotrellis.raster.{MultibandTile, Tile, TileLayout}
+import geotrellis.raster.{CellType, MultibandTile, Tile, TileLayout}
 import geotrellis.raster.geotiff.GeoTiffRasterSource
 import geotrellis.raster.io.geotiff.MultibandGeoTiff
 import geotrellis.raster.io.geotiff.reader.GeoTiffReader
@@ -19,7 +19,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.joda.time.DateTime
 
-import java.time.{ZoneOffset, ZonedDateTime}
+import java.time.{Instant, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 
 object RddUtils {
@@ -43,50 +43,92 @@ object RddUtils {
     tiled
   }
 
-  def getMultiTiledTemporalRDDWithMeta(sc: SparkContext, inputFiles: String, tileSize: Int, dt: ZonedDateTime): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
+  def getMultiTiledTemporalRDDWithMeta(sc: SparkContext, inputFiles: Array[String], tileSize: Int): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
 
     var extent: Extent = null
     var crs: CRS = null
-    print(DateTime.now() + "------READ ALL 10 TIFFs-----")
-//    sc.parallelize(inputFiles).map{
-//      case (inputFile) => {
-//        val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFile)
-//      }
-//    }
-//
-    for(i <- 0 to 10000){
-      val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFiles)
+    var cellType: CellType = null
+    var cellHeight: Double = null
+    var cellWidth: Double = null
+    var maxTime: Instant = null
+    var minTime: Instant = null
+    val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
+
+
+    print(DateTime.now() + "------START READING TIFF META-----")
+    for(i <- inputFiles.indices){
+      val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFiles(i))
       crs = gt.crs
+      cellHeight = gt.raster.cellSize.height
+      cellWidth = gt.raster.cellSize.width
+      cellType = gt.cellType
+      val tIndex = inputFiles(i).split("/").last.split(".tif").head.toInt
+      val instant = Instant.ofEpochMilli((sTs + tIndex * 1000L))
+      if(maxTime.toEpochMilli<instant.toEpochMilli){
+        maxTime = instant
+      }
+      if (minTime.toEpochMilli > instant.toEpochMilli) {
+        minTime = instant
+      }
       if(extent == null){
         extent = gt.extent
       }
       else{
         extent = extent.combine(gt.extent)
       }
-      if(i%100==0){
-        println(i)
-      }
     }
+    val xTileSize = extent.width / cellWidth
+    val yTileSize = extent.height / cellHeight
+    val maxXKey: Int = Math.ceil(xTileSize/tileSize).toInt
+    val maxYKey: Int = Math.ceil(yTileSize/tileSize).toInt
+
     val pe = ProjectedExtent(extent, crs)
-    print(DateTime.now() + "------DONE READ ALL 10 TIFFs-----")
+    print(DateTime.now() + "------DONE READING TIFF META-----")
     print(pe)
-
-
-
-    val layer: RDD[(TemporalProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
-      path = new Path(inputFiles),
-      uriToKey = {
-        case (uri, projectedExtent) =>
-          TemporalProjectedExtent(projectedExtent, dt)
-      },
-      options = HadoopGeoTiffRDD.Options.DEFAULT
-    )(sc, RasterReader.multibandGeoTiffReader)
-    val (zoom, meta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](layer, FloatingLayoutScheme(tileSize))
-    val tiled: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(
-      layer.tileToLayout(meta.cellType, meta.layout),
-      meta
+    println("Keys", maxXKey, maxYKey)
+    println("Tile Size", xTileSize, yTileSize)
+    val meta = TileLayerMetadata(
+      cellType,
+      new LayoutDefinition(
+        extent,
+        new TileLayout(
+          Math.ceil((xTileSize) / tileSize).toInt,
+          Math.ceil((yTileSize) / tileSize).toInt,
+          tileSize,
+          tileSize
+        )
+      ),
+      extent, crs, Bounds[SpaceTimeKey](SpaceTimeKey(0, 0, minTime.toEpochMilli), SpaceTimeKey(maxXKey, maxYKey, maxTime.toEpochMilli))
     )
-    tiled
+    val rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(sc.parallelize(inputFiles).map{
+      case (inputFile) => {
+        val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFile)
+        val e = extent
+        val fe = gt.extent
+        val tIndex = inputFile.split("/").last.split(".tif").head.toInt
+        val instant = sTs + tIndex * 1000L
+        val c: Int = Math.ceil((fe.ymax - e.ymax) / gt.raster.cellSize.height / 256).toInt
+        val r: Int = Math.ceil((e.xmin - fe.xmin) / gt.raster.cellSize.width / 256).toInt
+        (SpaceTimeKey(SpatialKey(r, c), new TemporalKey(instant)), gt.tile)
+      }
+    }, meta)
+    rdd
+
+
+//    val layer: RDD[(TemporalProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
+//      path = new Path(inputFiles),
+//      uriToKey = {
+//        case (uri, projectedExtent) =>
+//          TemporalProjectedExtent(projectedExtent, dt)
+//      },
+//      options = HadoopGeoTiffRDD.Options.DEFAULT
+//    )(sc, RasterReader.multibandGeoTiffReader)
+//    val (zoom, meta) = CollectTileLayerMetadata.fromRDD[TemporalProjectedExtent, MultibandTile, SpaceTimeKey](layer, FloatingLayoutScheme(tileSize))
+//    val tiled: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(
+//      layer.tileToLayout(meta.cellType, meta.layout),
+//      meta
+//    )
+//    tiled
   }
 
   /***
