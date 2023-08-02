@@ -45,7 +45,7 @@ object  Main {
   }
   def main(args: Array[String]): Unit = {
     val sc: SparkContext = Spark.context
-    val p = "hdfs://localhost:9000/o.tif"
+    val p = "hdfs://localhost:9000/LC08_L2SP_144039_20191226_20200824_02_T1_SR.tif"
     val layer: RDD[(ProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, ProjectedExtent, MultibandTile](
       path = new Path(p),
       uriToKey = {
