@@ -54,7 +54,7 @@ object RddUtils {
 //      }
 //    }
 //
-    for(i <- 0 to 100){
+    for(i <- 0 to 10000){
       val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFiles)
       crs = gt.crs
       if(extent == null){
@@ -63,10 +63,13 @@ object RddUtils {
       else{
         extent = extent.combine(gt.extent)
       }
-      println(i)
+      if(i%100==0){
+        println(i)
+      }
     }
     val pe = ProjectedExtent(extent, crs)
     print(DateTime.now() + "------DONE READ ALL 10 TIFFs-----")
+    print(pe)
 
 
 
