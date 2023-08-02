@@ -107,8 +107,8 @@ object RddUtils {
         val fe = gt.extent
         val tIndex = inputFile.split("/").last.split(".tif").head.toInt
         val instant = sTs + tIndex * 1000L
-        val c: Int = Math.ceil((fe.ymax - e.ymax) / gt.raster.cellSize.height / 256).toInt
-        val r: Int = Math.ceil((e.xmin - fe.xmin) / gt.raster.cellSize.width / 256).toInt
+        val c: Int = Math.ceil((e.ymin-fe.ymin) / gt.raster.cellSize.height / 256).toInt
+        val r: Int = Math.ceil((fe.xmax - e.xmax) / gt.raster.cellSize.width / 256).toInt
         (SpaceTimeKey(SpatialKey(r, c), new TemporalKey(instant)), gt.tile)
       }
     }, meta)
