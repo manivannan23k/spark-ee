@@ -23,7 +23,7 @@ object DataConfigs {
   var TEMP_PATH = "G:/ProjectData/temp_data/"
   var TILE_PATH = "G:/ProjectData/tiles/"
   var DATA_HOST = "https://test2.gishorizon.com"
-  var SPARK_MASTER = "spark://10.128.0.26:7077" //"local[*]"
+  var SPARK_MASTER = "local[*]"
   var EXE_MEM = "12g"
   var DRI_MEM = "12g"
 }

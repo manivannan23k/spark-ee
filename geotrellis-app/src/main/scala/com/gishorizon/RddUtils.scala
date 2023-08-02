@@ -62,8 +62,8 @@ object RddUtils {
       cellHeight = gt.raster.cellSize.height
       cellWidth = gt.raster.cellSize.width
       cellType = gt.cellType
-      val tIndex = inputFiles(i).split("/").last.split(".tif").head.toInt
-      val instant = Instant.ofEpochMilli((sTs + tIndex * 1000L))
+      val instant = Instant.ofEpochMilli(inputFiles(i).split("/").last.split(".tif").head.toLong)
+//      val instant = Instant.ofEpochMilli((sTs + tIndex * 1000L))
       if(maxTime==null || maxTime.toEpochMilli<instant.toEpochMilli){
         maxTime = instant
       }
@@ -106,10 +106,10 @@ object RddUtils {
         val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFile)
         val e = extent
         val fe = gt.extent
-        val tIndex = inputFile.split("/").last.split(".tif").head.toInt
-        val instant = sTs + tIndex * 1000L
-        val c: Int = Math.ceil((e.ymax-fe.ymax) / gt.raster.cellSize.height / 256).toInt
-        val r: Int = Math.round((e.xmin-fe.xmin) / gt.raster.cellSize.width / 256).toInt
+        val instant = inputFile.split("/").last.split(".tif").head.toLong
+//        val instant = sTs + tIndex * 1000L
+        val c: Int = Math.round((e.ymax-fe.ymax) / gt.raster.cellSize.height / 256).toInt
+        val r: Int = Math.round((fe.xmin - e.xmin) / gt.raster.cellSize.width / 256).toInt
         (SpaceTimeKey(SpatialKey(c, r), new TemporalKey(instant)), gt.tile)
       }
     }, meta)
