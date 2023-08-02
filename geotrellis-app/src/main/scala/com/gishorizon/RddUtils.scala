@@ -110,7 +110,7 @@ object RddUtils {
         val instant = sTs + tIndex * 1000L
         val c: Int = Math.ceil((e.ymax-fe.ymax) / gt.raster.cellSize.height / 256).toInt
         val r: Int = Math.round((e.xmin-fe.xmin) / gt.raster.cellSize.width / 256).toInt
-        (SpaceTimeKey(SpatialKey(r, c), new TemporalKey(instant)), gt.tile)
+        (SpaceTimeKey(SpatialKey(c, r), new TemporalKey(instant)), gt.tile)
       }
     }, meta)
     rdd
