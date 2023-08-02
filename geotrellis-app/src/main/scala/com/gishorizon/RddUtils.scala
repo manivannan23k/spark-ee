@@ -79,8 +79,8 @@ object RddUtils {
     }
     val xTileSize = (extent.width / cellWidth).toInt
     val yTileSize = (extent.height / cellHeight).toInt
-    val maxXKey: Int = Math.ceil(xTileSize/tileSize).toInt
-    val maxYKey: Int = Math.ceil(yTileSize/tileSize).toInt
+    val maxXKey: Int = Math.ceil(xTileSize.toDouble/tileSize.toDouble).toInt
+    val maxYKey: Int = Math.ceil(yTileSize.toDouble/tileSize.toDouble).toInt
 
     val pe = ProjectedExtent(extent, crs)
     print(DateTime.now() + "------DONE READING TIFF META-----")
@@ -92,14 +92,15 @@ object RddUtils {
       new LayoutDefinition(
         extent,
         new TileLayout(
-          Math.ceil((xTileSize) / tileSize).toInt,
-          Math.ceil((yTileSize) / tileSize).toInt,
+          Math.ceil((xTileSize.toDouble) / tileSize.toDouble).toInt,
+          Math.ceil((yTileSize.toDouble) / tileSize.toDouble).toInt,
           tileSize,
           tileSize
         )
       ),
       extent, crs, Bounds[SpaceTimeKey](SpaceTimeKey(0, 0, minTime.toEpochMilli), SpaceTimeKey(maxXKey, maxYKey, maxTime.toEpochMilli))
     )
+    println(meta)
     val rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(sc.parallelize(inputFiles).map{
       case (inputFile) => {
         val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFile)
