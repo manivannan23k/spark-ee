@@ -77,7 +77,7 @@ object InputReader {
 //    var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
     val paths: Array[String] = filePaths.value.map{
       v=>{
-        v.asInstanceOf[JsString].value
+        DataConfigs.TILE_PATH + v.asInstanceOf[JsString].value
       }
     }.toArray[String]
     val rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, paths, 256)
