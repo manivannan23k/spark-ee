@@ -79,8 +79,8 @@ object RddUtils {
     }
     val xTileSize = (extent.width / cellWidth).toInt
     val yTileSize = (extent.height / cellHeight).toInt
-    val maxXKey: Int = Math.ceil(xTileSize.toDouble/tileSize.toDouble).toInt
-    val maxYKey: Int = Math.ceil(yTileSize.toDouble/tileSize.toDouble).toInt
+    val maxXKey: Int = Math.ceil(xTileSize.toDouble/tileSize.toDouble).toInt - 1
+    val maxYKey: Int = Math.ceil(yTileSize.toDouble/tileSize.toDouble).toInt - 1
 
     val pe = ProjectedExtent(extent, crs)
     print(DateTime.now() + "------DONE READING TIFF META-----")
@@ -108,8 +108,8 @@ object RddUtils {
         val fe = gt.extent
         val tIndex = inputFile.split("/").last.split(".tif").head.toInt
         val instant = sTs + tIndex * 1000L
-        val c: Int = Math.ceil((e.ymin-fe.ymin) / gt.raster.cellSize.height / 256).toInt
-        val r: Int = Math.ceil((fe.xmax - e.xmax) / gt.raster.cellSize.width / 256).toInt
+        val c: Int = Math.ceil((e.ymax-fe.ymax) / gt.raster.cellSize.height / 256).toInt
+        val r: Int = Math.round((e.xmin-fe.xmin) / gt.raster.cellSize.width / 256).toInt
         (SpaceTimeKey(SpatialKey(r, c), new TemporalKey(instant)), gt.tile)
       }
     }, meta)
