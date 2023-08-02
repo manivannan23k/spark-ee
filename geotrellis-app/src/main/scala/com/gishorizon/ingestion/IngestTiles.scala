@@ -152,9 +152,18 @@ object IngestTiles {
       "I1" -> queryResult,
       "I2" -> queryResult
     )
-    println(DateTime.now() + "----------------START-----------------")
-    NDI.runProcess(i, operation).collect()
-    println(DateTime.now() + "----------------END-----------------")
+    queryResult.map{
+      case (k, v) => {
+        v.combine(1, 3){
+          (v, v2)=>{
+            v + v2
+          }
+        }
+      }
+    }
+//    println(DateTime.now() + "----------------START-----------------")
+//    NDI.runProcess(i, operation).collect()
+//    println(DateTime.now() + "----------------END-----------------")
   }
 
   private def log(msg: String): Unit = {
