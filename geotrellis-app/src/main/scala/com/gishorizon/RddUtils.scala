@@ -64,10 +64,10 @@ object RddUtils {
       cellType = gt.cellType
       val tIndex = inputFiles(i).split("/").last.split(".tif").head.toInt
       val instant = Instant.ofEpochMilli((sTs + tIndex * 1000L))
-      if(maxTime.toEpochMilli<instant.toEpochMilli){
+      if(maxTime==null || maxTime.toEpochMilli<instant.toEpochMilli){
         maxTime = instant
       }
-      if (minTime.toEpochMilli > instant.toEpochMilli) {
+      if (minTime==null || minTime.toEpochMilli > instant.toEpochMilli) {
         minTime = instant
       }
       if(extent == null){
