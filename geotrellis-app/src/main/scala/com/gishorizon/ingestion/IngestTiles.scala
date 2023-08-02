@@ -142,6 +142,6 @@ object IngestTiles {
     IngestTiles.run(
       Spark.context, "/mnt/data/data_dir/raw/LC08_L2SP_144039_20191226_20200824_02_T1_SR/LC08_L2SP_144039_20191226_20200824_02_T1_SR.tif", "2019-12-26T00:00:00Z", "file"
     )
-    IngestTiles.read(Spark.context, "2019-12-24T00:00:00Z", "2019-12-27T00:00:00Z")
+//    IngestTiles.read(Spark.context, "2019-12-24T00:00:00Z", "2019-12-27T00:00:00Z")
   }
 }
