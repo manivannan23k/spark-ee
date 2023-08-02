@@ -98,7 +98,9 @@ object RddUtils {
           tileSize
         )
       ),
-      extent, crs, Bounds[SpaceTimeKey](SpaceTimeKey(0, 0, minTime.toEpochMilli), SpaceTimeKey(maxXKey, maxYKey, maxTime.toEpochMilli))
+      extent,
+      crs,
+      Bounds[SpaceTimeKey](SpaceTimeKey(0, 0, minTime.toEpochMilli), SpaceTimeKey(maxXKey, maxYKey, maxTime.toEpochMilli))
     )
     println(meta)
     val rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(sc.parallelize(inputFiles).map{
@@ -108,9 +110,9 @@ object RddUtils {
         val fe = gt.extent
         val tIndex = inputFile.split("/").last.split(".tif").head.toInt
         val instant = sTs + tIndex * 1000L
-        val c: Int = Math.round((e.ymax-fe.ymax) / gt.raster.cellSize.height / 256).toInt
+        val c: Int = Math.round((e.ymax - fe.ymax) / gt.raster.cellSize.height / 256).toInt
         val r: Int = Math.round((fe.xmin - e.xmin) / gt.raster.cellSize.width / 256).toInt
-        (SpaceTimeKey(SpatialKey(c, r), new TemporalKey(instant)), gt.tile)
+        (SpaceTimeKey(SpatialKey(r, c), new TemporalKey(instant)), gt.tile)
       }
     }, meta)
     rdd
