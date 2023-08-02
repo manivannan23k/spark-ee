@@ -76,9 +76,9 @@ object InputReader {
     val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
     var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
     for (i <- filePaths.value.indices) {
-      val filePath = DataConfigs.TILE_PATH + filePaths(i).asInstanceOf[JsString].value.replace("/", "_").replace("Landsat_OLI_", "Landsat_OLI/").replace("LISS3_", "LISS3/")
+      val filePath = DataConfigs.TILE_PATH + filePaths(i).asInstanceOf[JsString].value//.replace("/", "_").replace("Landsat_OLI_", "Landsat_OLI/").replace("LISS3_", "LISS3/")
       Logger.log("Reading " + filePath)
-      val tIndex = filePath.split("_").last.split(".tif").head.toInt
+      val tIndex = filePath.split("/").last.split(".tif").head.toInt
       val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
       val dt = ZonedDateTime.ofInstant(
         Instant.ofEpochMilli((sTs + tIndex * 1000L))
