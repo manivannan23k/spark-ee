@@ -17,7 +17,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.joda.time.DateTime
 
-import java.time.{ZoneOffset, ZonedDateTime}
+import java.time.{Instant, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 
 object RddUtils {
@@ -41,11 +41,18 @@ object RddUtils {
     tiled
   }
 
-  def getMultiTiledTemporalRDDWithMeta(sc: SparkContext, inputFile: String, tileSize: Int, dt: ZonedDateTime): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
+  def getMultiTiledTemporalRDDWithMeta(sc: SparkContext, inputFile: Path, tileSize: Int): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
     val layer: RDD[(TemporalProjectedExtent, MultibandTile)] = HadoopGeoTiffRDD[ProjectedExtent, TemporalProjectedExtent, MultibandTile](
-      path = new Path(inputFile),
+      path = inputFile,
       uriToKey = {
         case (uri, projectedExtent) =>
+          val filePath = uri.toString
+          val tIndex = filePath.split("_").last.split(".tif").head.toInt
+          val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
+          val dt = ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli((sTs + tIndex * 1000L))
+            , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
+          )
           TemporalProjectedExtent(projectedExtent, dt)
       },
       options = HadoopGeoTiffRDD.Options.DEFAULT

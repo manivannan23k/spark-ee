@@ -9,6 +9,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import play.api.libs.json._
 import geotrellis.raster.io.geotiff
+import org.apache.hadoop.fs.Path
 
 import scala.collection.mutable.Map
 import java.sql.{Connection, DriverManager}
@@ -51,52 +52,51 @@ object InputReader {
     RddUtils.mergeRdds(rdds)
   }
 
-  private def getInputRdd1Temporal(sc: SparkContext, processInput: ProcessInput): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
-    val data = HttpUtils.getRequestSync(s"${DataConfigs.DATA_HOST}/getDataRefForAoi/?sensorName=${processInput.dsName}&tIndex=${processInput.tIndexes(0)}&level=12&aoiCode=${processInput.aoiCode}")
-    val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
-    var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
-    for (i <- filePaths.value.indices) {
-      val filePath = filePaths(i).asInstanceOf[JsString].value
-      val tIndex = filePath.split("/").last.split(".tif").head.toInt
-      val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
-      val dt = ZonedDateTime.ofInstant(
-        Instant.ofEpochMilli((sTs + tIndex * 1000))
-        , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
-      )
-      var rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, filePath, 256, dt)
-      rdds = rdds :+ rdd
-    }
-    RddUtils.mergeTemporalRdds(rdds)
-  }
+//  private def getInputRdd1Temporal(sc: SparkContext, processInput: ProcessInput): RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = {
+//    val data = HttpUtils.getRequestSync(s"${DataConfigs.DATA_HOST}/getDataRefForAoi/?sensorName=${processInput.dsName}&tIndex=${processInput.tIndexes(0)}&level=12&aoiCode=${processInput.aoiCode}")
+//    val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
+//    var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
+//    for (i <- filePaths.value.indices) {
+//      val filePath = filePaths(i).asInstanceOf[JsString].value
+//      val tIndex = filePath.split("/").last.split(".tif").head.toInt
+//      val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
+//      val dt = ZonedDateTime.ofInstant(
+//        Instant.ofEpochMilli((sTs + tIndex * 1000))
+//        , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
+//      )
+//      var rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, filePath, 256, dt)
+//      rdds = rdds :+ rdd
+//    }
+//    RddUtils.mergeTemporalRdds(rdds)
+//  }
 
   private def getInputRddTemporal(sc: SparkContext, processInput: ProcessInput)
   : RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]
   = {
     val data = HttpUtils.getRequestSync(s"${DataConfigs.DATA_HOST}/getDataRefsForAoi/?sensorName=${processInput.dsName}&tIndexes=${processInput.tIndexes.mkString("", ",", "")}&level=8&aoiCode=${processInput.aoiCode}")
     val filePaths = data.asInstanceOf[JsObject].value("data").asInstanceOf[JsArray]
-    var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
+//    var rdds: Array[RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Array()
+    var paths: Path = null
     for (i <- filePaths.value.indices) {
       val filePath = DataConfigs.TILE_PATH + filePaths(i).asInstanceOf[JsString].value.replace("/", "_").replace("Landsat_OLI_", "Landsat_OLI/").replace("LISS3_", "LISS3/")
+      val p = new Path(filePath)
       Logger.log("Reading " + filePath)
-      val tIndex = filePath.split("_").last.split(".tif").head.toInt
-      val sTs = ZonedDateTime.parse(f"1990-01-01T00:00:00Z", DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0))).toInstant.toEpochMilli
-      val dt = ZonedDateTime.ofInstant(
-        Instant.ofEpochMilli((sTs + tIndex * 1000L))
-        , DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(0, 0)).getZone
-      )
-      val rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, filePath, 256, dt)
-      rdd.checkpoint()
-      rdds = rdds :+ rdd
+      if (paths == null){
+        paths = p
+      }else{
+        paths = Path.mergePaths(paths, p)
+      }
     }
-    val merged = RddUtils.mergeTemporalRdds(rdds)
+    val rdd = RddUtils.getMultiTiledTemporalRDDWithMeta(sc, paths, 256)
+//    val merged = RddUtils.mergeTemporalRdds(rdds)
     Logger.log("Merged: " + processInput.id)
-    merged
+    rdd
   }
 
   def getInputs(sc: SparkContext, inputs: Array[ProcessInput]): mutable.Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = {
     var rddMap = mutable.Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]]()
     for(input <- inputs){
-      var rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = if (input.isTemporal) getInputRddTemporal(sc, input) else getInputRdd1Temporal(sc, input)
+      var rdd: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = getInputRddTemporal(sc, input)
       rdd = rdd.cache()
       rdd.checkpoint()
       rddMap += (
