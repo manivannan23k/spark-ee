@@ -77,8 +77,8 @@ object RddUtils {
         extent = extent.combine(gt.extent)
       }
     }
-    val xTileSize = extent.width / cellWidth
-    val yTileSize = extent.height / cellHeight
+    val xTileSize = (extent.width / cellWidth).toInt
+    val yTileSize = (extent.height / cellHeight).toInt
     val maxXKey: Int = Math.ceil(xTileSize/tileSize).toInt
     val maxYKey: Int = Math.ceil(yTileSize/tileSize).toInt
 
