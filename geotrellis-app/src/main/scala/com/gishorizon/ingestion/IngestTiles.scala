@@ -160,7 +160,7 @@ object IngestTiles {
           }
         }
       }
-    }
+    }.collect()
 //    println(DateTime.now() + "----------------START-----------------")
 //    NDI.runProcess(i, operation).collect()
 //    println(DateTime.now() + "----------------END-----------------")
