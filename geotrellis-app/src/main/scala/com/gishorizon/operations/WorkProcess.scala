@@ -116,37 +116,38 @@ object WorkProcess {
     }
     val outputId = process.output.id
     val outMeta = inputsData(outputId).metadata
-//    val rdd: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(inputsData(outputId).map { case (key, tile) => (key.spatialKey, tile) }, TileLayerMetadata(outMeta.cellType, outMeta.layout, outMeta.extent, outMeta.crs, outMeta.bounds.asInstanceOf[Bounds[SpatialKey]]))
-//    val raster: Raster[MultibandTile] = rdd.stitch()
-//    Logger.log("Stitch complete")
-//    val fPath = f"${DataConfigs.TEMP_PATH}${
-//      Iterator.continually(Random.nextPrintableChar)
-//        .filter(_.isLetter)
-//        .take(16)
-//        .mkString
-//    }.tif"
-//    GeoTiff(raster, outMeta.crs).write(fPath)
-//    Array(fPath)
-    val tPath = DataConfigs.TEMP_PATH
-    val fPaths = inputsData(outputId)
-      .map { case (key, tile) => (key.instant, (key.spatialKey, tile)) }
-      .groupByKey()
-      .map{
-      case (t, d) => {
-        val od: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(Spark.context.parallelize(d.toSeq), TileLayerMetadata(outMeta.cellType, outMeta.layout, outMeta.extent, outMeta.crs, outMeta.bounds.asInstanceOf[Bounds[SpatialKey]]))
-        val raster: Raster[MultibandTile] = od.stitch
-        println("Stitch complete")
-        val fPath = f"$tPath${
-          Iterator.continually(Random.nextPrintableChar)
-            .filter(_.isLetter)
-            .take(16)
-            .mkString
-        }.tif"
-        GeoTiff(raster, outMeta.crs).write(fPath)
-        fPath
-      }
-    }.collect()
-    fPaths
+    // RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]]
+    val rdd: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(inputsData(outputId).map { case (key, tile) => (key.spatialKey, tile) }, TileLayerMetadata(outMeta.cellType, outMeta.layout, outMeta.extent, outMeta.crs, outMeta.bounds.asInstanceOf[Bounds[SpatialKey]]))
+    val raster: Raster[MultibandTile] = rdd.stitch()
+    Logger.log("Stitch complete")
+    val fPath = f"${DataConfigs.TEMP_PATH}${
+      Iterator.continually(Random.nextPrintableChar)
+        .filter(_.isLetter)
+        .take(16)
+        .mkString
+    }.tif"
+    GeoTiff(raster, outMeta.crs).write(fPath)
+    Array(fPath)
+//    val tPath = DataConfigs.TEMP_PATH
+//    val fPaths = inputsData(outputId)
+//      .map { case (key, tile) => (key.instant, (key.spatialKey, tile)) }
+//      .groupByKey()
+//      .map{
+//      case (t, d) => {
+//        val od: RDD[(SpatialKey, MultibandTile)] with Metadata[TileLayerMetadata[SpatialKey]] = ContextRDD(Spark.context.parallelize(d.toSeq), TileLayerMetadata(outMeta.cellType, outMeta.layout, outMeta.extent, outMeta.crs, outMeta.bounds.asInstanceOf[Bounds[SpatialKey]]))
+//        val raster: Raster[MultibandTile] = od.stitch
+//        println("Stitch complete")
+//        val fPath = f"$tPath${
+//          Iterator.continually(Random.nextPrintableChar)
+//            .filter(_.isLetter)
+//            .take(16)
+//            .mkString
+//        }.tif"
+//        GeoTiff(raster, outMeta.crs).write(fPath)
+//        fPath
+//      }
+//    }.collect()
+//    fPaths
   }
 
   def runJob(strJsonData: String, processId: String): Unit = {
