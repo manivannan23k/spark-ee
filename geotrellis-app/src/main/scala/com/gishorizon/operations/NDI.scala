@@ -5,6 +5,7 @@ import geotrellis.raster.{ArrayMultibandTile, CellType, DoubleArrayTile, Multiba
 import geotrellis.spark.ContextRDD
 import geotrellis.spark.util.KryoSerializer
 import org.apache.spark.rdd.RDD
+import org.joda.time.DateTime
 
 object NDI {
 
@@ -22,7 +23,7 @@ object NDI {
       ContextRDD(in1.++(in2)
       .reduceByKey(
         (t1: MultibandTile, t2: MultibandTile) => {
-          MultibandTile(
+          val o = MultibandTile(
             (t1.band(b1).combineDouble(t2.band(b2)){
               (v1, v2) => {
                 v1 - v2
@@ -33,23 +34,8 @@ object NDI {
               }
             }).convert(CellType.fromName("float64"))
           )
-//          val mt = MultibandTile(
-//            t1.band(b1).convert(CellType.fromName("float64")).combineDouble(t2.band(b2).convert(CellType.fromName("float64"))) {
-//              (v1, v2) =>
-//                if (v1.isNaN && v2.isNaN) {
-//                  v1
-//                } else if (v1.isNaN) {
-//                  v1
-//                } else if (v2.isNaN) {
-//                  v2
-//                } else if (v1 + v2 == 0) {
-//                  0
-//                } else {
-//                  (v1 - v2) / ((v1 + v2))
-//                }
-//            }
-//          )
-//          mt
+          print(DateTime.now() + "------MOSAIC TILE-----")
+          o
         }), m)
 
     rdd.checkpoint()

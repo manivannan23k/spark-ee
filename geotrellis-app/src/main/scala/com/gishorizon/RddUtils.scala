@@ -112,6 +112,7 @@ object RddUtils {
         val instant = sTs + tIndex * 1000L
         val c: Int = Math.round((e.ymax - fe.ymax) / gt.raster.cellSize.height / 256).toInt
         val r: Int = Math.round((fe.xmin - e.xmin) / gt.raster.cellSize.width / 256).toInt
+        print(DateTime.now() + "------READ FILE-----" + inputFile)
         (SpaceTimeKey(SpatialKey(r, c), new TemporalKey(instant)), gt.tile)
       }
     }, meta)

@@ -69,7 +69,9 @@ object Mosaic {
     r1.checkpoint()
     val inRdds: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(r1.reduceByKey(
       (t1: MultibandTile, t2: MultibandTile) => {
-        t1.merge(t2)
+        val o = t1.merge(t2)
+        print(DateTime.now() + "------MOSAIC TILE-----")
+        o
       }
     ), m)
 
