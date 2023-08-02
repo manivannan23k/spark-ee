@@ -23,7 +23,15 @@ object NDI {
       .reduceByKey(
         (t1: MultibandTile, t2: MultibandTile) => {
           MultibandTile(
-            (t1.band(b1).convert(CellType.fromName("float64")) - t2.band(b2).convert(CellType.fromName("float64")))/(t1.band(b1).convert(CellType.fromName("float64")) + t2.band(b2).convert(CellType.fromName("float64"))).convert(CellType.fromName("float64"))
+            (t1.band(b1).combineDouble(t2.band(b2)){
+              (v1, v2) => {
+                v1 - v2
+              }
+            })/(t1.band(b1).combineDouble(t2.band(b2)){
+              (v1, v2)=>{
+                v1 + v2
+              }
+            }).convert(CellType.fromName("float64"))
           )
 //          val mt = MultibandTile(
 //            t1.band(b1).convert(CellType.fromName("float64")).combineDouble(t2.band(b2).convert(CellType.fromName("float64"))) {
