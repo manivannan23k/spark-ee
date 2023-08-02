@@ -1,7 +1,7 @@
 package com.gishorizon.ingestion
 
 import com.typesafe.config.ConfigFactory
-import geotrellis.layer.{FloatingLayoutScheme, KeyBounds, SpaceTimeKey, SpatialKey, TemporalProjectedExtent, TileLayerMetadata, ZoomedLayoutScheme}
+import geotrellis.layer.{FloatingLayoutScheme, KeyBounds, Metadata, SpaceTimeKey, SpatialKey, TemporalProjectedExtent, TileLayerMetadata, ZoomedLayoutScheme}
 import geotrellis.proj4.{CRS, WebMercator}
 import geotrellis.raster.{MultibandTile, Tile}
 import geotrellis.raster.resample.{Bilinear, NearestNeighbor}
@@ -24,7 +24,9 @@ import org.apache.spark.rdd.RDD
 import java.time.format.DateTimeFormatter
 import java.time.{ZoneOffset, ZonedDateTime}
 import com.gishorizon.Spark
+import com.gishorizon.operations.{NDI, ProcessInput, ProcessOperation}
 import geotrellis.store.s3.S3AttributeStore
+import org.joda.time.DateTime
 object IngestTiles {
   private val appConf = ConfigFactory.load()
   val layerName = "Landsat8"
@@ -118,6 +120,8 @@ object IngestTiles {
     val edDt = ZonedDateTime.parse(endDt, DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHoursMinutes(5, 30)))
     val extent = ProjectedExtent(new Extent(79.1189, 30.0055, 79.3222, 30.3047), CRS.fromEpsgCode(4326))
     val t = extent.reproject(CRS.fromString("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs "))
+
+    println(DateTime.now() + "----------------QUERY-----------------")
     val queryResult = reader
         .query[SpaceTimeKey, MultibandTile, TileLayerMetadata[SpaceTimeKey]](LayerId(layerName, 8))
         .where(
@@ -132,6 +136,23 @@ object IngestTiles {
         )
         .result
     println(queryResult)
+    println(DateTime.now() + "---------------QUERY--------------")
+    val input1 = new ProcessInput()
+    input1.id = "I1"
+    val input2 = new ProcessInput()
+    input2.id = "I2"
+
+    val operation = new ProcessOperation()
+    operation.id = "op_ndi"
+    operation.inputs = Array(input1, input2)
+    operation.params = "I1:3#I2:4"
+    val i: Map[String, RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]]] = Map(
+      "I1" -> queryResult,
+      "I2" -> queryResult
+    )
+    println(DateTime.now() + "----------------START-----------------")
+    NDI.runProcess(i, operation).collect()
+    println(DateTime.now() + "----------------END-----------------")
   }
 
   private def log(msg: String): Unit = {
