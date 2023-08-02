@@ -70,24 +70,6 @@ object Mosaic {
     val inRdds: RDD[(SpaceTimeKey, MultibandTile)] with Metadata[TileLayerMetadata[SpaceTimeKey]] = ContextRDD(r1.reduceByKey(
       (t1: MultibandTile, t2: MultibandTile) => {
         t1.merge(t2)
-//        var tils: Array[Tile] = Array()
-//        for (i <- 0 until t1.bandCount) {
-//          tils = tils :+ t1.band(i).convert(CellType.fromName("float32"))
-//            .combineDouble(t2.band(i).convert(CellType.fromName("float32"))) {
-//              (v1, v2) => {
-//                if (v1.isNaN && v2.isNaN) {
-//                  v1
-//                } else if (v1.isNaN) {
-//                  v2
-//                } else if (v2.isNaN) {
-//                  v1
-//                } else {
-//                  (v1 + v2) / 2
-//                }
-//              }
-//            }
-//        }
-//        ArrayMultibandTile(tils)
       }
     ), m)
 
