@@ -135,6 +135,8 @@ object IngestTiles {
           )
         )
         .result
+    queryResult.cache()
+    queryResult.checkpoint()
     println(queryResult)
     println(DateTime.now() + "---------------QUERY--------------")
     val input1 = new ProcessInput()
