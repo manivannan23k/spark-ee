@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "org.locationtech.geotrellis" %% "geotrellis-raster" % "3.6.3",
   "org.locationtech.geotrellis" %% "geotrellis-vector" % "3.6.3",
   "org.locationtech.geotrellis" %% "geotrellis-gdal" % "3.6.3",
+  "org.locationtech.geotrellis" %% "geotrellis-s3" % "3.6.3",
   "com.typesafe.akka" %% "akka-actor" % akkaV,
   "com.typesafe.akka" %% "akka-stream" % akkaV,
   "com.typesafe.akka" %% "akka-http" % akkaHttpV,
