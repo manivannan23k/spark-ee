@@ -34,7 +34,7 @@ object NDI {
               }
             }).convert(CellType.fromName("float64"))
           )
-          print(DateTime.now() + "------MOSAIC TILE-----")
+          print(DateTime.now() + "------NDVI-----")
           o
         }), m)
 

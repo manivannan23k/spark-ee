@@ -105,6 +105,10 @@ object WorkProcess {
         val result = Mosaic.runProcess(inputsData.toMap, operation)
         inputsData += (operation.output.id -> result)
       }
+      if (operation.opType == "op_mosaic_full") {
+        val result = MosaicFull.runProcess(inputsData.toMap, operation)
+        inputsData += (operation.output.id -> result)
+      }
       if (operation.opType == "op_bandsel") {
         val result = BandSelector.runProcess(inputsData.toMap, operation)
         inputsData += (operation.output.id -> result)
