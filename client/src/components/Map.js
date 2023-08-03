@@ -92,6 +92,11 @@ const MapLayers = (props) => {
                             url={`${Config.DATA_HOST}/tilemo/${layer.dsId}/{z}/{x}/{y}.png?bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}`}
                             maxZoom={24}
                         />
+                    case 'PREVIEW_DATA_TILE':
+                        return <TileLayer key={layer.id}
+                            url={`${Config.DATA_HOST}/tilepro/${layer.dsId.replace("preview_", "")}/{z}/{x}/{y}.png?bands=${layer.style.bands.join(",")}&vmin=${layer.style.min}&vmax=${layer.style.max}`}
+                            maxZoom={24}
+                        />
                 }
                 return '';
             })
