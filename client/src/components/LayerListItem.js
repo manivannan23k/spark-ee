@@ -102,7 +102,7 @@ const LayerListItem = (props) => {
                         <CenterFocusStrongIcon />
                     </IconButton>
                     {
-                        props.layer.type === "DATA_TILE" || props.layer.type === "OUTPUT_DATA_TILE" ? (
+                        props.layer.type === "DATA_TILE" || props.layer.type === "OUTPUT_DATA_TILE" || props.layer.type === "PREVIEW_DATA_TILE" ? (
                             <IconButton onClick={() => {
                                 setShowStyle(!showStyle)
                             }}>
@@ -120,7 +120,7 @@ const LayerListItem = (props) => {
             </Grid>
 
             {
-                (props.layer.type === "DATA_TILE" || props.layer.type === "OUTPUT_DATA_TILE") && showStyle ? (
+                (props.layer.type === "DATA_TILE" || props.layer.type === "OUTPUT_DATA_TILE" || props.layer.type === "PREVIEW_DATA_TILE") && showStyle ? (
                     <>
                         <FormControl style={{ margin: 12, width: 250 }}>
                             <InputLabel>Style type</InputLabel>

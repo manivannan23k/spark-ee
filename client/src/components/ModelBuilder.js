@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import DraggableComponent from "./DraggableComponent";
 import AppModal from "./AppModal";
 import { connect, useDispatch } from "react-redux";
-import { toggleModelBuilderDialog } from "../actions";
+import { toggleModelBuilderDialog, addLayer } from "../actions";
 import GoDiagram from "./GoDiagram";
 import Config from '../config.js';
 import { Button, TextField, Typography } from "@material-ui/core";
@@ -131,7 +131,7 @@ const ModelBuilder = (props) => {
 
     let inputTypes = ['in_raster_band', 'in_raster_layer'];
     let outputTypes = ['out_raster_band', 'out_raster_layer'];
-    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol', 'op_fpca', 'op_mosaic', 'op_local_dif', 'op_bandsel', 'op_tstomb'];
+    let operationTypes = ['op_ndi', 'op_local_avg', 'op_savgol', 'op_fpca', 'op_mosaic', 'op_local_dif', 'op_bandsel', 'op_tstomb', 'op_mosaic_full'];
     const [components, setComponents] = useState({
         inputs: [],
         output: null,
@@ -214,6 +214,69 @@ const ModelBuilder = (props) => {
         // console.log(components)
     }, [components])
 
+    const buildComps = () => {
+        let reqComps = {
+            inputs: [], operations: [], output: {}
+        };
+        let otbds = 1, iids = [];
+        for (let i = 0; i < components.inputs.length; i++) {
+            let input = components.inputs[i];
+            input = {
+                "id": input.componentId,
+                "tIndexes": input.tIndexes,
+                "isTemporal": input.isTemporal,
+                "aoiCode": input.aoiCode,
+                "dsName": input.dsName
+            }
+            iids.push(input.id)
+            reqComps.inputs.push(input)
+        }
+        let oporder = [];
+        console.log(iids);
+
+        for (let i = 0; i < components.operations.length; i++) {
+            let operation = components.operations[i];
+            operation = {
+                "id": operation.componentId,
+                "type": operation.type,
+                "inputs": operation.inputs.map(inp => {
+                    let il = components.inputs.filter(e => { return e.componentId === inp.layer })[0]
+                    if (!il) {
+                        //from operation
+                        return {
+                            id: inp.layer,
+                            band: 0
+                        }
+                    }
+                    return {
+                        id: inp.layer,
+                        band: il.band ? parseInt(il.band) : 0
+                    }
+                }),
+                "output": {
+                    "id": operation.output.layer
+                },
+                "params": operation.params
+            }
+            reqComps.operations.push(operation)
+
+            if (components.operations[i].output.layer === components.output.componentId) {
+                otbds = components.operations[i].noOfBands;
+                oporder.push(operation.componentId);
+            } else if (iids.join(",").indexOf(operation.inputs.map(p0 => p0.id).join(",")) > -1) {
+                oporder = [
+                    operation.id, ...oporder
+                ]
+            }
+        }
+        console.log(oporder)
+        reqComps.output = {
+            id: components.output.componentId
+        }
+
+        return [reqComps, otbds];
+    }
+
     return <AppModal btnText={"Open Model Builder"} flag={props.dialog.showModelBuilderDialog} setFlag={(f) => {
         dispatch(toggleModelBuilderDialog(f))
     }} content=
@@ -270,8 +333,12 @@ const ModelBuilder = (props) => {
                                             type: "op_fpca"
                                         },
                                         {
-                                            name: "Mosaic",
+                                            name: "Mosaic (Interval)",
                                             type: "op_mosaic"
+                                        },
+                                        {
+                                            name: "Mosaic",
+                                            type: "op_mosaic_full"
                                         },
                                         {
                                             name: "Band Selector",
@@ -652,6 +719,7 @@ const ModelBuilder = (props) => {
                             }
 
                             if (changes.insertedLinkKeys) {
+                                console.log("LL")
 
                                 const getCompById = (id) => {
                                     let inputs = [...components["inputs"]];
@@ -683,6 +751,7 @@ const ModelBuilder = (props) => {
                                         layer: fromComp.component.componentId,
                                         band: fromComp.band
                                     };
+                                    toComp.component.noOfBands = fromComp.component.noOfBands;
                                     toComp.component.inputs.push(opInput)
                                     let operations = [...components.operations];
                                     operations.splice(toComp.index, 1);
@@ -727,6 +796,7 @@ const ModelBuilder = (props) => {
                                         layer: fromComp.component.output.layer,
                                         band: fromComp.component.output.band
                                     };
+                                    toComp.component.noOfBands = fromComp.component.noOfBands;
                                     toComp.component.inputs.push(opInput)
                                     let operations = [...components.operations];
                                     operations.splice(toComp.index, 1);
@@ -774,53 +844,57 @@ const ModelBuilder = (props) => {
                         setProcessResult("")
                     }}>Clear</Button>
                     <Button onClick={() => {
-                        // console.log(components);
-                        let reqComps = {
-                            inputs: [], operations: [], output: {}
-                        };
-                        for (let i = 0; i < components.inputs.length; i++) {
-                            let input = components.inputs[i];
-                            input = {
-                                "id": input.componentId,
-                                "tIndexes": input.tIndexes,
-                                "isTemporal": input.isTemporal,
-                                "aoiCode": input.aoiCode,
-                                "dsName": input.dsName
-                            }
-                            reqComps.inputs.push(input)
-                        }
-
-                        for (let i = 0; i < components.operations.length; i++) {
-                            let operation = components.operations[i];
-                            operation = {
-                                "id": operation.componentId,
-                                "type": operation.type,
-                                "inputs": operation.inputs.map(inp => {
-                                    let il = components.inputs.filter(e => { return e.componentId === inp.layer })[0]
-                                    if (!il) {
-                                        //from operation
-                                        return {
-                                            id: inp.layer,
-                                            band: 0
-                                        }
-                                    }
-                                    return {
-                                        id: inp.layer,
-                                        band: il.band ? parseInt(il.band) : 0
-                                    }
-                                }),
-                                "output": {
-                                    "id": operation.output.layer
-                                },
-                                "params": operation.params
-                            }
-                            reqComps.operations.push(operation)
-                        }
-                        reqComps.output = {
-                            id: components.output.componentId
-                        }
-
+                        let reqComps = buildComps();
+                        let otbds = reqComps[1];
+                        reqComps = reqComps[0];
                         console.log(reqComps)
+
+
+                        fetch(`${Config.PROCESS_HOST}/process/preview`, {
+                            body: JSON.stringify({
+                                task_data: JSON.stringify(reqComps)
+                            }),
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(r => r.json())
+                            .then(r => {
+                                console.log(r);
+                                let previewId = r.data;
+                                let lId = (Math.random() + 1).toString(36).substring(6);
+                                let layer = {
+                                    type: 'PREVIEW_DATA_TILE',
+                                    group: 'RASTER_DATA',
+                                    id: lId,
+                                    active: true,
+                                    // tIndex: firstResult.tIndex,
+                                    // tIndexes: props.map.queryResults.map(qr => qr.tIndex),
+                                    // aoiCode: firstResult['aoiCode'],
+                                    dsId: "preview_" + previewId,
+                                    noOfBands: otbds,
+                                    name: "Output " + previewId, // + ": " + firstResult.dsName,//'Layer: ' + firstResult.dsName + " #" + lId,
+                                    sortOrder: 0,
+                                    showLegend: false,
+                                    showInLayerList: true,
+                                    style: {
+                                        min: 0,
+                                        max: 1,
+                                        bands: [1],
+                                        type: "grayscale"
+                                    }
+                                }
+                                dispatch(addLayer(layer));
+                            })
+                            .catch(e => console.log(e))
+                    }}>Preview</Button>
+
+                    <Button onClick={() => {
+                        // console.log(components);
+                        let reqComps = buildComps()
+                        reqComps = reqComps[0];
                         fetch(`${Config.PROCESS_HOST}/process/submit`, {
                             body: JSON.stringify({
                                 data: JSON.stringify(reqComps),
