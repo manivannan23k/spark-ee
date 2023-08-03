@@ -28,10 +28,10 @@ object FpcaTemporal {
             (t1: (Long, MultibandTile), t2: (Long, MultibandTile)) => {
               var bds1: Array[Tile] = Array()
               for (i <- t1._2.bands) {
-                bds1 = bds1 :+ i
+                bds1 = bds1 :+ i.convert(CellType.fromName("float32"))
               }
               for (i <- t2._2.bands) {
-                bds1 = bds1 :+ i
+                bds1 = bds1 :+ i.convert(CellType.fromName("float32"))
               }
               val t: MultibandTile = ArrayMultibandTile(bds1)
               (t1._1, t)
