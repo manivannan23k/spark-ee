@@ -58,6 +58,7 @@ object RddUtils {
     print(DateTime.now() + "------START READING TIFF META-----")
     for(i <- inputFiles.indices){
       val gt: MultibandGeoTiff = GeoTiffReader.readMultiband(inputFiles(i))
+      println(inputFiles(i))
       crs = gt.crs
       cellHeight = gt.raster.cellSize.height
       cellWidth = gt.raster.cellSize.width
