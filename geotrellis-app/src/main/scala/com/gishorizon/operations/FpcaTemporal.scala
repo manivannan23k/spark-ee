@@ -28,11 +28,12 @@ object FpcaTemporal {
             (t1: (Long, MultibandTile), t2: (Long, MultibandTile)) => {
               var bds1: Array[Tile] = Array()
               for (i <- t1._2.bands) {
-                bds1 = bds1 :+ i.convert(CellType.fromName("float32"))
+                bds1 = bds1 :+ i.convert(CellType.fromName("float32")).mapDouble(c=>c)
               }
               for (i <- t2._2.bands) {
-                bds1 = bds1 :+ i.convert(CellType.fromName("float32"))
+                bds1 = bds1 :+ i.convert(CellType.fromName("float32")).mapDouble(c=>c)
               }
+
               val t: MultibandTile = ArrayMultibandTile(bds1)
               (t1._1, t)
             }
